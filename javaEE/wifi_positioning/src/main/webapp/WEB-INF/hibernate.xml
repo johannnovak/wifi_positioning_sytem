@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Créé le bean associé à la base de donnée -->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">
+		<!-- Nom du driver -->
+		<property name="driverClassName" value="org.postgresql.Driver" />
+
+		<!-- URL de la base de donnée -->
+		<property name="url" value="jdbc:postgresql://localhost:5432/lo53" />
+
+		<!-- Login pour se connecter -->
+		<property name="username" value="postgres" />
+
+		<!-- mot de passe associé au login -->
+		<property name="password" value="postgres" />
+	</bean>
+
+	<!-- Bean instanciant le SessionFactory (nécessaire pour aller requêter 
+		une base de donnée sous hibernate). La classe utilisée précise que c'est 
+		une SessionFactory fonctionnant via annotations. (Il existe une classe en local, sans annotations) -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		
+		<!-- Associe la propriété 'dataSource' de la sessionFactory au bean d'id 'dataSource' (défini ci-dessus) -->
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+
+		<!-- TODO je sais pas mais ça marche, à voir si on peut enlever -->
+		<property name="configurationClass">
+			<value>org.hibernate.cfg.AnnotationConfiguration</value>
+		</property>
+
+		<!-- Propriété précisant les package à scanner pour le mapping des classes/tables -->
+		<property name="packagesToScan" value="fr.utbm.lo53.wifipositioning.model" />
+
+		<!-- Précise toutes les propriétés normalement définies dans le fichier de configuration d'hibernate -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- Précise le langage SQL utilisé => ici postgresql -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+				
+				<!-- Précise qu'il faut montrer toutes les requêtes HSQL -->
+				<prop key="hibernate.show_sql">true</prop>
+				
+				<!-- Précise qu'il faut associé le thread courant à cette session. Si on l'enlève, ça ne marche pas -->
+				<prop key="hibernate.current_session_context_class">thread</prop>
+			</props>
+		</property>
+
+	</bean>
+
+	<!-- Bean de transaction. Nécessaire sûrement lors des interactions avec la base de donnée (genre save/load/commit/etc...). -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+</beans>
