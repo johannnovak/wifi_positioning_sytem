@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignTop="@+id/calibration_canvas"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Calibration"
+        android:id="@+id/textView_calibration"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/y_calib_textedit"
+        android:layout_toStartOf="@+id/y_calib_textedit">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/x_calib_text"
+            android:text="x"
+            android:layout_alignTop="@+id/x_calib_textedit"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="122dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/x_calib_textedit"
+            android:layout_toRightOf="@+id/x_calib_text"
+            android:layout_toLeftOf="@+id/textView_calibration"
+            android:layout_above="@+id/calibration_canvas" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/y_calib_text"
+            android:text="y"
+            android:layout_alignTop="@+id/x_calib_textedit"
+            android:layout_toRightOf="@+id/x_calib_textedit"
+            android:layout_toEndOf="@+id/x_calib_textedit" />
+
+        <EditText
+            android:layout_width="124dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/y_calib_textedit"
+            android:layout_alignTop="@+id/x_calib_textedit"
+            android:layout_toRightOf="@+id/y_calib_text"
+            android:layout_toLeftOf="@+id/add_calib_button"
+            android:layout_toStartOf="@+id/add_calib_button" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="add"
+            android:id="@+id/add_calib_button"
+            android:layout_below="@+id/textView_calibration"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+    </LinearLayout>
+
+    <fr.gi.utbm.lo53project.CanvasView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/calibration_canvas"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/add_calib_button" />
+
+</LinearLayout>
