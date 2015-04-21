@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -30,13 +33,13 @@ public class menuCalibration_Fragment extends Fragment {
         canvas.drawPoint(100f, 100f);
         canvas.drawPoint(200f, 200f);
 
-//        try {
-//            url = new URL("http://192.168.2.server:8080/wifiposition(n)ing/calibrate");
-////            url = new URL("http://192.168.2.server:8080/wifiposition(n)ing/locate");
-//        }
-//        catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            url = new URL("http://192.168.2.135:8080/wifi_positioning/calibrate");
+//            url = new URL("http://192.168.2.135:8080/wifi_positioning/locate");
+        }
+        catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
         add_calib_button = (Button) rootView.findViewById(R.id.add_calib_button);
         x_calib_textedit = (EditText) rootView.findViewById(R.id.x_calib_textedit);
@@ -48,22 +51,19 @@ public class menuCalibration_Fragment extends Fragment {
                 float x = Float.valueOf(x_calib_textedit.getText().toString());
                 float y = Float.valueOf(y_calib_textedit.getText().toString());
 
-                if (x != 0 && y != 0) {
-                    canvas.drawPoint(x, y);
-                }
 
-//                try {
-//                    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-////                    connection.addRequestProperty("x", );
-////                    connection.addRequestProperty("y", );
-//                    connection.connect();
-//                    if (connection.getResponseCode() == 200) {
-////                        drawPoint
-//                    }
-//                }
-//                catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                    connection.addRequestProperty("x", Float.toString(x));
+                    connection.addRequestProperty("y", Float.toString(y));
+                    connection.connect();
+                    if (connection.getResponseCode() == 200) {
+                        canvas.drawPoint(x, y);
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
