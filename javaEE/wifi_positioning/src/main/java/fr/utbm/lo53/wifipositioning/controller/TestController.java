@@ -48,4 +48,10 @@ public class TestController{
 				}
 			}
 	}
+	
+	@RequestMapping("/delete")
+	@ResponseBody
+	public void clearTable(){
+		generalService.clearTable();
+	}
 }

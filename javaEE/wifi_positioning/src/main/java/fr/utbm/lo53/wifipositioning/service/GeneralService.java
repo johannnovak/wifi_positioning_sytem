@@ -21,4 +21,8 @@ public class GeneralService{
 	public void insertInto(StrengthCoordinates strength) {
 		generalDAO.insertInto(strength);
 	}
+
+	public void clearTable(){
+		generalDAO.clearTable();
+	}
 }

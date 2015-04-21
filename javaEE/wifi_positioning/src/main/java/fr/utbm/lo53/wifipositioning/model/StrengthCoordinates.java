@@ -97,6 +97,6 @@ public class StrengthCoordinates {
 		s += "\ny : " + y;
 		s += "\nstrength : " + strength;
 
-		return super.toString();
+		return s.toString();
 	}
 }
