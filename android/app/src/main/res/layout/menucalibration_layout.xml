@@ -76,7 +76,7 @@
             android:layout_alignParentEnd="true" />
     </LinearLayout>
 
-    <fr.gi.utbm.lo53project.CanvasView
+    <fr.gi.utbm.lo53project.Viewport
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/calibration_canvas"

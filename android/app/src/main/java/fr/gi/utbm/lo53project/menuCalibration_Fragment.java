@@ -19,7 +19,7 @@ import java.net.URL;
  */
 public class menuCalibration_Fragment extends Fragment {
     View rootView;
-    private CanvasView canvas;
+    private Viewport canvas;
     private Button add_calib_button;
     private EditText x_calib_textedit;
     private EditText y_calib_textedit;
@@ -28,13 +28,14 @@ public class menuCalibration_Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.menucalibration_layout, container, false);
-        canvas = (CanvasView) rootView.findViewById(R.id.calibration_canvas);
+        canvas = (Viewport) rootView.findViewById(R.id.calibration_canvas);
         canvas.drawPoint(50f, 50f);
         canvas.drawPoint(100f, 100f);
         canvas.drawPoint(200f, 200f);
 
         try {
-            url = new URL("http://192.168.2.135:8080/wifi_positioning/calibrate");
+//            url = new URL("http://192.168.2.135:8080/wifi_positioning/calibrate");
+            url = new URL("http://192.168.43.78:8080/wifi_positioning/calibrate");
 //            url = new URL("http://192.168.2.135:8080/wifi_positioning/locate");
         }
         catch (MalformedURLException e) {
@@ -57,6 +58,8 @@ public class menuCalibration_Fragment extends Fragment {
                     connection.addRequestProperty("x", Float.toString(x));
                     connection.addRequestProperty("y", Float.toString(y));
                     connection.connect();
+
+                    System.out.println(connection.getResponseCode());
                     if (connection.getResponseCode() == 200) {
                         canvas.drawPoint(x, y);
                     }
