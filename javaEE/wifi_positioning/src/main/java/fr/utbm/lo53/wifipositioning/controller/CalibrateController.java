@@ -1,17 +1,20 @@
 package fr.utbm.lo53.wifipositioning.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.io.IOUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import fr.utbm.lo53.wifipositioning.model.StrengthCoordinates;
-import fr.utbm.lo53.wifipositioning.service.GeneralService;
+import fr.utbm.lo53.wifipositioning.model.Measurement;
+import fr.utbm.lo53.wifipositioning.model.Position;
+import fr.utbm.lo53.wifipositioning.service.CalibrateService;
 
 /**
  * Class designed to control the information given as parameters in the browser
@@ -20,12 +23,115 @@ import fr.utbm.lo53.wifipositioning.service.GeneralService;
  * After controlling the parameters, it sends the response "OK" if all the
  * informations are informed
  */
-@Controller
-public class CalibrateController {
+public class CalibrateController
+{
+	private final ServerSocket		m_socket;
+	private final CalibrateService	m_calibrateService;
 
-	@Autowired
-	private GeneralService	generalService;
-	
+	private final int				m_macAddressByteLength;
+	private final int				m_positionByteLength;
+	private final int				m_rssiByteLength;
+	private final int				m_packetOffset;
+
+	public CalibrateController(final int _calibratePort, final int _packetOffset,
+			final int _macAddressByteLength, final int _positionByteLength,
+			final int _rssiByteLength) throws IOException
+	{
+		m_socket = new ServerSocket(_calibratePort);
+		m_calibrateService = CalibrateService.getInstance();
+
+		m_packetOffset = _packetOffset;
+		m_macAddressByteLength = _macAddressByteLength;
+		m_positionByteLength = _positionByteLength;
+		m_rssiByteLength = _rssiByteLength;
+	}
+
+	public boolean listen()
+	{
+		Socket clientSocket = null;
+
+		String macAddress = "";
+		float x = -1.0f;
+		float y = -1.0f;
+		float rssi = -1.0f;
+
+		try
+		{
+			while (true)
+			{
+				try
+				{
+					clientSocket = m_socket.accept();
+
+					byte bytes[] = IOUtils.toByteArray(clientSocket.getInputStream());
+
+					List<Object> data = parseData(bytes, m_packetOffset);
+					macAddress = (String) data.get(0);
+					x = (float) data.get(1);
+					y = (float) data.get(2);
+					rssi = (float) data.get(3);
+
+					// calibrate(macAddress, rssi, x, y);
+
+					sendResponse(clientSocket, "200");
+				} catch (IOException e)
+				{
+					e.printStackTrace();
+				} finally
+				{
+					if (clientSocket != null)
+					{
+						try
+						{
+							clientSocket.close();
+						} catch (IOException e)
+						{
+							System.out
+									.println("Error when closing the client socket when calibrating.");
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		} finally
+		{
+			try
+			{
+				m_socket.close();
+			} catch (IOException e)
+			{
+				System.out.println("Error when closing the server cocket when calibrating.");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private List<Object> parseData(
+			final byte[] _bytes,
+			final int _offset)
+	{
+		int offset = _offset;
+		ArrayList<Object> list = new ArrayList<Object>();
+
+		byte[] macAddressByteArray = Arrays.copyOfRange(_bytes, offset, offset
+				+ m_macAddressByteLength);
+		list.add(new String(macAddressByteArray));
+
+		offset += m_macAddressByteLength;
+		byte[] xByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_positionByteLength);
+		list.add(ByteBuffer.wrap(xByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
+
+		offset += m_positionByteLength;
+		byte[] yByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_positionByteLength);
+		list.add(ByteBuffer.wrap(yByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
+
+		offset += m_positionByteLength;
+		byte[] rssiByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_rssiByteLength);
+		list.add(ByteBuffer.wrap(rssiByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
+
+		return list;
+	}
+
 	/**
 	 * Allows you to
 	 * 
@@ -35,65 +141,63 @@ public class CalibrateController {
 	 * @throws IOException
 	 * @throws IllegalArgumentException
 	 */
-	@RequestMapping("/calibrate")
-	@ResponseBody
-	public String calibrate(HttpServletRequest request) throws IOException,
-			IllegalArgumentException {
-		String ap_id = request.getParameter("ap_id");
-		String tel_id = request.getParameter("tel_id");
-
+	public String calibrate(
+			final String _macAddress,
+			final float _rssi,
+			final float _x,
+			final float _y) throws IOException, IllegalArgumentException
+	{
 		// Verify that the data sent are not null or empty
-		if (ap_id == null || ap_id.isEmpty()) {
+		if ((_macAddress == null) || _macAddress.isEmpty())
+		{
 			throw new IllegalArgumentException("ID's Access Point is invalid! ");
 		}
-		if (tel_id == null || tel_id.isEmpty()) {
-			throw new IllegalArgumentException("ID's mobile phone is invalid! ");
+		if (_rssi == 0)
+		{
+			throw new IllegalArgumentException("The strength of the signal is invalid! ");
 		}
-		if (request.getParameter("strength") == null) {
-			throw new IllegalArgumentException(
-					"The strength of the signal is invalid! ");
-		}
-		if (request.getParameter("x") == null
-				|| request.getParameter("x").isEmpty()) {
+		if (_x < 0)
+		{
 			throw new IllegalArgumentException("The cordonates x is invalid! ");
 		}
-		if (request.getParameter("y") == null
-				|| request.getParameter("y").isEmpty()) {
+		if (_y < 0)
+		{
 			throw new IllegalArgumentException("The cordonates y is invalid! ");
 		}
 
-		double strength = Double.parseDouble(request.getParameter("strength"));
-		int x = -1, y = -1;
-		x = Integer.parseInt(request.getParameter("x"));
-		y = Integer.parseInt(request.getParameter("y"));
+		System.out.println("ID's AP : " + _macAddress + "\tRSSI: " + _rssi + "\tX = " + _x
+				+ "\tY = " + _y);
 
-		System.out.println("ID's AP : " + ap_id + "\tID's mobile phone : "
-				+ tel_id + "\tStrength : " + strength + "\tX = " + x + "\tY = "+ y);
-		
-		insertIntoDatabase(tel_id, ap_id, x, y , strength);
-		
-		// String s = request.getHeaderNames().nextElement();
-		// request.getHeader(s);
+		insertIntoDatabase(_macAddress, _x, _y, _rssi);
+
 		return "OK";
 	}
 
 	/**
 	 * Insert the parameters into the database
-	 * @param _tel_id 
+	 * 
+	 * @param _tel_id
 	 * @param _ap_id
 	 * @param _x
 	 * @param _y
 	 * @param _strength
 	 */
-	public void insertIntoDatabase( String _tel_id, String _ap_id, int _x, int _y, double _strength){
-		StrengthCoordinates strength = new StrengthCoordinates(_tel_id,_ap_id,_x, _y, _strength);
-		generalService.insertInto(strength);
+	public void insertIntoDatabase(
+			final String _macAddress,
+			final float _x,
+			final float _y,
+			final float _rssi)
+	{
+		Position position = new Position(_x, _y);
+		Measurement measurement = new Measurement(_rssi, _macAddress, position);
+		m_calibrateService.insertMeasurement(measurement);
 	}
-	
-	@ResponseBody
-	@ExceptionHandler(Exception.class)
-	public String handleAllException(Exception ex) {
-		String error = new String("Exception : " + ex.getMessage());
-		return error;
+
+	private void sendResponse(
+			final Socket _socket,
+			final String _msg) throws IOException
+	{
+		PrintWriter out = new PrintWriter(_socket.getOutputStream(), true);
+		out.println(_msg);
 	}
 }

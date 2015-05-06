@@ -1,0 +1,15 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="fr.utbm.lo53.wifipositioning.model">
+	<class name="Measurement" table="measurement">
+		<id name="id" column="id">
+			<generator class="identity" />
+		</id>
+
+		<property name="rssi" column="rssi" type="float" />
+		<property name="mac_address" column="mac_address" type="string"/>
+
+	</class>
+</hibernate-mapping>			

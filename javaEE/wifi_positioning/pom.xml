@@ -4,7 +4,6 @@
 	<groupId>fr.utbm.lo53.garcia_novak_pelligand_rabiller.project</groupId>
 	<artifactId>wifi_positioning</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
 
 	<build>
 		<plugins>

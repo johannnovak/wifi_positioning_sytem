@@ -1,67 +1,78 @@
 package fr.utbm.lo53.wifipositioning.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+public class Measurement
+{
 
-@Entity
-@Table(name="accessPoint")
-public class Measurement {
+	private int			m_id;
+	private float		m_rssi;
+	private String		m_macAddress;
+	private Position	m_position;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name = "id")
-	private int id; 
-	
-	@Column(name="rssi")
-	private float rssi;
-	
-	@Column(name="mac_address")
-	private float mac_address;
-
-	public Measurement() {
+	public Measurement()
+	{
 	}
 
-	public Measurement(float _rssi) {
-		this.rssi = _rssi;
+	public Measurement(final float _rssi, final String _macAddress, final Position _position)
+	{
+		m_rssi = _rssi;
+		m_macAddress = _macAddress;
+		m_position = _position;
 	}
-	
+
 	/****************************************/
 	/********** GETTERS and SETTERS *********/
 	/****************************************/
-	public int getId() {
-		return id;
+	public int getId()
+	{
+		return m_id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setId(
+			final int id)
+	{
+		this.m_id = id;
 	}
 
-	public float getRssi() {
-		return rssi;
+	public float getRssi()
+	{
+		return m_rssi;
 	}
 
-	public void setRssi(float rssi) {
-		this.rssi = rssi;
-	} 
-	
-	public float getMac_address() {
-		return mac_address;
+	public void setRssi(
+			final float rssi)
+	{
+		this.m_rssi = rssi;
 	}
 
-	public void setMac_address(float mac_address) {
-		this.mac_address = mac_address;
+	public String getMac_address()
+	{
+		return m_macAddress;
+	}
+
+	public void setMac_address(
+			final String mac_address)
+	{
+		this.m_macAddress = mac_address;
+	}
+
+	public Position getM_position()
+	{
+		return m_position;
+	}
+
+	public void setM_position(
+			final Position m_position)
+	{
+		this.m_position = m_position;
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		String s = "";
-		s += "ID: " + id;
-		s += "\nRSSI: " + rssi;
-		s += "\nMAC ADDRESS: " + mac_address;
+		s += "ID: " + m_id;
+		s += "\nRSSI: " + m_rssi;
+		s += "\nMAC ADDRESS: " + m_macAddress;
 		return s.toString();
 	}
 }
