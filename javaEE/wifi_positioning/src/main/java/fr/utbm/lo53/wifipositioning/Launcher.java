@@ -3,12 +3,10 @@ package fr.utbm.lo53.wifipositioning;
 import java.io.IOException;
 import java.util.Properties;
 
-import fr.utbm.lo53.wifipositioning.controller.CalibrateController;
-
 public class Launcher
 {
 	public static void main(
-			final String[] args) throws ClassNotFoundException, IOException
+			final String[] args) throws IOException
 	{
 		/* Loading of properties */
 		Properties properties = new Properties();
@@ -16,24 +14,37 @@ public class Launcher
 				.getResourceAsStream("server.properties"));
 
 		/* Retrieves the overall properties */
-		int packetOffset = Integer.parseInt(properties.getProperty("calibrate.packet.offset"));
-		int macAddressByteLength = Integer.parseInt(properties
-				.getProperty("mac.address.byte.length"));
-		int positionByteLength = Integer
-				.parseInt(properties.getProperty("mac.address.byte.length"));
-		int rssiByteLength = Integer.parseInt(properties.getProperty("mac.address.byte.length"));
+		System.setProperty("mac.address.byte.length",
+				properties.getProperty("mac.address.byte.length"));
+		System.setProperty("position.byte.length", properties.getProperty("position.byte.length"));
+		System.setProperty("rssi.byte.length", properties.getProperty("rssi.byte.length"));
 
 		/* Retrieves the properties concerning the calibration */
-		int calibratePort = Integer.parseInt(properties.getProperty("calibrate.port"));
+		System.setProperty("calibrate.port", properties.getProperty("calibrate.port"));
+		System.setProperty("calibrate.packet.offset",
+				properties.getProperty("calibrate.packet.offset"));
 
 		/* Retrieves the properties concerning the location */
+		System.setProperty("locate.port", properties.getProperty("locate.port"));
+		System.setProperty("locate.packet.offset", properties.getProperty("locate.packet.offset"));
 
-		/* Creates the two controllers */
-		CalibrateController calibrateController = new CalibrateController(calibratePort,
-				packetOffset, macAddressByteLength, positionByteLength, rssiByteLength);
-		// LocateController locateController = new LocateController(locatePort)
+		/* Runs standalone controllers */
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				CalibrateStandalone.main(null);
+			}
+		}).start();
 
-		/* Controllers starts to listen to their port */
-		calibrateController.listen();
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				LocateStandalone.main(null);
+			}
+		}).start();
 	}
 }

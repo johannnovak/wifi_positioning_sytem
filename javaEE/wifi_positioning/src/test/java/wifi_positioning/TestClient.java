@@ -2,40 +2,38 @@ package wifi_positioning;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Random;
 
 public class TestClient
 {
 	public static void main(
-			final String[] args) throws IOException
+			final String[] args) throws IOException, InterruptedException
 	{
 		System.out.println("client");
 
-		Socket s = new Socket("127.0.0.1", 1111);
-		System.out.println("fffffffffff");
-		s.getOutputStream().write(
-				"fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-						.getBytes());
-		s.close();
+		Socket s;
+		Random r = new Random();
+		int port;
+		String str;
+		while (true)
+		{
+			Thread.sleep(1000);
+			str = "";
+			if (r.nextBoolean())
+				port = 1111;
+			else
+				port = 1112;
 
-		s = new Socket("127.0.0.1", 1111);
-		System.out.println("aaaaaaaaaaaaaaaaaaaa");
-		s.getOutputStream().write(
-				"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-						.getBytes());
-		s.close();
+			s = new Socket("127.0.0.1", port);
 
-		s = new Socket("127.0.0.1", 1111);
-		System.out.println("zzzzzzzzzzzzzzzzzz");
-		s.getOutputStream().write(
-				"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
-						.getBytes());
-		s.close();
+			for (int i = 0; i < 50; ++i)
+			{
+				str += String.valueOf(Character.toChars((r.nextInt() % 26) + 'a'));
+			}
 
-		s = new Socket("127.0.0.1", 1111);
-		System.out.println("xxxxxxxxxxxxxxxxxxx");
-		s.getOutputStream().write(
-				"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-						.getBytes());
-		s.close();
+			System.out.println(str);
+			s.getOutputStream().write(str.getBytes());
+			s.close();
+		}
 	}
 }

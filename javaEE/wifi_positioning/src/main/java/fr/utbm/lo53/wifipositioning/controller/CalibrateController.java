@@ -1,9 +1,6 @@
 package fr.utbm.lo53.wifipositioning.controller;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
-import fr.utbm.lo53.wifipositioning.controller.runnable.CalibrateSocketRunnable;
+import fr.utbm.lo53.wifipositioning.controller.runnable.CalibrateRunnable;
 
 /**
  * Class designed to control the information given as parameters in the browser
@@ -12,51 +9,12 @@ import fr.utbm.lo53.wifipositioning.controller.runnable.CalibrateSocketRunnable;
  * After controlling the parameters, it sends the response "OK" if all the
  * informations are informed
  */
-public class CalibrateController
+public class CalibrateController extends SocketController<CalibrateRunnable>
 {
-	private final ServerSocket	m_socket;
-
-	private final int			m_macAddressByteLength;
-	private final int			m_positionByteLength;
-	private final int			m_rssiByteLength;
-	private final int			m_packetOffset;
-
-	public CalibrateController(final int _calibratePort, final int _packetOffset,
-			final int _macAddressByteLength, final int _positionByteLength,
-			final int _rssiByteLength) throws IOException
+	public CalibrateController()
 	{
-		m_socket = new ServerSocket(_calibratePort);
+		super("calibrate.port");
 
-		m_packetOffset = _packetOffset;
-		m_macAddressByteLength = _macAddressByteLength;
-		m_positionByteLength = _positionByteLength;
-		m_rssiByteLength = _rssiByteLength;
-	}
-
-	public void listen()
-	{
-		try
-		{
-			while (true)
-			{
-				new Thread(new CalibrateSocketRunnable(m_socket.accept(), m_packetOffset,
-						m_macAddressByteLength, m_positionByteLength, m_rssiByteLength)).start();
-
-			}
-		} catch (IOException e)
-		{
-			System.out.println("An error occured when accepting the connection.");
-			e.printStackTrace();
-		} finally
-		{
-			try
-			{
-				m_socket.close();
-			} catch (IOException e)
-			{
-				System.out.println("Error when closing the server cocket when calibrating.");
-				e.printStackTrace();
-			}
-		}
+		m_controllerName = this.getClass().getSimpleName();
 	}
 }
