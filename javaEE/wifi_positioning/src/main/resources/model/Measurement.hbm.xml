@@ -4,12 +4,16 @@
 
 <hibernate-mapping package="fr.utbm.lo53.wifipositioning.model">
 	<class name="Measurement" table="measurement">
-		<id name="id" column="id">
-			<generator class="identity" />
+		<id name="id" column="measurement_id">
+			<generator class="increment"/>
 		</id>
 
+        <many-to-one name="position" class="Position" fetch="select">
+            <column name="position_id" not-null="true" />
+        </many-to-one>
+        
 		<property name="rssi" column="rssi" type="float" />
-		<property name="mac_address" column="mac_address" type="string"/>
+		<property name="macAddress" column="mac_address" type="string" />
 
 	</class>
 </hibernate-mapping>			

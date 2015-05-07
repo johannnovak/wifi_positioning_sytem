@@ -1,21 +1,25 @@
 package fr.utbm.lo53.wifipositioning.model;
 
+import java.util.HashSet;
+import java.util.Set;
 
 public class Position
 {
 
-	private int		m_id;
-	private float	m_x;
-	private float	m_y;
+	private int					id;
+	private float				x;
+	private float				y;
+	private Set<Measurement>	measurements	= new HashSet<Measurement>(0);
 
 	public Position()
 	{
 	}
 
-	public Position(final float _x, final float _y)
+	public Position(final float _x, final float _y, final Measurement _measurement)
 	{
-		this.m_x = _x;
-		this.m_y = _y;
+		this.x = _x;
+		this.y = _y;
+		measurements.add(_measurement);
 	}
 
 	/****************************************/
@@ -23,44 +27,55 @@ public class Position
 	/****************************************/
 	public int getId()
 	{
-		return m_id;
+		return id;
 	}
 
 	public void setId(
 			final int id)
 	{
-		this.m_id = id;
+		this.id = id;
 	}
 
 	public float getX()
 	{
-		return m_x;
+		return x;
 	}
 
 	public void setX(
 			final float x)
 	{
-		this.m_x = x;
+		this.x = x;
 	}
 
 	public float getY()
 	{
-		return m_y;
+		return y;
 	}
 
 	public void setY(
 			final float y)
 	{
-		this.m_y = y;
+		this.y = y;
+	}
+
+	public Set<Measurement> getMeasurements()
+	{
+		return measurements;
+	}
+
+	public void setMeasurements(
+			final Set<Measurement> measurements)
+	{
+		this.measurements = measurements;
 	}
 
 	@Override
 	public String toString()
 	{
 		String s = "";
-		s += "ID: " + m_id;
-		s += "\nx : " + m_x;
-		s += "\ny : " + m_y;
+		s += "ID: " + id;
+		s += "\nx : " + x;
+		s += "\ny : " + y;
 		return s.toString();
 	}
 }

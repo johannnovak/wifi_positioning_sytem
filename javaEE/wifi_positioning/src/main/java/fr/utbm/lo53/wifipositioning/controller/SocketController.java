@@ -7,31 +7,38 @@ import java.lang.reflect.ParameterizedType;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.utbm.lo53.wifipositioning.controller.runnable.SocketRunnable;
 
 public abstract class SocketController<R extends SocketRunnable>
 {
-	protected ServerSocket	m_socket;
+	/** Logger of the class */
+	private final static Logger	s_logger	= LoggerFactory.getLogger(SocketController.class);
 
-	protected String		m_controllerName;
+	protected ServerSocket		m_socket;
+
+	protected String			m_controllerName;
 
 	public SocketController(final String portSystemProperty)
 	{
+		s_logger.debug("Creating SocketController...");
 		int port = Integer.parseInt(System.getProperty(portSystemProperty));
 		try
 		{
 			m_socket = new ServerSocket(port);
 		} catch (IOException e)
 		{
-			System.out.println("An error occured when creating socket with port " + port);
-			e.printStackTrace();
+			s_logger.error(
+					String.format("An error occured when creating socket with port '%s'.", port), e);
 		}
 	}
 
 	public boolean listen()
 	{
-		System.out.println("Controller " + m_controllerName + " is listening on : "
-				+ m_socket.getInetAddress() + ":" + m_socket.getLocalPort() + " ...");
+		s_logger.info("Controller '{}' is listening on : '{}:{}'  ...", m_controllerName,
+				m_socket.getInetAddress(), m_socket.getLocalPort());
 
 		R runnable;
 		if (m_socket != null)
@@ -48,8 +55,7 @@ public abstract class SocketController<R extends SocketRunnable>
 				}
 			} catch (IOException e)
 			{
-				System.out.println("An error occured when accepting the connection.");
-				e.printStackTrace();
+				s_logger.error("An error occured when accepting the socket.", e);
 			} finally
 			{
 				try
@@ -57,8 +63,10 @@ public abstract class SocketController<R extends SocketRunnable>
 					m_socket.close();
 				} catch (IOException e)
 				{
-					System.out.println("Error when closing the server cocket when calibrating.");
-					e.printStackTrace();
+					s_logger.error(String
+							.format("Error when closing the server socket when %s.",
+									m_controllerName.equals(CalibrateController.class
+											.getSimpleName()) ? "calibrating" : "locating"), e);
 				}
 			}
 			return true;
@@ -79,19 +87,19 @@ public abstract class SocketController<R extends SocketRunnable>
 			return runnable;
 		} catch (InstantiationException e)
 		{
-			e.printStackTrace();
+			s_logger.error("", e);
 		} catch (IllegalAccessException e)
 		{
-			e.printStackTrace();
+			s_logger.error("", e);
 		} catch (IllegalArgumentException e)
 		{
-			e.printStackTrace();
+			s_logger.error("", e);
 		} catch (InvocationTargetException e)
 		{
-			e.printStackTrace();
+			s_logger.error("", e);
 		} catch (NoSuchMethodException e)
 		{
-			e.printStackTrace();
+			s_logger.error("", e);
 		}
 		return null;
 	}

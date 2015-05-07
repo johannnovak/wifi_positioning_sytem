@@ -1,5 +1,8 @@
 package fr.utbm.lo53.wifipositioning.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.utbm.lo53.wifipositioning.controller.runnable.CalibrateRunnable;
 
 /**
@@ -11,10 +14,15 @@ import fr.utbm.lo53.wifipositioning.controller.runnable.CalibrateRunnable;
  */
 public class CalibrateController extends SocketController<CalibrateRunnable>
 {
+	/** Logger of the class */
+	private final static Logger	s_logger	= LoggerFactory.getLogger(CalibrateController.class);
+
 	public CalibrateController()
 	{
 		super("calibrate.port");
 
 		m_controllerName = this.getClass().getSimpleName();
+
+		s_logger.debug("CalibrateController created.");
 	}
 }

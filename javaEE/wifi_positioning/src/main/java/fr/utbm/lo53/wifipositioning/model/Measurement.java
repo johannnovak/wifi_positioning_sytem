@@ -3,20 +3,19 @@ package fr.utbm.lo53.wifipositioning.model;
 public class Measurement
 {
 
-	private int			m_id;
-	private float		m_rssi;
-	private String		m_macAddress;
-	private Position	m_position;
+	private int			id;
+	private float		rssi;
+	private String		macAddress;
+	private Position	position;
 
 	public Measurement()
 	{
 	}
 
-	public Measurement(final float _rssi, final String _macAddress, final Position _position)
+	public Measurement(final float _rssi, final String _macAddress)
 	{
-		m_rssi = _rssi;
-		m_macAddress = _macAddress;
-		m_position = _position;
+		rssi = _rssi;
+		macAddress = _macAddress;
 	}
 
 	/****************************************/
@@ -24,55 +23,55 @@ public class Measurement
 	/****************************************/
 	public int getId()
 	{
-		return m_id;
+		return id;
 	}
 
 	public void setId(
 			final int id)
 	{
-		this.m_id = id;
+		this.id = id;
 	}
 
 	public float getRssi()
 	{
-		return m_rssi;
+		return rssi;
 	}
 
 	public void setRssi(
 			final float rssi)
 	{
-		this.m_rssi = rssi;
+		this.rssi = rssi;
 	}
 
-	public String getMac_address()
+	public String getMacAddress()
 	{
-		return m_macAddress;
+		return macAddress;
 	}
 
-	public void setMac_address(
+	public void setMacAddress(
 			final String mac_address)
 	{
-		this.m_macAddress = mac_address;
+		this.macAddress = mac_address;
 	}
 
-	public Position getM_position()
+	public Position getPosition()
 	{
-		return m_position;
+		return position;
 	}
 
-	public void setM_position(
-			final Position m_position)
+	public void setPosition(
+			Position position)
 	{
-		this.m_position = m_position;
+		this.position = position;
 	}
 
 	@Override
 	public String toString()
 	{
 		String s = "";
-		s += "ID: " + m_id;
-		s += "\nRSSI: " + m_rssi;
-		s += "\nMAC ADDRESS: " + m_macAddress;
+		s += "ID: " + id;
+		s += "\nRSSI: " + rssi;
+		s += "\nMAC ADDRESS: " + macAddress;
 		return s.toString();
 	}
 }
