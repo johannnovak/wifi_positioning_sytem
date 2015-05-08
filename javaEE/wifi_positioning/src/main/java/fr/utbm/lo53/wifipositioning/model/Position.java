@@ -73,9 +73,14 @@ public class Position
 	public String toString()
 	{
 		String s = "";
-		s += "ID: " + id;
-		s += "\nx : " + x;
-		s += "\ny : " + y;
+		s += "ID : " + id;
+		s += "\t| x : " + x;
+		s += "\t| y : " + y;
+		s += "\t| Associated Measurements : [";
+		for (Measurement m : measurements)
+			s += m.toString() + " | ";
+
+		s += "]";
 		return s.toString();
 	}
 }

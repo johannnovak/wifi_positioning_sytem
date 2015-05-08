@@ -60,7 +60,7 @@ public class Measurement
 	}
 
 	public void setPosition(
-			Position position)
+			final Position position)
 	{
 		this.position = position;
 	}
@@ -70,8 +70,9 @@ public class Measurement
 	{
 		String s = "";
 		s += "ID: " + id;
-		s += "\nRSSI: " + rssi;
-		s += "\nMAC ADDRESS: " + macAddress;
+		s += "\t| RSSI: " + rssi;
+		s += "\t| MacAddress : " + macAddress;
+		s += "\t| Position : " + position.getX() + "; " + position.getY();
 		return s.toString();
 	}
 }
