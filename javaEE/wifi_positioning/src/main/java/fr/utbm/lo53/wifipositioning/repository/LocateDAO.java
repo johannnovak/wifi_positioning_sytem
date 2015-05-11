@@ -1,9 +1,16 @@
 package fr.utbm.lo53.wifipositioning.repository;
 
+import java.util.List;
+
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import fr.utbm.lo53.wifipositioning.model.Measurement;
+import fr.utbm.lo53.wifipositioning.model.Position;
 import fr.utbm.lo53.wifipositioning.util.HibernateUtil;
 
 /**
@@ -14,6 +21,9 @@ import fr.utbm.lo53.wifipositioning.util.HibernateUtil;
  */
 public class LocateDAO
 {
+	/** Logger of the class */
+	private final static Logger		s_logger	= LoggerFactory.getLogger(LocateDAO.class);
+
 	private static LocateDAO		s_locateDAO;
 	private final SessionFactory	m_sessionFactory;
 
@@ -27,14 +37,34 @@ public class LocateDAO
 		return s_locateDAO;
 	}
 
-	public synchronized void getPosition()
+	public synchronized Position queryPositionFromMeasurements(
+			final List<Measurement> _measurements,
+			final float _epsilon)
 	{
 		Session session = m_sessionFactory.getCurrentSession();
 		try
 		{
 			session.beginTransaction();
-			// session.saveOrUpdate(_measurement);
+
+			String hqlQueryString = "SELECT p FROM Measurement m join Position p where ";
+			for (Measurement m : _measurements)
+				hqlQueryString += "m.rssi + epsilon > " + m.getRssi() + " and m.rssi - epsilon < "
+						+ m.getRssi() + " and ";
+			hqlQueryString = hqlQueryString.substring(0, hqlQueryString.length() - 3);
+			Query hqlQuery = session.createQuery(hqlQueryString);
+
+			@SuppressWarnings("unchecked")
+			List<Position> matchingPositions = hqlQuery.list();
+
+			if (matchingPositions.size() > 1)
+			{
+				s_logger.error("Error when querying database for locate. Number of position got from query > 1.");
+				return null;
+			}
+
 			session.getTransaction().commit();
+
+			return matchingPositions.get(0);
 		} catch (HibernateException he)
 		{
 			he.printStackTrace();
@@ -55,6 +85,6 @@ public class LocateDAO
 				session.close();
 			}
 		}
+		return null;
 	}
-
 }

@@ -1,15 +1,21 @@
 package fr.utbm.lo53.wifipositioning.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Position
+public class Position implements Serializable
 {
+
+	/**
+	 * 
+	 */
+	private static final long	serialVersionUID	= 1L;
 
 	private int					id;
 	private float				x;
 	private float				y;
-	private Set<Measurement>	measurements	= new HashSet<Measurement>(0);
+	private Set<Measurement>	measurements		= new HashSet<Measurement>(0);
 
 	public Position()
 	{
@@ -83,4 +89,5 @@ public class Position
 		s += "]";
 		return s.toString();
 	}
+
 }

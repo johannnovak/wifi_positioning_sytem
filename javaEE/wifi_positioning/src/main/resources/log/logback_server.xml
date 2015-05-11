@@ -39,7 +39,7 @@
 
 	<!-- Permet d'obtenir les logs des requetes et reponses DICOM -->
 	<!-- <logger name="org.dcm4che3.net.Association" level="DEBUG" /> -->
-	<logger name="org.hibernate" level="ERROR" />
+	<logger name="org.hibernate." level="error" />
 
 	<root level="debug">
 		<appender-ref ref="FILE-${module.name}" />

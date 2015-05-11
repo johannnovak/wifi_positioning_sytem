@@ -1,5 +1,9 @@
 package fr.utbm.lo53.wifipositioning.service;
 
+import java.util.List;
+
+import fr.utbm.lo53.wifipositioning.model.Measurement;
+import fr.utbm.lo53.wifipositioning.model.Position;
 import fr.utbm.lo53.wifipositioning.repository.LocateDAO;
 
 public class LocateService
@@ -23,8 +27,10 @@ public class LocateService
 		return s_locateService;
 	}
 
-	public void getPosition()
+	public Position queryPositionFromMeasurements(
+			final List<Measurement> _measurements,
+			final float _epsilon)
 	{
-		m_locateDAO.getPosition();
+		return m_locateDAO.queryPositionFromMeasurements(_measurements, _epsilon);
 	}
 }

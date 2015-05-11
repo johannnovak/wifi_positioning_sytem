@@ -64,7 +64,7 @@ public abstract class SocketRunnable implements Runnable
 
 	protected void sendResponse(
 			final Socket _socket,
-			final String _msg) throws IOException
+			final byte[] _msg) throws IOException
 	{
 		PrintWriter out = new PrintWriter(_socket.getOutputStream(), true);
 		out.println(_msg);

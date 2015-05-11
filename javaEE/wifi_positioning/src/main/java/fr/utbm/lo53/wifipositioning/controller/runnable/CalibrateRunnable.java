@@ -50,17 +50,17 @@ public class CalibrateRunnable extends SocketRunnable
 		try
 		{
 			List<Object> data = parseData(bytes, m_packetOffset);
-			if (data == null)
-				sendResponse(m_clientSocket, "500");
+			if ((data == null) || data.isEmpty())
+				sendResponse(m_clientSocket, "500".getBytes());
 			macAddress = (String) data.get(0);
 			x = (float) data.get(1);
 			y = (float) data.get(2);
 			rssi = (float) data.get(3);
 
 			if (calibrate(macAddress, rssi, x, y))
-				sendResponse(m_clientSocket, "200");
+				sendResponse(m_clientSocket, "200".getBytes());
 			else
-				sendResponse(m_clientSocket, "500");
+				sendResponse(m_clientSocket, "500".getBytes());
 		} finally
 		{
 			s_logger.debug("Response sent back to the client.");

@@ -2,6 +2,8 @@ package fr.utbm.lo53.wifipositioning.util;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 public class HibernateUtil
 {
@@ -9,7 +11,11 @@ public class HibernateUtil
 
 	private static SessionFactory buildSessionFactory()
 	{
-		return new Configuration().configure().buildSessionFactory();
+		Configuration configuration = new Configuration();
+		configuration.configure();
+		ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(
+				configuration.getProperties()).buildServiceRegistry();
+		return configuration.buildSessionFactory(serviceRegistry);
 	}
 
 	public static synchronized SessionFactory getSessionfactory()

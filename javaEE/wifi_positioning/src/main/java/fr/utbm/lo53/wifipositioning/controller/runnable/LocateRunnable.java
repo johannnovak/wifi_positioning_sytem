@@ -9,12 +9,22 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import fr.utbm.lo53.wifipositioning.model.Measurement;
+import fr.utbm.lo53.wifipositioning.model.Position;
 import fr.utbm.lo53.wifipositioning.service.LocateService;
 
 public class LocateRunnable extends SocketRunnable
 {
+
+	/** Logger of the class */
+	private final static Logger	s_logger	= LoggerFactory.getLogger(LocateRunnable.class);
+
 	private final LocateService	m_locateService;
+
+	private final float			m_epsilon;
 
 	public LocateRunnable(final Socket _clientSocket)
 	{
@@ -24,28 +34,50 @@ public class LocateRunnable extends SocketRunnable
 
 		m_packetOffset = Integer.parseInt(System.getProperty("locate.packet.offset"));
 
+		m_epsilon = Float.parseFloat(System.getProperty("locate.rssi.epsilon"));
+
 		m_runnableName = this.getClass().getSimpleName();
 	}
 
 	@Override
 	protected void socketHandler() throws IOException
 	{
-		String macAddress = "";
-		float x = -1.0f;
-		float y = -1.0f;
-		float rssi = -1.0f;
+
+		List<Measurement> measurements = new ArrayList<Measurement>();
+
+		// String macAddress = "";
+		// float x = -1.0f;
+		// float y = -1.0f;
+		// float rssi = -1.0f;
 
 		byte bytes[] = IOUtils.toByteArray(m_clientSocket.getInputStream());
 
-		List<Object> data = parseData(bytes, m_packetOffset);
-		macAddress = (String) data.get(0);
-		x = (float) data.get(1);
-		y = (float) data.get(2);
-		rssi = (float) data.get(3);
+		try
+		{
+			List<Object> data = parseData(bytes, m_packetOffset);
+			if ((data == null) || data.isEmpty())
+			{
+				s_logger.error("Error, empty data list when parsing packet header.");
+				sendResponse(m_clientSocket, "500".getBytes());
+			}
+			// macAddress = (String) data.get(0);
+			// x = (float) data.get(1);
+			// y = (float) data.get(2);
+			// rssi = (float) data.get(3);
 
-		locate();
+			Position queriedPosition = locate(measurements);
 
-		sendResponse(m_clientSocket, "200");
+			if (queriedPosition == null)
+			{
+				s_logger.error("Error, queried position is null. No position have been queried.");
+				sendResponse(m_clientSocket, "500".getBytes());
+			} else
+				sendResponse(m_clientSocket, ("x:" + queriedPosition.getX() + ";y:"
+						+ queriedPosition.getY() + ";").getBytes());
+		} finally
+		{
+			s_logger.debug("Locate response sent back to the client.");
+		}
 	}
 
 	@Override
@@ -84,7 +116,9 @@ public class LocateRunnable extends SocketRunnable
 	 * @throws IOException
 	 * @throws IllegalArgumentException
 	 */
-	public void locate()
+	public Position locate(
+			final List<Measurement> _measurements)
 	{
+		return m_locateService.queryPositionFromMeasurements(_measurements, m_epsilon);
 	}
 }
