@@ -1,6 +1,5 @@
 package fr.utbm.lo53.wifipositioning.repository;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -53,33 +52,54 @@ public class CalibrateDAO
 			hqlQuery.setParameter("y", _position.getY());
 
 			@SuppressWarnings("unchecked")
-			List<Object> resultList = hqlQuery.list();
+			List<Object> posList = hqlQuery.list();
 
 			/*
-			 * If it doesn't exist, we save the new position and its associates
+			 * If it doesn't exist, we save the new position and its associated
 			 * measurement.
 			 */
-			if (resultList.isEmpty())
+			if (posList.isEmpty())
 			{
 				s_logger.debug("The coordinates (x,y) have not been found in the database.");
 				session.save(_position);
 
 				/*
-				 * The position already exists, so we set the measurement's new
-				 * position and save it inside the database.
+				 * The position already exists, so we only want to add/update
+				 * the measurement in the database.
 				 */
 			} else
 			{
 				s_logger.debug("The coordinates (x,y) have been found in the database.");
-				Iterator<Measurement> measurementIterator = _position.getMeasurements().iterator();
-				while (measurementIterator.hasNext())
+
+				hqlQuery = session
+						.createQuery("SELECT m FROM Measurement m join m.position p where p.x = :x and p.y = :y");
+				hqlQuery.setParameter("x", _position.getX());
+				hqlQuery.setParameter("y", _position.getY());
+
+				@SuppressWarnings("unchecked")
+				List<Object> rssiList = hqlQuery.list();
+				Measurement requestMeasurement = _position.getMeasurements().iterator().next();
+
+				/*
+				 * If there is no mac address associated with the (x,y) => add
+				 * new measurement
+				 */
+				if (rssiList.isEmpty())
 				{
-					Measurement m = measurementIterator.next();
-					m.setPosition((Position) resultList.get(0));
-					session.save(m);
+					requestMeasurement.setPosition((Position) posList.get(0));
+					session.save(requestMeasurement);
+
+					/*
+					 * If there is already a macAddress for the (x,y) => update
+					 * rssi
+					 */
+				} else
+				{
+					Measurement m = (Measurement) rssiList.get(0);
+					m.setRssi(requestMeasurement.getRssi());
+					session.update(m);
 				}
 			}
-
 			session.getTransaction().commit();
 
 			s_logger.debug("Insertion in the database successful.");

@@ -124,19 +124,19 @@ public class CalibrateRunnable extends SocketRunnable
 		{
 			if ((_macAddress == null) || _macAddress.isEmpty())
 			{
-				throw new IllegalArgumentException("ID's Access Point is invalid! ");
+				throw new IllegalArgumentException("Access Point's mac address is invalid! ");
 			}
 			if (_rssi == 0)
 			{
-				throw new IllegalArgumentException("The strength of the signal is invalid! ");
+				throw new IllegalArgumentException("The RSSI is invalid! ");
 			}
 			if (_x < 0)
 			{
-				throw new IllegalArgumentException("The cordonates x is invalid! ");
+				throw new IllegalArgumentException("The coordonate x is invalid! ");
 			}
 			if (_y < 0)
 			{
-				throw new IllegalArgumentException("The cordonates y is invalid! ");
+				throw new IllegalArgumentException("The coordonate y is invalid! ");
 			}
 		} catch (IllegalArgumentException e)
 		{
