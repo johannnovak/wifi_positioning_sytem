@@ -22,4 +22,10 @@ public class LocationViewport extends AbstractViewport{
             canvas.drawPoint(p.x, p.y, mPaint);
         }
     }
+
+    public void onSelect(float x, float y) {
+//        mSelectedPoint.set(x, y);
+//        mMap.addPosition(x, y, Position.Type.CALIBRATION);
+//        invalidate(); // Force the viewport to redraw
+    }
 }

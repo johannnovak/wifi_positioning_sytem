@@ -14,14 +14,16 @@ import android.view.View;
 /**
  * Created by celian on 07/04/15.
  */
-public abstract class AbstractViewport extends View {
+public abstract class AbstractViewport extends View implements Selectable {
 
+    // State
     private enum State {
         NONE,
         SCROLLING,
         SELECTING,
         SCALING
     }
+    private State mState;
 
     // Limits
     private static float MIN_ZOOM = 1f;
@@ -32,7 +34,6 @@ public abstract class AbstractViewport extends View {
     private static int MAX_Y = 100;
 
     // Moving and scaling values
-    private State mState;
     private float mScaleFactor = 1.f;
     private PointF mViewportOffset = new PointF(0, 0);
 
@@ -88,6 +89,10 @@ public abstract class AbstractViewport extends View {
     private void updateState(MotionEvent e) {
         switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
+                if (mState == State.SELECTING) {
+                    PointF selected = fromViewToWorld(e.getX(), e.getY());
+                    onSelect (selected.x, selected.y);
+                }
                 mState = State.NONE;
                 break;
             case MotionEvent.ACTION_DOWN:
@@ -95,6 +100,14 @@ public abstract class AbstractViewport extends View {
                 break;
         }
     }
+
+    public PointF fromViewToWorld (float x, float y) {
+        return new PointF(
+            (x - mViewportOffset.x) / mScaleFactor,
+            (y - mViewportOffset.y) / mScaleFactor
+        );
+    }
+
 
     /**
      * Perform the scale, the translation
@@ -173,8 +186,8 @@ public abstract class AbstractViewport extends View {
             if (mState != State.SCALING) {
                 // Set the viewport offset according to the finger distance.
                 mViewportOffset.set(
-                        Math.max(MIN_X, Math.min(mViewportOffset.x - distanceX, MAX_X)),
-                        Math.max(MIN_Y, Math.min(mViewportOffset.y - distanceY, MAX_Y))
+                        Math.max(MIN_X, Math.min(mViewportOffset.x - (distanceX / mScaleFactor), MAX_X)),
+                        Math.max(MIN_Y, Math.min(mViewportOffset.y - (distanceY / mScaleFactor), MAX_Y))
                 );
             }
 
