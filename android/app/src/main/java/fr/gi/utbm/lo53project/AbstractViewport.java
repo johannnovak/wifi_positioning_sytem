@@ -16,16 +16,23 @@ import android.view.View;
  */
 public abstract class AbstractViewport extends View {
 
+    private enum State {
+        NONE,
+        SCROLLING,
+        SELECTING,
+        SCALING
+    }
+
     // Limits
     private static float MIN_ZOOM = 1f;
     private static float MAX_ZOOM = 5f;
     private static int MIN_X = -100;
     private static int MIN_Y = -100;
-    private static int MAX_X = 1500;
-    private static int MAX_Y = 1800;
+    private static int MAX_X = 100;
+    private static int MAX_Y = 100;
 
     // Moving and scaling values
-    private boolean bScaling;
+    private State mState;
     private float mScaleFactor = 1.f;
     private PointF mViewportOffset = new PointF(0, 0);
 
@@ -57,6 +64,8 @@ public abstract class AbstractViewport extends View {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeWidth(20f);
+
+        mState = State.NONE;
     }
 
     /**
@@ -66,6 +75,7 @@ public abstract class AbstractViewport extends View {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        updateState(event);
 
         boolean isScalingOrDragging = mScaleGestureDetector.onTouchEvent(event);
         isScalingOrDragging = mGestureDetector.onTouchEvent(event) || isScalingOrDragging;
@@ -73,6 +83,17 @@ public abstract class AbstractViewport extends View {
         if (isScalingOrDragging) invalidate();
         return isScalingOrDragging || super.onTouchEvent(event);
 
+    }
+
+    private void updateState(MotionEvent e) {
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_UP:
+                mState = State.NONE;
+                break;
+            case MotionEvent.ACTION_DOWN:
+                mState = State.SCROLLING;
+                break;
+        }
     }
 
     /**
@@ -89,6 +110,9 @@ public abstract class AbstractViewport extends View {
         // Translate the viewport
         canvas.translate(mViewportOffset.x, mViewportOffset.y);
 
+        canvas.drawRect(200, 200, 500, 500, mPaint);
+
+        invalidate();
     }
 
 //    /**
@@ -104,6 +128,17 @@ public abstract class AbstractViewport extends View {
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            mState = State.SCALING;
+            return true;
+        }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            mState = State.SCROLLING;
+        }
+
         /**
          * Called when the user perform a scale with fingers
          * @param detector : the scale gesture detector
@@ -114,13 +149,14 @@ public abstract class AbstractViewport extends View {
             mScaleFactor *= detector.getScaleFactor();
             mScaleFactor  = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
 
-            bScaling = true;
-
             return true;
         }
     }
 
     private class ScrollListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public void onLongPress(MotionEvent e) { mState = State.SELECTING; }
 
         /**
          * Called when the user performs a scroll with a finger
@@ -134,20 +170,15 @@ public abstract class AbstractViewport extends View {
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                                 float distanceX, float distanceY) {
 
-            // Ensure that we are not scaling the viewport
-            if (!bScaling) {
-
+            if (mState != State.SCALING) {
                 // Set the viewport offset according to the finger distance.
                 mViewportOffset.set(
-                    Math.max(MIN_X, Math.min(mViewportOffset.x - distanceX, MAX_X)),
-                    Math.max(MIN_Y, Math.min(mViewportOffset.y - distanceY, MAX_Y))
+                        Math.max(MIN_X, Math.min(mViewportOffset.x - distanceX, MAX_X)),
+                        Math.max(MIN_Y, Math.min(mViewportOffset.y - distanceY, MAX_Y))
                 );
-                return true;
             }
 
-            bScaling = false;
-            return false;
-
+            return true;
         }
     }
 
