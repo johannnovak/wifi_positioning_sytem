@@ -14,7 +14,7 @@ import android.view.View;
 /**
  * Created by celian on 07/04/15.
  */
-public abstract class AbstractViewport extends View implements Selectable {
+public abstract class AbstractViewport extends View {
 
     // State
     private enum State {
@@ -47,6 +47,7 @@ public abstract class AbstractViewport extends View implements Selectable {
     // World Map
     protected WorldMap mMap;
 
+    private SelectListener mSelectListener;
 
     public AbstractViewport(Context c, AttributeSet attrs, WorldMap map) {
         super(c, attrs);
@@ -71,8 +72,7 @@ public abstract class AbstractViewport extends View implements Selectable {
 
     /**
      * Transmit the motionEvent to the detectors and say to the canvas to redraw.
-     * @param event
-     * @return
+     * @param event the motion event
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -86,12 +86,16 @@ public abstract class AbstractViewport extends View implements Selectable {
 
     }
 
+    /**
+     * Update the state according to the motion event action
+     * @param e : motion event
+     */
     private void updateState(MotionEvent e) {
         switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
                 if (mState == State.SELECTING) {
                     PointF selected = fromViewToWorld(e.getX(), e.getY());
-                    onSelect (selected.x, selected.y);
+                    mSelectListener.onSelect(selected.x, selected.y);
                 }
                 mState = State.NONE;
                 break;
@@ -101,17 +105,22 @@ public abstract class AbstractViewport extends View implements Selectable {
         }
     }
 
+    /**
+     * Convert coordinates from view space to world space
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return the converted point
+     */
     public PointF fromViewToWorld (float x, float y) {
         return new PointF(
-            (x - mViewportOffset.x) / mScaleFactor,
-            (y - mViewportOffset.y) / mScaleFactor
+            (x / mScaleFactor) - mViewportOffset.x,
+            (y / mScaleFactor) - mViewportOffset.y
         );
     }
 
-
     /**
      * Perform the scale, the translation
-     * @param canvas
+     * @param canvas canvas
      */
     @Override
     protected void onDraw(Canvas canvas) {
@@ -139,14 +148,29 @@ public abstract class AbstractViewport extends View implements Selectable {
 //        invalidate();
 //    }
 
+    /***********************************************
+     *  Gesture Listeners
+     ***********************************************/
+    /**
+     * ScaleListener : Listen the scale of the viewport
+     */
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
+        /**
+         * Called when a scale gesture begin
+         * @param detector : the scale gesture detector
+         * @return true anyway
+         */
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {
             mState = State.SCALING;
             return true;
         }
 
+        /**
+         * Called when a scale gesture end
+         * @param detector : the scale gesture detector
+         */
         @Override
         public void onScaleEnd(ScaleGestureDetector detector) {
             mState = State.SCROLLING;
@@ -155,7 +179,7 @@ public abstract class AbstractViewport extends View implements Selectable {
         /**
          * Called when the user perform a scale with fingers
          * @param detector : the scale gesture detector
-         * @return
+         * @return true anyway
          */
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
@@ -166,18 +190,24 @@ public abstract class AbstractViewport extends View implements Selectable {
         }
     }
 
+    /**
+     * ScrollListener: Listen the scroll of the viewport
+     */
     private class ScrollListener extends GestureDetector.SimpleOnGestureListener {
-
+        /**
+         * Called when the user performs a long press
+         * @param e : motion event
+         */
         @Override
         public void onLongPress(MotionEvent e) { mState = State.SELECTING; }
 
         /**
          * Called when the user performs a scroll with a finger
-         * @param e1
-         * @param e2
-         * @param distanceX
-         * @param distanceY
-         * @return
+         * @param e1 : first motion event
+         * @param e2 : second motion event
+         * @param distanceX : distance covered in X
+         * @param distanceY : distance covered in Y
+         * @return true anyway
          */
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
@@ -195,6 +225,29 @@ public abstract class AbstractViewport extends View implements Selectable {
         }
     }
 
+
+    /***********************************************
+     *  Selection Listener
+     ***********************************************/
+    /**
+     * Set the selection listener
+     * @param l : the selection listener
+     */
+    public void setOnSelectListener ( SelectListener l ) {
+        this.mSelectListener = l;
+    }
+
+    /**
+     * Select Listener interface
+     */
+    public interface SelectListener {
+        /**
+         * Called when we select a location
+         * @param x : x of selected location
+         * @param y : y of selected location
+         */
+        void onSelect(float x, float y);
+    }
 
 }
 

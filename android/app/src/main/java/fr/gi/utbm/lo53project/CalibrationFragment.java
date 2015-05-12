@@ -5,8 +5,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import java.io.IOException;
@@ -18,10 +16,6 @@ import java.net.URL;
  * Created by Android on 06/04/2015.
  */
 public class CalibrationFragment extends AbstractFragment {
-
-    private Button add_calib_button;
-    private EditText x_calib_textedit;
-    private EditText y_calib_textedit;
 
     private CalibrationViewport mViewport;
 
@@ -48,24 +42,16 @@ public class CalibrationFragment extends AbstractFragment {
             e.printStackTrace();
         }
 
-        // Get buttons and textedits
-        add_calib_button = (Button) rootView.findViewById(R.id.add_calib_button);
-        x_calib_textedit = (EditText) rootView.findViewById(R.id.x_calib_textedit);
-        y_calib_textedit = (EditText) rootView.findViewById(R.id.y_calib_textedit);
+        mViewport.setOnSelectListener(new AbstractViewport.SelectListener() {
 
-        // When user add a position
-        add_calib_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            @Override
+            public void onSelect(float x, float y) {
+                sendPoint(x, y);
 
-                float x = Float.valueOf(x_calib_textedit.getText().toString());
-                float y = Float.valueOf(y_calib_textedit.getText().toString());
-
+                // To remove when we can send to server
                 addPoint(x, y);
-
-                if (!sendPoint(x, y))
-                    System.out.println("Sent failed !");
-
             }
+
         });
 
         return rootView;
@@ -76,7 +62,7 @@ public class CalibrationFragment extends AbstractFragment {
         mViewport.invalidate(); // Force the viewport to redraw
     }
 
-    private boolean sendPoint(float x, float y) {
+    private void sendPoint(float x, float y) {
         try {
             // Connection to the server
             HttpURLConnection connection = (HttpURLConnection) mUrl.openConnection();
@@ -89,13 +75,10 @@ public class CalibrationFragment extends AbstractFragment {
             // If server return ok we add the point to the world map
             if (connection.getResponseCode() == 200) {
                 addPoint(x, y);
-                return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return false;
     }
 
 }

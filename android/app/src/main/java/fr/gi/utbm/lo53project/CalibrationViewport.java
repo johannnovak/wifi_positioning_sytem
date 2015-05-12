@@ -23,9 +23,8 @@ public class CalibrationViewport extends AbstractViewport {
         }
     }
 
-    public void onSelect(float x, float y) {
-//        mSelectedPoint.set(x, y);
-        mMap.addPosition(x, y, Position.Type.CALIBRATION);
-        invalidate(); // Force the viewport to redraw
-    }
+//    public void onSelect(float x, float y) {
+//        mMap.addPosition(x, y, Position.Type.CALIBRATION);
+//        invalidate(); // Force the viewport to redraw
+//    }
 }
