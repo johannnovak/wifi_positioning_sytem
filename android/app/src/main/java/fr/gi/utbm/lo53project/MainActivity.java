@@ -15,6 +15,7 @@ import android.view.MenuItem;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public static String TAG_WORLDMAP = "Global WorldMap";
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -25,8 +26,14 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
+    private Bundle mWorldMapBundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Create a Bundle containing the WorldMap
+        mWorldMapBundle = new Bundle();
+        mWorldMapBundle.putSerializable(TAG_WORLDMAP, new WorldMap());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibration);
 
@@ -50,12 +57,16 @@ public class MainActivity extends ActionBarActivity
 
         switch(position) {
             case 0 :
-                objFragment = new menuCalibration_Fragment();
+                objFragment = new CalibrationFragment();
                 break;
             case 1 :
-                objFragment = new menuDetection_Fragment();
+                objFragment = new LocationFragment();
                 break;
         }
+
+        // Give the bundle (containing the WorldMap) to the fragment
+        objFragment.setArguments(mWorldMapBundle);
+
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
