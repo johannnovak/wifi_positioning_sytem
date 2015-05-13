@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by celian on 29/04/15.
+ * Created by celian on 29/04/15 for LO53Project
  */
 public class Position extends PointF {
 
@@ -15,7 +15,6 @@ public class Position extends PointF {
         LOCATION,
         CALIBRATION
     }
-
     public static final Map<Type , Integer> COLORS = new HashMap<Type , Integer>() {{
         put(Position.Type.LOCATION,      Color.WHITE);
         put(Position.Type.CALIBRATION,   Color.BLACK);

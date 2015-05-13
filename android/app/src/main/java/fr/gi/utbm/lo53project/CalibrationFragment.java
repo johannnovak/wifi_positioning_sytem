@@ -13,7 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by Android on 06/04/2015.
+ * Created by Android on 06/04/2015 for LO53Project
  */
 public class CalibrationFragment extends AbstractFragment {
 
@@ -57,11 +57,21 @@ public class CalibrationFragment extends AbstractFragment {
         return rootView;
     }
 
+    /**
+     * Add a point to the world map and force the viewport to redraw
+     * @param x x coordinate
+     * @param y y coordinate
+     */
     private void addPoint(float x, float y) {
         mMap.addPosition(x, y, Position.Type.CALIBRATION);
         mViewport.invalidate(); // Force the viewport to redraw
     }
 
+    /**
+     * Send a point to the server and call addPoint if server return OK
+     * @param x x coordinate
+     * @param y y coordinate
+     */
     private void sendPoint(float x, float y) {
         try {
             // Connection to the server

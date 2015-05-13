@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import java.net.URL;
 
 /**
- * Created by celian on 05/05/15.
+ * Created by celian on 05/05/15 for LO53Project
  */
 public abstract class AbstractFragment extends Fragment {
 

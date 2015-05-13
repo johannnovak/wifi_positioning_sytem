@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -12,7 +13,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 /**
- * Created by celian on 07/04/15.
+ * Created by celian on 07/04/15 for LO53Project
  */
 public abstract class AbstractViewport extends View {
 
@@ -75,7 +76,7 @@ public abstract class AbstractViewport extends View {
      * @param event the motion event
      */
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(@NonNull MotionEvent event) {
         updateState(event);
 
         boolean isScalingOrDragging = mScaleGestureDetector.onTouchEvent(event);

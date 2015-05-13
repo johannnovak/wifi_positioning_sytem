@@ -11,7 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by Android on 06/04/2015.
+ * Created by Android on 06/04/2015 for LO53Project
  */
 public class LocationFragment extends AbstractFragment {
 

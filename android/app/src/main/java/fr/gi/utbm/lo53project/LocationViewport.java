@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 
 /**
- * Created by celian on 05/05/15.
+ * Created by celian on 05/05/15 for LO53Project
  */
 public class LocationViewport extends AbstractViewport{
 
