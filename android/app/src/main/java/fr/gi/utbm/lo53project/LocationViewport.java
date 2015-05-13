@@ -23,9 +23,4 @@ public class LocationViewport extends AbstractViewport{
         }
     }
 
-    public void onSelect(float x, float y) {
-//        mSelectedPoint.set(x, y);
-//        mMap.addPosition(x, y, Position.Type.CALIBRATION);
-//        invalidate(); // Force the viewport to redraw
-    }
 }

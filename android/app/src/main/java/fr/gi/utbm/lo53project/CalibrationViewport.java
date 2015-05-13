@@ -9,8 +9,8 @@ import android.util.AttributeSet;
  */
 public class CalibrationViewport extends AbstractViewport {
 
-    public CalibrationViewport(Context context, AttributeSet attrs, WorldMap map) {
-        super(context, attrs, map);
+    public CalibrationViewport(Context context, AttributeSet attrs, WorldMap map, SelectionListener listener) {
+        super(context, attrs, map, listener);
     }
 
     @Override
@@ -22,9 +22,4 @@ public class CalibrationViewport extends AbstractViewport {
             canvas.drawPoint(p.x, p.y, mPaint);
         }
     }
-
-//    public void onSelect(float x, float y) {
-//        mMap.addPosition(x, y, Position.Type.CALIBRATION);
-//        invalidate(); // Force the viewport to redraw
-//    }
 }

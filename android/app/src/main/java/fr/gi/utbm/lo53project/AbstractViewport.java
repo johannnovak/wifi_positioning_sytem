@@ -48,9 +48,9 @@ public abstract class AbstractViewport extends View {
     // World Map
     protected WorldMap mMap;
 
-    private SelectListener mSelectListener;
+    private SelectionListener mSelectionListener;
 
-    public AbstractViewport(Context c, AttributeSet attrs, WorldMap map) {
+    public AbstractViewport(Context c, AttributeSet attrs, WorldMap map, SelectionListener listener) {
         super(c, attrs);
 
         mMap = map;
@@ -69,6 +69,11 @@ public abstract class AbstractViewport extends View {
         mPaint.setStrokeWidth(20f);
 
         mState = State.NONE;
+        mSelectionListener = listener;
+    }
+
+    public AbstractViewport(Context c, AttributeSet attrs, WorldMap map) {
+        this(c, attrs, map, null);
     }
 
     /**
@@ -92,11 +97,16 @@ public abstract class AbstractViewport extends View {
      * @param e : motion event
      */
     private void updateState(MotionEvent e) {
+
+        // Ensure that we are not in SELECTING state when selection listener is not defined
+        if (mState == State.SELECTING && mSelectionListener == null)
+            throw new AssertionError("Error SELECTING State reached meanwhile selection listener is not defined.");
+
         switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
                 if (mState == State.SELECTING) {
                     PointF selected = fromViewToWorld(e.getX(), e.getY());
-                    mSelectListener.onSelect(selected.x, selected.y);
+                    mSelectionListener.onSelect(selected.x, selected.y);
                 }
                 mState = State.NONE;
                 break;
@@ -104,6 +114,16 @@ public abstract class AbstractViewport extends View {
                 mState = State.SCROLLING;
                 break;
         }
+    }
+
+    /**
+     * Add a point to the world map and force the viewport to redraw
+     * @param x x coordinate
+     * @param y y coordinate
+     */
+    protected void addPoint(float x, float y, Position.Type t) {
+        mMap.addPosition(x, y, t);
+        this.invalidate(); // Force the viewport to redraw
     }
 
     /**
@@ -200,7 +220,10 @@ public abstract class AbstractViewport extends View {
          * @param e : motion event
          */
         @Override
-        public void onLongPress(MotionEvent e) { mState = State.SELECTING; }
+        public void onLongPress(MotionEvent e) {
+            if (mSelectionListener != null)
+                mState = State.SELECTING;
+        }
 
         /**
          * Called when the user performs a scroll with a finger
@@ -230,18 +253,7 @@ public abstract class AbstractViewport extends View {
     /***********************************************
      *  Selection Listener
      ***********************************************/
-    /**
-     * Set the selection listener
-     * @param l : the selection listener
-     */
-    public void setOnSelectListener ( SelectListener l ) {
-        this.mSelectListener = l;
-    }
-
-    /**
-     * Select Listener interface
-     */
-    public interface SelectListener {
+    public interface SelectionListener {
         /**
          * Called when we select a location
          * @param x : x of selected location

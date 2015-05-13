@@ -43,4 +43,12 @@ public class LocationFragment extends AbstractFragment {
         return rootView;
     }
 
+    private void receivePoint() {
+        // TO DO
+        // - create a thread which loop ?
+        // - receiver already implemented
+
+        // use mViewport.addPoint(x, y, Position.Type.LOCATION);
+    }
+
 }

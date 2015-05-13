@@ -29,8 +29,18 @@ public class CalibrationFragment extends AbstractFragment {
         // Initialize view
         View rootView = inflater.inflate(R.layout.calibration_layout, container, false);
 
-        // Initialize viewport and add it to the linear layout
-        mViewport = new CalibrationViewport(getActivity(), null, mMap);
+        // Initialize viewport and its listener
+        mViewport = new CalibrationViewport(getActivity(), null, mMap, new AbstractViewport.SelectionListener() {
+            @Override
+            public void onSelect(float x, float y) {
+                sendPoint(x, y);
+
+                // To remove when we can send to server
+                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+            }
+        });
+
+        // Add the viewport to the linear layout
         LinearLayout calibration_viewport_layout = (LinearLayout)rootView.findViewById(R.id.calib_viewport_layout);
         calibration_viewport_layout.addView(mViewport);
 
@@ -42,29 +52,7 @@ public class CalibrationFragment extends AbstractFragment {
             e.printStackTrace();
         }
 
-        mViewport.setOnSelectListener(new AbstractViewport.SelectListener() {
-
-            @Override
-            public void onSelect(float x, float y) {
-                sendPoint(x, y);
-
-                // To remove when we can send to server
-                addPoint(x, y);
-            }
-
-        });
-
         return rootView;
-    }
-
-    /**
-     * Add a point to the world map and force the viewport to redraw
-     * @param x x coordinate
-     * @param y y coordinate
-     */
-    private void addPoint(float x, float y) {
-        mMap.addPosition(x, y, Position.Type.CALIBRATION);
-        mViewport.invalidate(); // Force the viewport to redraw
     }
 
     /**
@@ -84,7 +72,7 @@ public class CalibrationFragment extends AbstractFragment {
 
             // If server return ok we add the point to the world map
             if (connection.getResponseCode() == 200) {
-                addPoint(x, y);
+                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
             }
         } catch (IOException e) {
             e.printStackTrace();
