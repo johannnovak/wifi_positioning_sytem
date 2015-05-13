@@ -138,16 +138,16 @@ public abstract class AbstractViewport extends View {
         invalidate();
     }
 
-//    /**
-//     * Clear the canvas
-//     */
-//    public void clearCanvas() {
-//        mPoints.clear();
-//        mScaleFactor = 1.0f;
-//        mViewportOffset.set(0, 0);
-//
-//        invalidate();
-//    }
+    /**
+     * Clear the canvas
+     */
+    @SuppressWarnings("unused")
+    public void clearCanvas() {
+        mScaleFactor = 1.0f;
+        mViewportOffset.set(0, 0);
+
+        invalidate();
+    }
 
     /***********************************************
      *  Gesture Listeners

@@ -154,10 +154,11 @@
       <file leaf-file-name="AbstractViewport.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5978947">
-              <caret line="105" column="9" selection-start-line="105" selection-start-column="9" selection-end-line="105" selection-end-column="9" />
+            <state vertical-scroll-proportion="0.67368424">
+              <caret line="149" column="5" selection-start-line="149" selection-start-column="5" selection-end-line="149" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#3941#3968#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1424,7 +1425,6 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/location_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Selectable.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/calibration_layout.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java" />
@@ -1433,6 +1433,7 @@
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/WorldMap.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Position.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/NavigationDrawerFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java" />
       </list>
     </option>
   </component>
@@ -1918,6 +1919,7 @@
           <caret line="184" column="43" selection-start-line="184" selection-start-column="43" selection-end-line="184" selection-end-column="43" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3941#3968#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2028,6 +2030,7 @@
           <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3941#3968#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2123,6 +2126,7 @@
           <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3941#3968#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2221,6 +2225,7 @@
           <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3941#3968#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2392,10 +2397,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5978947">
-          <caret line="105" column="9" selection-start-line="105" selection-start-column="9" selection-end-line="105" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.67368424">
+          <caret line="149" column="5" selection-start-line="149" selection-start-column="5" selection-end-line="149" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3941#3968#0" expanded="true" />
           </folding>
         </state>
       </provider>
