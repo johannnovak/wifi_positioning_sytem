@@ -28,25 +28,15 @@ public class Launcher
 		properties.load(Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("conf/server.properties"));
 
-		/* Retrieves the overall properties */
-		System.setProperty("mac.address.byte.length",
-				properties.getProperty("mac.address.byte.length"));
-		System.setProperty("position.byte.length", properties.getProperty("position.byte.length"));
-		System.setProperty("rssi.byte.length", properties.getProperty("rssi.byte.length"));
-
 		/* Retrieves the APs properties */
 		System.setProperty("ap.port", properties.getProperty("ap.port"));
 		System.setProperty("ap.ips", properties.getProperty("ap.ips"));
-		System.setProperty("ap.response.offset", properties.getProperty("ap.response.offset"));
 
 		/* Retrieves the properties concerning the calibration */
 		System.setProperty("calibrate.port", properties.getProperty("calibrate.port"));
-		System.setProperty("calibrate.request.offset",
-				properties.getProperty("calibrate.request.offset"));
 
 		/* Retrieves the properties concerning the location */
 		System.setProperty("locate.port", properties.getProperty("locate.port"));
-		System.setProperty("locate.request.offset", properties.getProperty("locate.request.offset"));
 
 		s_logger.debug("Properties loaded.");
 

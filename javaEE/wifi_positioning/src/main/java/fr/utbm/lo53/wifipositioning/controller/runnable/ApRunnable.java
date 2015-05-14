@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import fr.utbm.lo53.wifipositioning.model.Measurement;
 
-public class ApRssiRunnable implements Runnable
+public class ApRunnable implements Runnable
 {
 	/** Logger of the class */
-	private final static Logger		s_logger	= LoggerFactory.getLogger(ApRssiRunnable.class);
+	private final static Logger		s_logger	= LoggerFactory.getLogger(ApRunnable.class);
 
 	private final String			m_apIP;
 	private List<Object>			m_mobileRequestData;
@@ -24,7 +24,7 @@ public class ApRssiRunnable implements Runnable
 
 	private final SocketRunnable	m_socketRunnable;
 
-	public ApRssiRunnable(final String _apIP, final int _apPort, final SocketRunnable socketRunnable)
+	public ApRunnable(final String _apIP, final int _apPort, final SocketRunnable socketRunnable)
 	{
 		m_apIP = _apIP;
 		m_apPort = _apPort;

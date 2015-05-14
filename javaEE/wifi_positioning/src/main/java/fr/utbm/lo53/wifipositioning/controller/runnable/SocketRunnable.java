@@ -25,7 +25,7 @@ public abstract class SocketRunnable implements Runnable
 	protected int						m_positionByteLength;
 
 	protected int						m_rssiByteLength;
-	private final ApRssiRunnable[]		m_apRssiRunnable;
+	private final ApRunnable[]		m_apRssiRunnable;
 	private final Thread[]				m_apSocketThreads;
 	private final Set<Measurement>		m_rssiMeasurements;
 
@@ -51,11 +51,11 @@ public abstract class SocketRunnable implements Runnable
 
 		/* Creation of the runnables and the associated threads for the APs */
 		m_apSocketThreads = new Thread[apIPs.length];
-		m_apRssiRunnable = new ApRssiRunnable[apIPs.length];
+		m_apRssiRunnable = new ApRunnable[apIPs.length];
 		m_rssiMeasurements = new HashSet<Measurement>();
 		for (int i = 0; i < m_apSocketThreads.length; ++i)
 		{
-			m_apRssiRunnable[i] = new ApRssiRunnable(apIPs[i], apPort, this);
+			m_apRssiRunnable[i] = new ApRunnable(apIPs[i], apPort, this);
 			m_apSocketThreads[i] = new Thread(m_apRssiRunnable[i]);
 		}
 	}
