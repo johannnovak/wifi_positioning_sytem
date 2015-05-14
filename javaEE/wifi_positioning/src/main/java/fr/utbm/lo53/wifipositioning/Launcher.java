@@ -41,12 +41,12 @@ public class Launcher
 
 		/* Retrieves the properties concerning the calibration */
 		System.setProperty("calibrate.port", properties.getProperty("calibrate.port"));
-		System.setProperty("calibrate.packet.offset",
-				properties.getProperty("calibrate.packet.offset"));
+		System.setProperty("calibrate.request.offset",
+				properties.getProperty("calibrate.request.offset"));
 
 		/* Retrieves the properties concerning the location */
 		System.setProperty("locate.port", properties.getProperty("locate.port"));
-		System.setProperty("locate.packet.offset", properties.getProperty("locate.packet.offset"));
+		System.setProperty("locate.request.offset", properties.getProperty("locate.request.offset"));
 
 		s_logger.debug("Properties loaded.");
 

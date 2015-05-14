@@ -1,14 +1,13 @@
 package fr.utbm.lo53.wifipositioning.controller.runnable;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,79 +31,79 @@ public class LocateRunnable extends SocketRunnable
 
 		m_locateService = LocateService.getInstance();
 
-		m_packetOffset = Integer.parseInt(System.getProperty("locate.packet.offset"));
-
 		m_epsilon = Float.parseFloat(System.getProperty("locate.rssi.epsilon"));
 
 		m_runnableName = this.getClass().getSimpleName();
 	}
 
 	@Override
-	protected void parseMobileRequestHandler() throws IOException
+	protected List<Object> parseMobileRequestHandler()
 	{
-
-		List<Measurement> measurements = new ArrayList<Measurement>();
-
-		// String macAddress = "";
-		// float x = -1.0f;
-		// float y = -1.0f;
-		// float rssi = -1.0f;
-
-		byte bytes[] = IOUtils.toByteArray(m_clientSocket.getInputStream());
+		s_logger.debug("Thread-{} : Parsing mobile socket connection data for {}.", m_threadID,
+				m_runnableName);
 
 		try
 		{
-			List<Object> data = parseRequestData(bytes, m_packetOffset);
+			List<Object> data = parseRequestData(m_clientSocket.getInputStream());
 			if ((data == null) || data.isEmpty())
 			{
-				s_logger.error("Error, empty data list when parsing packet header.");
-				handleResponse(m_clientSocket, "500".getBytes());
+				s_logger.error("Thread-{} : Error, empty data list when parsing ({}).", m_threadID,
+						m_runnableName);
+				return null;
 			}
-			// macAddress = (String) data.get(0);
-			// x = (float) data.get(1);
-			// y = (float) data.get(2);
-			// rssi = (float) data.get(3);
-
-			Position queriedPosition = locate(measurements);
-
-			if (queriedPosition == null)
-			{
-				s_logger.error("Error, queried position is null. No position have been queried.");
-				handleResponse(m_clientSocket, "500".getBytes());
-			} else
-				handleResponse(m_clientSocket, ("x:" + queriedPosition.getX() + ";y:"
-						+ queriedPosition.getY() + ";").getBytes());
+			return data;
+		} catch (Exception e)
+		{
+			s_logger.error(String.format(
+					"Thread-%s : An error occured when parsing the mobile request data.",
+					m_threadID), e);
 		} finally
 		{
-			s_logger.debug("Locate response sent back to the client.");
+			s_logger.debug("Thread-{} : Request Data Parsing over ({}).", m_threadID,
+					m_runnableName);
 		}
+		return null;
 	}
 
 	@Override
 	protected List<Object> parseRequestData(
-			final byte[] _bytes,
-			final int _offset)
+			final InputStream _inputStream) throws IOException, ClassNotFoundException
 	{
-		int offset = _offset;
+		s_logger.debug("Thread-{} : Parsing data from byte[]...", m_threadID);
+
 		ArrayList<Object> list = new ArrayList<Object>();
+		ObjectInputStream ois = new ObjectInputStream(_inputStream);
+		String data = (String) ois.readObject();
+		s_logger.debug("data : {}", data);
 
-		byte[] macAddressByteArray = Arrays.copyOfRange(_bytes, offset, offset
-				+ m_macAddressByteLength);
-		list.add(new String(macAddressByteArray));
+		String[] dataArray = data.split(";");
 
-		offset += m_macAddressByteLength;
-		byte[] xByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_positionByteLength);
-		list.add(ByteBuffer.wrap(xByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
+		if (dataArray.length != 1)
+		{
+			s_logger.error(
+					"Thread-{} : Can't parse data, the number of parameter is not equal to 1 ! ",
+					m_threadID);
+			return null;
+		}
+		/* Adds the macAddress */
+		list.add(dataArray[0]);
 
-		offset += m_positionByteLength;
-		byte[] yByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_positionByteLength);
-		list.add(ByteBuffer.wrap(yByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
-
-		offset += m_positionByteLength;
-		byte[] rssiByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_rssiByteLength);
-		list.add(ByteBuffer.wrap(rssiByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
+		/* Verify that the data sent are not null or empty */
+		if (((String) list.get(0) == null) || ((String) list.get(0) == ""))
+		{
+			s_logger.error("Thread-{} : The mobile mac address is empty! ", m_threadID);
+			return null;
+		}
 
 		return list;
+	}
+
+	@Override
+	protected boolean accessDatabaseHandler(
+			final List<Object> mobileRequestData,
+			final Set<Measurement> _measurements)
+	{
+		return locate(_measurements);
 	}
 
 	/**
@@ -116,9 +115,16 @@ public class LocateRunnable extends SocketRunnable
 	 * @throws IOException
 	 * @throws IllegalArgumentException
 	 */
-	public Position locate(
-			final List<Measurement> _measurements)
+	public boolean locate(
+			final Set<Measurement> _measurements)
 	{
-		return m_locateService.queryPositionFromMeasurements(_measurements, m_epsilon);
+		Position p = null;
+		s_logger.debug("Thread-{} : Retrieving position from database.", m_threadID);
+		if ((p = m_locateService.queryPositionFromMeasurements(_measurements, m_epsilon)) != null)
+		{
+			m_mobileResponse = "x:" + p.getX() + ";y:" + p.getY();
+			return true;
+		} else
+			return false;
 	}
 }

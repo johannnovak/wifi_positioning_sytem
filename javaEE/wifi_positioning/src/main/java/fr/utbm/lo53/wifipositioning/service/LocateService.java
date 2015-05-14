@@ -1,6 +1,6 @@
 package fr.utbm.lo53.wifipositioning.service;
 
-import java.util.List;
+import java.util.Set;
 
 import fr.utbm.lo53.wifipositioning.model.Measurement;
 import fr.utbm.lo53.wifipositioning.model.Position;
@@ -28,7 +28,7 @@ public class LocateService
 	}
 
 	public Position queryPositionFromMeasurements(
-			final List<Measurement> _measurements,
+			final Set<Measurement> _measurements,
 			final float _epsilon)
 	{
 		return m_locateDAO.queryPositionFromMeasurements(_measurements, _epsilon);

@@ -8,7 +8,8 @@
 
 	<property name="log_dir" value="log" />
 	<property name="file_name" value="${module.name}" />
-	<property name="pattern" value="%d{yyyy-MM-dd-HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n" />
+	<property name="pattern"
+		value="%d{yyyy-MM-dd-HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n" />
 
 
 	<!-- Crrer un appender pour la sortie console (non utilise) -->
@@ -19,7 +20,8 @@
 	</appender>
 
 	<!-- Creer un appender pour logger dans un fichier -->
-	<appender name="FILE-${module.name}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="FILE-${module.name}"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
 
 		<file>${log_dir}/${file_name}.log</file>
 
@@ -27,7 +29,8 @@
 			<FileNamePattern>${log_dir}/${file_name}-%d{yyyy-MM-dd}.%i.log</FileNamePattern>
 			<FileNameArchivePattern>${log_dir}/archive/${file_name}-%d{yyyy-MM}.zip</FileNameArchivePattern>
 			<name>${module.name}</name>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<maxFileSize>20MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
@@ -39,8 +42,13 @@
 
 	<!-- Permet d'obtenir les logs des requetes et reponses DICOM -->
 	<!-- <logger name="org.dcm4che3.net.Association" level="DEBUG" /> -->
-	<logger name="org.hibernate." level="error" />
 
+	<logger name="org.hibernate">
+		<level value="error" />
+		<appender-ref ref="FILE-${module.name}" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+	
 	<root level="debug">
 		<appender-ref ref="FILE-${module.name}" />
 		<appender-ref ref="STDOUT" />

@@ -97,4 +97,9 @@ public class Position implements Serializable
 		return s.toString();
 	}
 
+	public boolean equals(
+			final Position _p)
+	{
+		return ((x == _p.getX()) && (y == _p.getY()));
+	}
 }

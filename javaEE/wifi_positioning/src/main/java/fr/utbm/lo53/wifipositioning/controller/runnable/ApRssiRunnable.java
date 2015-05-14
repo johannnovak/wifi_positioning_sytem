@@ -1,15 +1,14 @@
 package fr.utbm.lo53.wifipositioning.controller.runnable;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.utbm.lo53.wifipositioning.model.Measurement;
@@ -17,25 +16,19 @@ import fr.utbm.lo53.wifipositioning.model.Measurement;
 public class ApRssiRunnable implements Runnable
 {
 	/** Logger of the class */
-	private final static Logger		s_logger	= (Logger) LoggerFactory
-														.getLogger(ApRssiRunnable.class);
+	private final static Logger		s_logger	= LoggerFactory.getLogger(ApRssiRunnable.class);
 
 	private final String			m_apIP;
 	private List<Object>			m_mobileRequestData;
 	private final int				m_apPort;
 
-	private final int				m_offset;
-	private final Set<Measurement>	m_measurements;
-	private final int				m_macAddressByteLength;
+	private final SocketRunnable	m_socketRunnable;
 
-	public ApRssiRunnable(final String _apIP, final int _apPort,
-			final Set<Measurement> _measurements)
+	public ApRssiRunnable(final String _apIP, final int _apPort, final SocketRunnable socketRunnable)
 	{
 		m_apIP = _apIP;
 		m_apPort = _apPort;
-		m_measurements = _measurements;
-		m_offset = Integer.parseInt(System.getProperty("ap.response.offset"));
-		m_macAddressByteLength = Integer.parseInt(System.getProperty("mac.address.byte.length"));
+		m_socketRunnable = socketRunnable;
 	}
 
 	public void setMobileRequestData(
@@ -79,9 +72,8 @@ public class ApRssiRunnable implements Runnable
 	private void writeSocket(
 			final Socket _socket) throws IOException
 	{
-		PrintWriter out = new PrintWriter(_socket.getOutputStream(), true);
-		String mobileMacAddress = (String) m_mobileRequestData.get(0);
-		out.println(mobileMacAddress);
+		ObjectOutputStream oos = new ObjectOutputStream(_socket.getOutputStream());
+		oos.writeObject(m_mobileRequestData.get(0));
 	}
 
 	private void readSocket(
@@ -89,46 +81,49 @@ public class ApRssiRunnable implements Runnable
 	{
 		try
 		{
-			/* Gets the bytes from the inputStream */
-			byte[] apResponse = IOUtils.toByteArray(_socket.getInputStream());
-
 			/* Parse the AP response */
 			s_logger.debug("Parsing AP response from byte...");
-			List<Object> responseData = parseResponse(apResponse, m_offset);
-			float rssi = (float) responseData.get(0);
-			String apMacAddress = (String) responseData.get(1);
+			List<Object> responseData = parseResponse(_socket.getInputStream());
+			String apMacAddress = (String) responseData.get(0);
+			float rssi = Float.parseFloat((String) responseData.get(1));
 
 			/* Adds a new measurement to the set */
-			m_measurements.add(new Measurement(rssi, apMacAddress));
+			m_socketRunnable.addApMeasurement(new Measurement(rssi, apMacAddress));
 		} catch (Exception e)
 		{
-			s_logger.error("An error occured when parsinf the data.", e);
+			s_logger.error("An error occured when parsing the AP response data.", e);
 		}
 	}
 
 	private List<Object> parseResponse(
-			final byte[] _apResponse,
-			final int _offset)
+			final InputStream _inputStream) throws IOException, ClassNotFoundException
 	{
-		int offset = _offset;
 		ArrayList<Object> list = new ArrayList<Object>();
 
-		try
-		{
-			/* Parses the byte array. */
-			byte[] macAddressByteArray = Arrays.copyOfRange(_apResponse, offset, offset
-					+ m_macAddressByteLength);
-			list.add(new String(macAddressByteArray));
-			offset += m_macAddressByteLength;
+		ObjectInputStream ois = new ObjectInputStream(_inputStream);
+		String data = (String) ois.readObject();
+		s_logger.debug("data : {}", data);
+		String[] dataArray = data.split(";");
 
-			byte[] rssiByteArray = Arrays.copyOfRange(_apResponse, offset, offset
-					+ m_macAddressByteLength);
-			list.add(new String(rssiByteArray));
-			return list;
-		} catch (Exception e)
+		if (dataArray.length != 3)
 		{
-			s_logger.error("An error occured when parsing the AP response data.", e);
+			s_logger.error("Can't parse AP response data, the number of parameter is not equal to 2 ! ");
 			return null;
 		}
+
+		/* Adds the macAddress */
+		list.add(dataArray[0]);
+
+		/* Adds the rssi */
+		list.add(dataArray[1]);
+
+		/* Verify that the data sent are not null or empty */
+		if (((String) list.get(0) == null) || ((String) list.get(0) == ""))
+		{
+			s_logger.error("The ap mac address is empty! ");
+			return null;
+		}
+
+		return list;
 	}
 }

@@ -1,15 +1,13 @@
 package fr.utbm.lo53.wifipositioning.controller.runnable;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,69 +28,67 @@ public class CalibrateRunnable extends SocketRunnable
 
 		m_calibrateService = CalibrateService.getInstance();
 
-		m_packetOffset = Integer.parseInt(System.getProperty("calibrate.packet.offset"));
-
 		m_runnableName = this.getClass().getSimpleName();
 
 		s_logger.debug("CalibrateRunnable created.");
 	}
 
 	@Override
-	protected List<Object> parseMobileRequestHandler() throws IOException
+	protected List<Object> parseMobileRequestHandler()
 	{
 		s_logger.debug("Thread-{} : Parsing mobile socket connection data for calibration.",
 				m_threadID);
 
-		byte bytes[] = IOUtils.toByteArray(m_clientSocket.getInputStream());
-
 		try
 		{
-			List<Object> requestData = parseRequestData(bytes, m_packetOffset);
+			List<Object> requestData = parseRequestData(m_clientSocket.getInputStream());
 			if ((requestData == null) || requestData.isEmpty())
-				handleResponse(m_clientSocket, "500".getBytes());
+			{
+				s_logger.error("Thread-{} : Error, empty request data list when parsing.",
+						m_threadID);
+				sendResponse(m_clientSocket, "500");
+			}
 			return requestData;
+		} catch (Exception e)
+		{
+			s_logger.error(String.format(
+					"Thread-%s : An error occured when parsing the mobile request data.",
+					m_threadID), e);
 		} finally
 		{
-			s_logger.debug("Thread-{} : Response sent back to the client.", m_threadID);
+			s_logger.debug("Thread-{} : Request parsed.", m_threadID);
 		}
+		return null;
 	}
 
 	@Override
 	protected List<Object> parseRequestData(
-			final byte[] _bytes,
-			final int _offset)
+			final InputStream _inputStream) throws IOException, ClassNotFoundException
 	{
 		s_logger.debug("Thread-{} : Parsing data from byte[]...", m_threadID);
-		int offset = _offset;
+
 		ArrayList<Object> list = new ArrayList<Object>();
+		ObjectInputStream ois = new ObjectInputStream(_inputStream);
+		String data = (String) ois.readObject();
+		s_logger.debug("data : {}", data);
 
-		try
+		String[] dataArray = data.split(";");
+
+		if (dataArray.length != 3)
 		{
-			/* Parses the byte array. */
-			byte[] macAddressByteArray = Arrays.copyOfRange(_bytes, offset, offset
-					+ m_macAddressByteLength);
-			list.add(new String(macAddressByteArray));
-
-			offset += m_macAddressByteLength;
-			byte[] xByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_positionByteLength);
-			list.add(ByteBuffer.wrap(xByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
-
-			offset += m_positionByteLength;
-			byte[] yByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_positionByteLength);
-			list.add(ByteBuffer.wrap(yByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
-
-			offset += m_positionByteLength;
-			byte[] rssiByteArray = Arrays.copyOfRange(_bytes, offset, offset + m_rssiByteLength);
-			list.add(ByteBuffer.wrap(rssiByteArray).order(ByteOrder.LITTLE_ENDIAN).getFloat());
-
-		} catch (Exception e)
-		{
-			s_logger.error(String.format(
-					"Thread-%s : Failed to parse mobile data for calibration.", m_threadID), e);
+			s_logger.error(
+					"Thread-{} : Can't parse data, the number of parameter is not equal to 3 ! ",
+					m_threadID);
 			return null;
 		}
+		/* Adds the macAddress */
+		list.add(dataArray[0]);
 
-		s_logger.debug("Thread-{} : Parsing of data completed.", m_threadID);
+		/* Adds the x coordinate */
+		list.add(dataArray[1]);
+
+		/* Adds the y coordinate */
+		list.add(dataArray[2]);
 
 		/* Verify that the data sent are not null or empty */
 		if (((String) list.get(0) == null) || ((String) list.get(0) == ""))
@@ -100,12 +96,14 @@ public class CalibrateRunnable extends SocketRunnable
 			s_logger.error("Thread-{} : The mobile mac address is empty! ", m_threadID);
 			return null;
 		}
-		if ((int) list.get(1) < 0)
+		if (((String) list.get(1) == null) || ((String) list.get(1) == "")
+				|| (Integer.parseInt((String) list.get(1)) < 0))
 		{
 			s_logger.error("Thread-{} : The coordonate x is invalid! ", m_threadID);
 			return null;
 		}
-		if ((int) list.get(2) < 0)
+		if (((String) list.get(2) == null) || ((String) list.get(2) == "")
+				|| (Integer.parseInt((String) list.get(1)) < 0))
 		{
 			s_logger.error("Thread-{} : The coordonate y is invalid! ", m_threadID);
 			return null;
@@ -119,8 +117,8 @@ public class CalibrateRunnable extends SocketRunnable
 			final List<Object> _mobileRequestData,
 			final Set<Measurement> _measurements)
 	{
-		int x = (int) _mobileRequestData.get(1);
-		int y = (int) _mobileRequestData.get(2);
+		int x = Integer.parseInt((String) _mobileRequestData.get(1));
+		int y = Integer.parseInt((String) _mobileRequestData.get(2));
 
 		return calibrate(x, y, _measurements);
 	}
@@ -141,9 +139,30 @@ public class CalibrateRunnable extends SocketRunnable
 	{
 
 		Position position = new Position(_x, _y, _measurements);
+
+		List<Measurement> tempMeasurements = new ArrayList<Measurement>();
 		for (Measurement m : _measurements)
+		{
 			m.setPosition(position);
+			tempMeasurements.add(m);
+		}
+		for (int i = 1; i < tempMeasurements.size(); ++i)
+		{
+			if (tempMeasurements.get(i).equals(tempMeasurements.get(i - 1)))
+			{
+				_measurements.remove(tempMeasurements.get(i));
+				tempMeasurements.remove(i);
+				--i;
+			}
+		}
+		tempMeasurements.clear();
+
 		s_logger.debug("Thread-{} : Inserting following Position : {}", m_threadID, position);
-		return m_calibrateService.insertSample(position);
+		if (m_calibrateService.insertSample(position))
+		{
+			m_mobileResponse = "200";
+			return true;
+		} else
+			return false;
 	}
 }

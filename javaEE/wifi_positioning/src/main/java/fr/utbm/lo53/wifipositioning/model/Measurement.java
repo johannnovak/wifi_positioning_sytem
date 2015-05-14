@@ -69,10 +69,23 @@ public class Measurement
 	public String toString()
 	{
 		String s = "";
-		s += "ID: " + id;
-		s += "\t| RSSI: " + rssi;
-		s += "\t| MacAddress : " + macAddress;
-		s += "\t| Position : " + position.getX() + "; " + position.getY();
+		s += "|" + id + "," + macAddress + "," + rssi;
+		if (position != null)
+			s += "," + position.getX() + ", " + position.getY();
 		return s.toString();
+	}
+
+	@Override
+	public boolean equals(
+			final Object _m)
+	{
+		Measurement measurement = (Measurement) _m;
+		return ((rssi == measurement.getRssi()) && macAddress.equals(measurement.getMacAddress()));
+	}
+
+	public boolean equals(
+			final Measurement _m)
+	{
+		return ((rssi == _m.getRssi()) && macAddress.equals(_m.getMacAddress()));
 	}
 }

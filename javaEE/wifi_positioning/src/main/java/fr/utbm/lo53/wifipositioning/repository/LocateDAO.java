@@ -1,6 +1,7 @@
 package fr.utbm.lo53.wifipositioning.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -38,7 +39,7 @@ public class LocateDAO
 	}
 
 	public synchronized Position queryPositionFromMeasurements(
-			final List<Measurement> _measurements,
+			final Set<Measurement> _measurements,
 			final float _epsilon)
 	{
 		Session session = m_sessionFactory.getCurrentSession();
