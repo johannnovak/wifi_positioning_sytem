@@ -1,6 +1,5 @@
 package fr.utbm.lo53.wifipositioning.service;
 
-import fr.utbm.lo53.wifipositioning.model.Measurement;
 import fr.utbm.lo53.wifipositioning.model.Position;
 import fr.utbm.lo53.wifipositioning.repository.CalibrateDAO;
 
@@ -21,11 +20,10 @@ public class CalibrateService
 		return s_calibrateService;
 	}
 
-	public synchronized void insertSample(
-			final Position _position,
-			final Measurement _measurement)
+	public synchronized boolean insertSample(
+			final Position _position)
 	{
-		m_CalibrateDAO.insertSample(_position);
+		return m_CalibrateDAO.insertSample(_position);
 	}
 
 }

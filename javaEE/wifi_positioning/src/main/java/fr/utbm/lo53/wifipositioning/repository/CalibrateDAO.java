@@ -37,7 +37,7 @@ public class CalibrateDAO
 		return s_calibrateDAO;
 	}
 
-	public synchronized void insertSample(
+	public synchronized boolean insertSample(
 			final Position _position)
 	{
 		s_logger.debug("CalibrateDAO inserting new Measurement-Position...");
@@ -103,6 +103,7 @@ public class CalibrateDAO
 			session.getTransaction().commit();
 
 			s_logger.debug("Insertion in the database successful.");
+			return true;
 		} catch (HibernateException he)
 		{
 			he.printStackTrace();
@@ -123,5 +124,6 @@ public class CalibrateDAO
 				session.close();
 			}
 		}
+		return false;
 	}
 }

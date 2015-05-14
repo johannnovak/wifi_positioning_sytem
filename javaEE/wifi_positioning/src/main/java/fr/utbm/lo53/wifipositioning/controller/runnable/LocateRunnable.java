@@ -40,7 +40,7 @@ public class LocateRunnable extends SocketRunnable
 	}
 
 	@Override
-	protected void socketHandler() throws IOException
+	protected void parseMobileRequestHandler() throws IOException
 	{
 
 		List<Measurement> measurements = new ArrayList<Measurement>();
@@ -54,11 +54,11 @@ public class LocateRunnable extends SocketRunnable
 
 		try
 		{
-			List<Object> data = parseData(bytes, m_packetOffset);
+			List<Object> data = parseRequestData(bytes, m_packetOffset);
 			if ((data == null) || data.isEmpty())
 			{
 				s_logger.error("Error, empty data list when parsing packet header.");
-				sendResponse(m_clientSocket, "500".getBytes());
+				handleResponse(m_clientSocket, "500".getBytes());
 			}
 			// macAddress = (String) data.get(0);
 			// x = (float) data.get(1);
@@ -70,9 +70,9 @@ public class LocateRunnable extends SocketRunnable
 			if (queriedPosition == null)
 			{
 				s_logger.error("Error, queried position is null. No position have been queried.");
-				sendResponse(m_clientSocket, "500".getBytes());
+				handleResponse(m_clientSocket, "500".getBytes());
 			} else
-				sendResponse(m_clientSocket, ("x:" + queriedPosition.getX() + ";y:"
+				handleResponse(m_clientSocket, ("x:" + queriedPosition.getX() + ";y:"
 						+ queriedPosition.getY() + ";").getBytes());
 		} finally
 		{
@@ -81,7 +81,7 @@ public class LocateRunnable extends SocketRunnable
 	}
 
 	@Override
-	protected List<Object> parseData(
+	protected List<Object> parseRequestData(
 			final byte[] _bytes,
 			final int _offset)
 	{

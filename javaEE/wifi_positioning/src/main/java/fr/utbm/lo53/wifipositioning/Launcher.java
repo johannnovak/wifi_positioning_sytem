@@ -34,6 +34,11 @@ public class Launcher
 		System.setProperty("position.byte.length", properties.getProperty("position.byte.length"));
 		System.setProperty("rssi.byte.length", properties.getProperty("rssi.byte.length"));
 
+		/* Retrieves the APs properties */
+		System.setProperty("ap.port", properties.getProperty("ap.port"));
+		System.setProperty("ap.ips", properties.getProperty("ap.ips"));
+		System.setProperty("ap.response.offset", properties.getProperty("ap.response.offset"));
+
 		/* Retrieves the properties concerning the calibration */
 		System.setProperty("calibrate.port", properties.getProperty("calibrate.port"));
 		System.setProperty("calibrate.packet.offset",

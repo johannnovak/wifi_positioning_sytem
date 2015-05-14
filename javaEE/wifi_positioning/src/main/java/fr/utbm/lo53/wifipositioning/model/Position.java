@@ -28,6 +28,13 @@ public class Position implements Serializable
 		measurements.add(_measurement);
 	}
 
+	public Position(final float _x, final float _y, final Set<Measurement> _measurements)
+	{
+		this.x = _x;
+		this.y = _y;
+		measurements = _measurements;
+	}
+
 	/****************************************/
 	/********** GETTERS and SETTERS *********/
 	/****************************************/

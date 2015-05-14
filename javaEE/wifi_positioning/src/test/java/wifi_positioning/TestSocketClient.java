@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Random;
 
-public class TestClient
+public class TestSocketClient
 {
 	public static void main(
 			final String[] args) throws IOException, InterruptedException
