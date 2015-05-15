@@ -3,7 +3,6 @@ package fr.gi.utbm.lo53project;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
@@ -36,14 +35,10 @@ public abstract class AbstractViewport extends View {
 
     // Frames
     private RectF mViewportFrame = new RectF();
-    private RectF mWorldBounds = new RectF(0, 0, 2000, 2000);
 
     // Gesture Detectors
     private ScaleGestureDetector mScaleGestureDetector;
     private GestureDetector mGestureDetector;
-
-    // Paint
-    protected Paint mPaint;
 
     // World Map
     protected WorldMap mMap;
@@ -60,13 +55,6 @@ public abstract class AbstractViewport extends View {
         // Gestures detectors
         mScaleGestureDetector   = new ScaleGestureDetector(getContext(), new ScaleListener());
         mGestureDetector        = new GestureDetector(getContext(), new ScrollListener());
-
-        // Paints for the points
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeWidth(20f);
 
         mState = State.NONE;
         mSelectionListener = listener;
@@ -157,7 +145,8 @@ public abstract class AbstractViewport extends View {
         // Translate the viewport
         canvas.translate(mViewportFrame.left, mViewportFrame.top);
 
-        canvas.drawRect(200, 200, 500, 500, mPaint);
+        // Draw the world map grid
+        mMap.drawGrid(canvas);
 
         invalidate();
     }
@@ -249,11 +238,12 @@ public abstract class AbstractViewport extends View {
                 // Offset the viewport according to the finger distance
                 mViewportFrame.offset(dx, dy);
 
-                // Ensure that we don't cross world bounds
-                if ( mViewportFrame.left < mWorldBounds.left || mViewportFrame.right > mWorldBounds.right) {
+                // Ensure that we are not crossing world bounds
+                RectF bounds = mMap.getBounds();
+                if ( mViewportFrame.left < bounds.left || mViewportFrame.right > bounds.right) {
                     mViewportFrame.offset(-dx, 0);
                 }
-                if ( mViewportFrame.top < mWorldBounds.top|| mViewportFrame.bottom > mWorldBounds.bottom) {
+                if ( mViewportFrame.top < bounds.top|| mViewportFrame.bottom > bounds.bottom) {
                     mViewportFrame.offset(0, -dy);
                 }
             }

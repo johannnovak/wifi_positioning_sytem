@@ -18,8 +18,7 @@ public class CalibrationViewport extends AbstractViewport {
         super.onDraw(canvas);
 
         for (Position p : mMap.getPositionsOfType(Position.Type.CALIBRATION)) {
-            mPaint.setColor(p.color);
-            canvas.drawPoint(p.x, p.y, mPaint);
+            canvas.drawPoint(p.x, p.y, mMap.paints.get(p.type));
         }
     }
 }

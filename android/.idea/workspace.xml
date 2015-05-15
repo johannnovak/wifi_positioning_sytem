@@ -76,7 +76,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="37" column="55" selection-start-line="37" selection-start-column="55" selection-end-line="37" selection-end-column="55" />
+              <caret line="35" column="34" selection-start-line="35" selection-start-column="34" selection-end-line="35" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -88,7 +88,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationViewport.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+              <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -110,12 +110,16 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/WorldMap.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+              <caret line="140" column="52" selection-start-line="140" selection-start-column="52" selection-end-line="140" selection-end-column="52" />
               <folding>
-                <element signature="e#282#283#0" expanded="true" />
-                <element signature="e#328#329#0" expanded="true" />
-                <element signature="e#861#862#0" expanded="true" />
-                <element signature="e#894#895#0" expanded="true" />
+                <element signature="e#2208#2235#0" expanded="true" />
+                <element signature="e#2263#2264#0" expanded="true" />
+                <element signature="e#2297#2298#0" expanded="true" />
+                <element signature="e#2422#2423#0" expanded="true" />
+                <element signature="e#2455#2456#0" expanded="true" />
+                <element signature="e#2882#2883#0" expanded="true" />
+                <element signature="e#2912#2913#0" expanded="true" />
+                <element signature="e#2996#3023#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -125,7 +129,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Position.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="23" column="2" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
+              <caret line="18" column="17" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -146,8 +150,8 @@
       <file leaf-file-name="AbstractViewport.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.90947366">
-              <caret line="36" column="13" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.68210524">
+              <caret line="147" column="34" selection-start-line="147" selection-start-column="34" selection-end-line="147" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -171,7 +175,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="23" column="5" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
+              <caret line="20" column="61" selection-start-line="20" selection-start-column="61" selection-end-line="20" selection-end-column="61" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -1417,13 +1421,13 @@
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Selectable.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/calibration_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/WorldMap.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Position.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/NavigationDrawerFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationViewport.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Position.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationViewport.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/WorldMap.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java" />
       </list>
     </option>
@@ -2002,10 +2006,14 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="9" column="47" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="47" />
           <folding>
-            <element signature="e#282#283#0" expanded="true" />
-            <element signature="e#328#329#0" expanded="true" />
-            <element signature="e#861#862#0" expanded="true" />
-            <element signature="e#894#895#0" expanded="true" />
+            <element signature="e#2208#2235#0" expanded="true" />
+            <element signature="e#2263#2264#0" expanded="true" />
+            <element signature="e#2297#2298#0" expanded="true" />
+            <element signature="e#2422#2423#0" expanded="true" />
+            <element signature="e#2455#2456#0" expanded="true" />
+            <element signature="e#2882#2883#0" expanded="true" />
+            <element signature="e#2912#2913#0" expanded="true" />
+            <element signature="e#2996#3023#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2100,10 +2108,14 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="9" column="47" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="47" />
           <folding>
-            <element signature="e#282#283#0" expanded="true" />
-            <element signature="e#328#329#0" expanded="true" />
-            <element signature="e#861#862#0" expanded="true" />
-            <element signature="e#894#895#0" expanded="true" />
+            <element signature="e#2208#2235#0" expanded="true" />
+            <element signature="e#2263#2264#0" expanded="true" />
+            <element signature="e#2297#2298#0" expanded="true" />
+            <element signature="e#2422#2423#0" expanded="true" />
+            <element signature="e#2455#2456#0" expanded="true" />
+            <element signature="e#2882#2883#0" expanded="true" />
+            <element signature="e#2912#2913#0" expanded="true" />
+            <element signature="e#2996#3023#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2208,10 +2220,14 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
           <folding>
-            <element signature="e#282#283#0" expanded="true" />
-            <element signature="e#328#329#0" expanded="true" />
-            <element signature="e#861#862#0" expanded="true" />
-            <element signature="e#894#895#0" expanded="true" />
+            <element signature="e#2208#2235#0" expanded="true" />
+            <element signature="e#2263#2264#0" expanded="true" />
+            <element signature="e#2297#2298#0" expanded="true" />
+            <element signature="e#2422#2423#0" expanded="true" />
+            <element signature="e#2455#2456#0" expanded="true" />
+            <element signature="e#2882#2883#0" expanded="true" />
+            <element signature="e#2912#2913#0" expanded="true" />
+            <element signature="e#2996#3023#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2295,10 +2311,64 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="31" column="24" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/NavigationDrawerFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="138" column="0" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="20" column="61" selection-start-line="20" selection-start-column="61" selection-end-line="20" selection-end-column="61" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractFragment.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="18" column="23" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Position.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="18" column="17" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationViewport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="35" column="34" selection-start-line="35" selection-start-column="34" selection-end-line="35" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -2318,74 +2388,24 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/WorldMap.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <caret line="140" column="52" selection-start-line="140" selection-start-column="52" selection-end-line="140" selection-end-column="52" />
           <folding>
-            <element signature="e#282#283#0" expanded="true" />
-            <element signature="e#328#329#0" expanded="true" />
-            <element signature="e#861#862#0" expanded="true" />
-            <element signature="e#894#895#0" expanded="true" />
+            <element signature="e#2208#2235#0" expanded="true" />
+            <element signature="e#2263#2264#0" expanded="true" />
+            <element signature="e#2297#2298#0" expanded="true" />
+            <element signature="e#2422#2423#0" expanded="true" />
+            <element signature="e#2455#2456#0" expanded="true" />
+            <element signature="e#2882#2883#0" expanded="true" />
+            <element signature="e#2912#2913#0" expanded="true" />
+            <element signature="e#2996#3023#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/Position.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="23" column="2" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/NavigationDrawerFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="138" column="0" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="23" column="5" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="31" column="24" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="37" column="55" selection-start-line="37" selection-start-column="55" selection-end-line="37" selection-end-column="55" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/LocationViewport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.90947366">
-          <caret line="36" column="13" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.68210524">
+          <caret line="147" column="34" selection-start-line="147" selection-start-column="34" selection-end-line="147" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

@@ -18,8 +18,7 @@ public class LocationViewport extends AbstractViewport{
         super.onDraw(canvas);
 
         for (Position p : mMap.getPositions()) {
-            mPaint.setColor(p.color);
-            canvas.drawPoint(p.x, p.y, mPaint);
+            canvas.drawPoint(p.x, p.y, mMap.paints.get(p.type));
         }
     }
 
