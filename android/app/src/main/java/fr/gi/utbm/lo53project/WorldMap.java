@@ -125,6 +125,7 @@ public class WorldMap implements Serializable {
         float dx = mBounds.width() / GRID_WIDTH;
         float dy = mBounds.height() / GRID_HEIGHT;
 
+        // Row lines
         for (int i = 0; i < GRID_HEIGHT; i++)
         {
             canvas.drawLine(
@@ -133,7 +134,13 @@ public class WorldMap implements Serializable {
                 mGridPaint
             );
         }
+        canvas.drawLine(
+                mBounds.left, mBounds.height(), // start X & Y
+                mBounds.right, mBounds.height(), // end X & Y
+                mGridPaint
+        );
 
+        // Column lines
         for (int i = 0; i < GRID_WIDTH; i++)
         {
             canvas.drawLine(
@@ -142,6 +149,11 @@ public class WorldMap implements Serializable {
                 mGridPaint
             );
         }
+        canvas.drawLine(
+                mBounds.width(), mBounds.top, // start X & Y
+                mBounds.width(), mBounds.bottom, // end X & Y
+                mGridPaint
+        );
     }
 
 
