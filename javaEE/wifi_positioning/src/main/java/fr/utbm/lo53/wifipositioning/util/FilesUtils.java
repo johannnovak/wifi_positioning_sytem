@@ -9,11 +9,19 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
+/**
+ * Static class designed to be able to perform operations on files.
+ * 
+ * @author jnovak
+ *
+ */
 public class FilesUtils
 {
 
 	/** Logger of the class */
 	private final static Logger	s_logger	= LoggerFactory.getLogger(FilesUtils.class);
+
+	/* --------------------------------------------------------------------- */
 
 	/**
 	 * Method used to initialize the log file.

@@ -11,7 +11,9 @@ public class TestSocketAp
 	public static void main(
 			final String[] args) throws IOException, ClassNotFoundException
 	{
+		@SuppressWarnings("resource")
 		ServerSocket serverSocket = new ServerSocket(1110);
+
 		while (true)
 		{
 			System.out.println("waiting");

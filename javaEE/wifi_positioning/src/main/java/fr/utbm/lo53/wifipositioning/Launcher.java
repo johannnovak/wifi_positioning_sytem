@@ -9,11 +9,30 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.core.joran.spi.JoranException;
 import fr.utbm.lo53.wifipositioning.util.FilesUtils;
 
+/**
+ * Main to launch to initialize the WifiPositioning server. It reads the
+ * 'server.properties' resources files and export all of these properties to the
+ * System Properties. It then launch in new {@link Thread}s, the
+ * {@link CalibrateStandalone} and the {@link LocateStandalone}.
+ * 
+ * @author jnovak
+ *
+ */
 public class Launcher
 {
 	/** Logger of the class */
 	private final static Logger	s_logger	= LoggerFactory.getLogger(Launcher.class);
 
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * Main method to launch to start the WifiPositioning server.
+	 * 
+	 * @param args
+	 *            No args.
+	 * @throws IOException
+	 * @throws JoranException
+	 */
 	public static void main(
 			final String[] args) throws IOException, JoranException
 	{
@@ -43,7 +62,6 @@ public class Launcher
 		/* Runs standalone controllers */
 		new Thread(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				CalibrateStandalone.main(null);
@@ -52,7 +70,6 @@ public class Launcher
 
 		new Thread(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				LocateStandalone.main(null);
