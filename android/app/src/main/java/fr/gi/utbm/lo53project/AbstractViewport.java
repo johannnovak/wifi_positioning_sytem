@@ -88,7 +88,7 @@ public abstract class AbstractViewport extends View {
 
         // Ensure that we are not in SELECTING state when selection listener is not defined
         if (mState == State.SELECTING && mSelectionListener == null)
-            throw new AssertionError("Error SELECTING State reached meanwhile selection listener is not defined.");
+            throw new AssertionError("Error SELECTING State reached meanwhile but listener is not defined.");
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
@@ -122,10 +122,28 @@ public abstract class AbstractViewport extends View {
      */
     public PointF fromViewToWorld (float x, float y) {
         return new PointF(
-            (x / mScaleFactor) - mViewportFrame.left,
-            (y / mScaleFactor) - mViewportFrame.top
+            (x / mScaleFactor) + mViewportFrame.left,
+            (y / mScaleFactor) + mViewportFrame.top
         );
     }
+
+    public float fromViewToWorld (float d) {
+        return d / mScaleFactor;
+    }
+
+
+    public PointF fromWorldToView (float x, float y) {
+        return new PointF(
+            (x - mViewportFrame.left) * mScaleFactor,
+            (y - mViewportFrame.top) * mScaleFactor
+        );
+    }
+
+    public float fromWorldToView (float d) {
+        return d * mScaleFactor;
+    }
+
+
 
     /**
      * Perform the scale, the translation
@@ -143,12 +161,10 @@ public abstract class AbstractViewport extends View {
         canvas.scale(mScaleFactor, mScaleFactor);
 
         // Translate the viewport
-        canvas.translate(mViewportFrame.left, mViewportFrame.top);
+        canvas.translate(-mViewportFrame.left, -mViewportFrame.top);
 
         // Draw the world map grid
         mMap.drawGrid(canvas);
-
-        invalidate();
     }
 
     /**
@@ -157,7 +173,6 @@ public abstract class AbstractViewport extends View {
     @SuppressWarnings("unused")
     public void clearCanvas() {
         mScaleFactor = 1.0f;
-//        mViewportOffset.set(0, 0);
         mViewportFrame.set(0, 0, 0, 0);
         invalidate();
     }
@@ -230,21 +245,39 @@ public abstract class AbstractViewport extends View {
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                                 float distanceX, float distanceY) {
 
-            if (mState != State.SCALING) {
+            if (mState != State.SCALING ) {
 
-                float dx = -(distanceX / mScaleFactor);
-                float dy = -(distanceY / mScaleFactor);
-
-                // Offset the viewport according to the finger distance
-                mViewportFrame.offset(dx, dy);
-
-                // Ensure that we are not crossing world bounds
                 RectF bounds = mMap.getBounds();
-                if ( mViewportFrame.left < bounds.left || mViewportFrame.right > bounds.right) {
-                    mViewportFrame.offset(-dx, 0);
+
+                // Offset along X-axis
+                if (mViewportFrame.width() < bounds.width()) {
+                    float dx = (distanceX / mScaleFactor);
+
+                    // Offset the viewport according to the finger distance
+                    mViewportFrame.offset(dx, 0);
+
+
+                    // Now, we just have to ensure that we are not crossing world bounds
+                    if (mViewportFrame.left < bounds.left) {
+                        mViewportFrame.offsetTo(bounds.left, mViewportFrame.top);
+                    } else if (mViewportFrame.left > bounds.right - fromViewToWorld(mViewportFrame.width())) {
+                        mViewportFrame.offsetTo(bounds.right - fromViewToWorld(mViewportFrame.width()), mViewportFrame.top);
+                    }
                 }
-                if ( mViewportFrame.top < bounds.top|| mViewportFrame.bottom > bounds.bottom) {
-                    mViewportFrame.offset(0, -dy);
+
+                // Offset along Y-axis
+                if (mViewportFrame.height() < bounds.height()) {
+                    float dy = (distanceY / mScaleFactor);
+
+                    // Offset the viewport according to the finger distance
+                    mViewportFrame.offset(0, dy);
+
+                    // Now, we just have to ensure that we are not crossing world bounds
+                    if (mViewportFrame.top < bounds.top) {
+                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.top);
+                    } else if (mViewportFrame.top > bounds.bottom - fromViewToWorld(mViewportFrame.height())) {
+                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.bottom - fromViewToWorld(mViewportFrame.height()));
+                    }
                 }
             }
 

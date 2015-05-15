@@ -23,8 +23,8 @@ public class WorldMap implements Serializable {
 
     private RectF mBounds;
 
-    private static int GRID_WIDTH = 5;
-    private static int GRID_HEIGHT = 5;
+    private static int GRID_WIDTH = 10;
+    private static int GRID_HEIGHT = 10;
 
     public Map<Position.Type , Paint> paints;
 

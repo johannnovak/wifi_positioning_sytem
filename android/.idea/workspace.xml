@@ -76,7 +76,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="35" column="34" selection-start-line="35" selection-start-column="34" selection-end-line="35" selection-end-column="34" />
+              <caret line="74" column="23" selection-start-line="74" selection-start-column="23" selection-end-line="74" selection-end-column="23" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -110,16 +110,16 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/WorldMap.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="140" column="52" selection-start-line="140" selection-start-column="52" selection-end-line="140" selection-end-column="52" />
+              <caret line="26" column="39" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
               <folding>
-                <element signature="e#2208#2235#0" expanded="true" />
-                <element signature="e#2263#2264#0" expanded="true" />
-                <element signature="e#2297#2298#0" expanded="true" />
-                <element signature="e#2422#2423#0" expanded="true" />
-                <element signature="e#2455#2456#0" expanded="true" />
-                <element signature="e#2882#2883#0" expanded="true" />
-                <element signature="e#2912#2913#0" expanded="true" />
-                <element signature="e#2996#3023#0" expanded="true" />
+                <element signature="e#2210#2237#0" expanded="true" />
+                <element signature="e#2265#2266#0" expanded="true" />
+                <element signature="e#2299#2300#0" expanded="true" />
+                <element signature="e#2424#2425#0" expanded="true" />
+                <element signature="e#2457#2458#0" expanded="true" />
+                <element signature="e#2884#2885#0" expanded="true" />
+                <element signature="e#2914#2915#0" expanded="true" />
+                <element signature="e#2998#3025#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -150,10 +150,15 @@
       <file leaf-file-name="AbstractViewport.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.68210524">
-              <caret line="147" column="34" selection-start-line="147" selection-start-column="34" selection-end-line="147" selection-end-column="34" />
+            <state vertical-scroll-proportion="1.8336842">
+              <caret line="96" column="72" selection-start-line="96" selection-start-column="72" selection-end-line="96" selection-end-column="72" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#3860#3861#0" expanded="true" />
+                <element signature="e#3899#3900#0" expanded="true" />
+                <element signature="e#4152#4153#0" expanded="true" />
+                <element signature="e#4191#4192#0" expanded="true" />
+                <element signature="e#4851#4878#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1606,11 +1611,11 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Android\AndroidStudioProjects\LO53Project\app\src\main\res\layout" />
-    </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="fr.gi.utbm.lo53project" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Android\AndroidStudioProjects\LO53Project\app\src\main\res\layout" />
     </key>
   </component>
   <component name="RunManager" selected="Android Application.app">
@@ -1839,7 +1844,7 @@
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32934928" sideWeight="0.48959032" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32934928" sideWeight="0.83075887" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32934928" sideWeight="0.83075887" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32934928" sideWeight="0.49496305" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32975152" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1914,6 +1919,11 @@
           <caret line="184" column="43" selection-start-line="184" selection-start-column="43" selection-end-line="184" selection-end-column="43" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3860#3861#0" expanded="true" />
+            <element signature="e#3899#3900#0" expanded="true" />
+            <element signature="e#4152#4153#0" expanded="true" />
+            <element signature="e#4191#4192#0" expanded="true" />
+            <element signature="e#4851#4878#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2006,14 +2016,14 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="9" column="47" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="47" />
           <folding>
-            <element signature="e#2208#2235#0" expanded="true" />
-            <element signature="e#2263#2264#0" expanded="true" />
-            <element signature="e#2297#2298#0" expanded="true" />
-            <element signature="e#2422#2423#0" expanded="true" />
-            <element signature="e#2455#2456#0" expanded="true" />
-            <element signature="e#2882#2883#0" expanded="true" />
-            <element signature="e#2912#2913#0" expanded="true" />
-            <element signature="e#2996#3023#0" expanded="true" />
+            <element signature="e#2210#2237#0" expanded="true" />
+            <element signature="e#2265#2266#0" expanded="true" />
+            <element signature="e#2299#2300#0" expanded="true" />
+            <element signature="e#2424#2425#0" expanded="true" />
+            <element signature="e#2457#2458#0" expanded="true" />
+            <element signature="e#2884#2885#0" expanded="true" />
+            <element signature="e#2914#2915#0" expanded="true" />
+            <element signature="e#2998#3025#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2031,6 +2041,11 @@
           <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3860#3861#0" expanded="true" />
+            <element signature="e#3899#3900#0" expanded="true" />
+            <element signature="e#4152#4153#0" expanded="true" />
+            <element signature="e#4191#4192#0" expanded="true" />
+            <element signature="e#4851#4878#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2108,14 +2123,14 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="9" column="47" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="47" />
           <folding>
-            <element signature="e#2208#2235#0" expanded="true" />
-            <element signature="e#2263#2264#0" expanded="true" />
-            <element signature="e#2297#2298#0" expanded="true" />
-            <element signature="e#2422#2423#0" expanded="true" />
-            <element signature="e#2455#2456#0" expanded="true" />
-            <element signature="e#2882#2883#0" expanded="true" />
-            <element signature="e#2912#2913#0" expanded="true" />
-            <element signature="e#2996#3023#0" expanded="true" />
+            <element signature="e#2210#2237#0" expanded="true" />
+            <element signature="e#2265#2266#0" expanded="true" />
+            <element signature="e#2299#2300#0" expanded="true" />
+            <element signature="e#2424#2425#0" expanded="true" />
+            <element signature="e#2457#2458#0" expanded="true" />
+            <element signature="e#2884#2885#0" expanded="true" />
+            <element signature="e#2914#2915#0" expanded="true" />
+            <element signature="e#2998#3025#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2133,6 +2148,11 @@
           <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3860#3861#0" expanded="true" />
+            <element signature="e#3899#3900#0" expanded="true" />
+            <element signature="e#4152#4153#0" expanded="true" />
+            <element signature="e#4191#4192#0" expanded="true" />
+            <element signature="e#4851#4878#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2220,14 +2240,14 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
           <folding>
-            <element signature="e#2208#2235#0" expanded="true" />
-            <element signature="e#2263#2264#0" expanded="true" />
-            <element signature="e#2297#2298#0" expanded="true" />
-            <element signature="e#2422#2423#0" expanded="true" />
-            <element signature="e#2455#2456#0" expanded="true" />
-            <element signature="e#2882#2883#0" expanded="true" />
-            <element signature="e#2912#2913#0" expanded="true" />
-            <element signature="e#2996#3023#0" expanded="true" />
+            <element signature="e#2210#2237#0" expanded="true" />
+            <element signature="e#2265#2266#0" expanded="true" />
+            <element signature="e#2299#2300#0" expanded="true" />
+            <element signature="e#2424#2425#0" expanded="true" />
+            <element signature="e#2457#2458#0" expanded="true" />
+            <element signature="e#2884#2885#0" expanded="true" />
+            <element signature="e#2914#2915#0" expanded="true" />
+            <element signature="e#2998#3025#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2238,6 +2258,11 @@
           <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3860#3861#0" expanded="true" />
+            <element signature="e#3899#3900#0" expanded="true" />
+            <element signature="e#4152#4153#0" expanded="true" />
+            <element signature="e#4191#4192#0" expanded="true" />
+            <element signature="e#4851#4878#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2329,16 +2354,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="20" column="61" selection-start-line="20" selection-start-column="61" selection-end-line="20" selection-end-column="61" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractFragment.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -2365,16 +2380,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="35" column="34" selection-start-line="35" selection-start-column="34" selection-end-line="35" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -2385,29 +2390,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationViewport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="20" column="61" selection-start-line="20" selection-start-column="61" selection-end-line="20" selection-end-column="61" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/CalibrationFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="74" column="23" selection-start-line="74" selection-start-column="23" selection-end-line="74" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/WorldMap.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="140" column="52" selection-start-line="140" selection-start-column="52" selection-end-line="140" selection-end-column="52" />
+          <caret line="26" column="39" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
           <folding>
-            <element signature="e#2208#2235#0" expanded="true" />
-            <element signature="e#2263#2264#0" expanded="true" />
-            <element signature="e#2297#2298#0" expanded="true" />
-            <element signature="e#2422#2423#0" expanded="true" />
-            <element signature="e#2455#2456#0" expanded="true" />
-            <element signature="e#2882#2883#0" expanded="true" />
-            <element signature="e#2912#2913#0" expanded="true" />
-            <element signature="e#2996#3023#0" expanded="true" />
+            <element signature="e#2210#2237#0" expanded="true" />
+            <element signature="e#2265#2266#0" expanded="true" />
+            <element signature="e#2299#2300#0" expanded="true" />
+            <element signature="e#2424#2425#0" expanded="true" />
+            <element signature="e#2457#2458#0" expanded="true" />
+            <element signature="e#2884#2885#0" expanded="true" />
+            <element signature="e#2914#2915#0" expanded="true" />
+            <element signature="e#2998#3025#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/fr/gi/utbm/lo53project/AbstractViewport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.68210524">
-          <caret line="147" column="34" selection-start-line="147" selection-start-column="34" selection-end-line="147" selection-end-column="34" />
+        <state vertical-scroll-proportion="1.8336842">
+          <caret line="96" column="72" selection-start-line="96" selection-start-column="72" selection-end-line="96" selection-end-column="72" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#3860#3861#0" expanded="true" />
+            <element signature="e#3899#3900#0" expanded="true" />
+            <element signature="e#4152#4153#0" expanded="true" />
+            <element signature="e#4191#4192#0" expanded="true" />
+            <element signature="e#4851#4878#0" expanded="true" />
           </folding>
         </state>
       </provider>
