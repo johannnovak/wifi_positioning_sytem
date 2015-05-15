@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 /**
  * Created by Android on 06/04/2015 for LO53Project
@@ -18,6 +18,7 @@ import java.net.URL;
 public class CalibrationFragment extends AbstractFragment {
 
     private CalibrationViewport mViewport;
+    private static int mServerPort = 1111;
 
     @Nullable
     @Override
@@ -33,24 +34,13 @@ public class CalibrationFragment extends AbstractFragment {
         mViewport = new CalibrationViewport(getActivity(), null, mMap, new AbstractViewport.SelectionListener() {
             @Override
             public void onSelect(float x, float y) {
-//                sendPoint(x, y);
-
-                // To remove when we can send to server
-                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+                sendPoint(x, y);
             }
         });
 
         // Add the viewport to the linear layout
         LinearLayout calibration_viewport_layout = (LinearLayout)rootView.findViewById(R.id.calib_viewport_layout);
         calibration_viewport_layout.addView(mViewport);
-
-        // Initialize calibration's URL
-        try {
-            mUrl = new URL("http://192.168.43.78:8080/wifi_positioning/calibrate");
-        }
-        catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
         return rootView;
     }
@@ -62,19 +52,26 @@ public class CalibrationFragment extends AbstractFragment {
      */
     private void sendPoint(float x, float y) {
         try {
-            // Connection to the server
-            HttpURLConnection connection = (HttpURLConnection) mUrl.openConnection();
+            Socket clientSocket = new Socket(mServerIP, mServerPort);
 
-            // Sending coordinates
-            connection.addRequestProperty("x", Float.toString(x));
-            connection.addRequestProperty("y", Float.toString(y));
-            connection.connect();
+            ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
 
-            // If server return ok we add the point to the world map
-            if (connection.getResponseCode() == 200) {
-                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+            oos.writeObject(mMacAddress + ";" + (int)x + ";" + (int)y + ";"); // "mobileMacAddress;x;y"
+
+            try {
+                ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+                String code = (String) ois.readObject();
+
+                if (code.equals("200")) {
+                    mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+                }
+                clientSocket.close();
             }
-        } catch (IOException e) {
+            catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
