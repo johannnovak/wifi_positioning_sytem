@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -29,14 +30,13 @@ public abstract class AbstractViewport extends View {
     // Limits
     private static float MIN_ZOOM = 1f;
     private static float MAX_ZOOM = 5f;
-    private static int MIN_X = -100;
-    private static int MIN_Y = -100;
-    private static int MAX_X = 100;
-    private static int MAX_Y = 100;
 
-    // Moving and scaling values
+    // Scale factor
     private float mScaleFactor = 1.f;
-    private PointF mViewportOffset = new PointF(0, 0);
+
+    // Frames
+    private RectF mViewportFrame = new RectF();
+    private RectF mWorldBounds = new RectF(0, 0, 2000, 2000);
 
     // Gesture Detectors
     private ScaleGestureDetector mScaleGestureDetector;
@@ -134,8 +134,8 @@ public abstract class AbstractViewport extends View {
      */
     public PointF fromViewToWorld (float x, float y) {
         return new PointF(
-            (x / mScaleFactor) - mViewportOffset.x,
-            (y / mScaleFactor) - mViewportOffset.y
+            (x / mScaleFactor) - mViewportFrame.left,
+            (y / mScaleFactor) - mViewportFrame.top
         );
     }
 
@@ -147,11 +147,15 @@ public abstract class AbstractViewport extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        // Update viewport frame
+        mViewportFrame.bottom = mViewportFrame.top + canvas.getHeight();
+        mViewportFrame.right = mViewportFrame.left + canvas.getWidth();
+
         // Scale the viewport
         canvas.scale(mScaleFactor, mScaleFactor);
 
         // Translate the viewport
-        canvas.translate(mViewportOffset.x, mViewportOffset.y);
+        canvas.translate(mViewportFrame.left, mViewportFrame.top);
 
         canvas.drawRect(200, 200, 500, 500, mPaint);
 
@@ -164,8 +168,8 @@ public abstract class AbstractViewport extends View {
     @SuppressWarnings("unused")
     public void clearCanvas() {
         mScaleFactor = 1.0f;
-        mViewportOffset.set(0, 0);
-
+//        mViewportOffset.set(0, 0);
+        mViewportFrame.set(0, 0, 0, 0);
         invalidate();
     }
 
@@ -238,11 +242,20 @@ public abstract class AbstractViewport extends View {
                                 float distanceX, float distanceY) {
 
             if (mState != State.SCALING) {
-                // Set the viewport offset according to the finger distance.
-                mViewportOffset.set(
-                        Math.max(MIN_X, Math.min(mViewportOffset.x - (distanceX / mScaleFactor), MAX_X)),
-                        Math.max(MIN_Y, Math.min(mViewportOffset.y - (distanceY / mScaleFactor), MAX_Y))
-                );
+
+                float dx = -(distanceX / mScaleFactor);
+                float dy = -(distanceY / mScaleFactor);
+
+                // Offset the viewport according to the finger distance
+                mViewportFrame.offset(dx, dy);
+
+                // Ensure that we don't cross world bounds
+                if ( mViewportFrame.left < mWorldBounds.left || mViewportFrame.right > mWorldBounds.right) {
+                    mViewportFrame.offset(-dx, 0);
+                }
+                if ( mViewportFrame.top < mWorldBounds.top|| mViewportFrame.bottom > mWorldBounds.bottom) {
+                    mViewportFrame.offset(0, -dy);
+                }
             }
 
             return true;
