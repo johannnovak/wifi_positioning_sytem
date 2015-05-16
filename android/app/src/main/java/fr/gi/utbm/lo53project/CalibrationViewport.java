@@ -18,5 +18,7 @@ public class CalibrationViewport extends AbstractViewport {
         super.onDraw(canvas);
 
         mMap.drawPositions(canvas, Position.Type.CALIBRATION);
+        if (mMap.drawHoverPositions(canvas))
+            invalidate();
     }
 }

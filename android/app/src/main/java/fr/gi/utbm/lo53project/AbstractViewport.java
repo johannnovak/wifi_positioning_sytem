@@ -71,13 +71,13 @@ public abstract class AbstractViewport extends View {
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         updateState(event);
+        updateHoverSelection(event);
 
         boolean isScalingOrDragging = mScaleGestureDetector.onTouchEvent(event);
         isScalingOrDragging = mGestureDetector.onTouchEvent(event) || isScalingOrDragging;
 
         if (isScalingOrDragging) invalidate();
         return isScalingOrDragging || super.onTouchEvent(event);
-
     }
 
     /**
@@ -95,12 +95,21 @@ public abstract class AbstractViewport extends View {
                 if (mState == State.SELECTING) {
                     PointF selected = fromViewToWorld(e.getX(), e.getY());
                     mSelectionListener.onSelect(selected.x, selected.y);
+                    mMap.unhovered();
                 }
                 mState = State.NONE;
                 break;
             case MotionEvent.ACTION_DOWN:
                 mState = State.SCROLLING;
                 break;
+        }
+    }
+
+    private void updateHoverSelection(MotionEvent e) {
+        if(mState == State.SELECTING) {
+            PointF hover = fromViewToWorld(e.getX(), e.getY());
+            mMap.addHoverPosition(hover.x, hover.y);
+            invalidate();
         }
     }
 
