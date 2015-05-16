@@ -12,11 +12,8 @@ public class Position extends PointF {
         CALIBRATION
     }
 
-    public Type type;
-
-    public Position(float x, float y, Type t) {
+    public Position(float x, float y) {
         super(x, y);
-        type = t;
     }
 
 }

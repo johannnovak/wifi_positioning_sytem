@@ -17,8 +17,6 @@ public class CalibrationViewport extends AbstractViewport {
     protected void onDraw (Canvas canvas) {
         super.onDraw(canvas);
 
-        for (Position p : mMap.getPositionsOfType(Position.Type.CALIBRATION)) {
-            canvas.drawPoint(p.x, p.y, mMap.paints.get(p.type));
-        }
+        mMap.drawPositions(canvas, Position.Type.CALIBRATION);
     }
 }

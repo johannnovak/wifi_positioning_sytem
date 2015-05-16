@@ -7,9 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * Created by Android on 06/04/2015 for LO53Project
  */
@@ -31,14 +28,6 @@ public class LocationFragment extends AbstractFragment {
         mViewport = new LocationViewport(getActivity(), null, mMap);
         LinearLayout location_viewport_layout = (LinearLayout)rootView.findViewById(R.id.location_viewport_layout);
         location_viewport_layout.addView(mViewport);
-
-        // Initialize location's URL
-        try {
-            mUrl = new URL("http://192.168.43.78:8080/wifi_positioning/locate");
-        }
-        catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
         return rootView;
     }

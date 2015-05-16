@@ -16,9 +16,7 @@ import java.util.Map;
  */
 public class WorldMap implements Serializable {
 
-    private List<Position> mPositions;
-    private Paint mCalibrationPaint;
-    private Paint mLocationPaint;
+    private Map< Position.Type, List<Position>> mPositions;
     private Paint mGridPaint;
 
     private RectF mBounds;
@@ -29,25 +27,24 @@ public class WorldMap implements Serializable {
     public Map<Position.Type , Paint> paints;
 
     public WorldMap() {
-        mPositions = new ArrayList<>();
 
         mBounds = new RectF(0, 0, 2000, 2000);
 
         // Paint dedicated to calibration points
-        mCalibrationPaint  = new Paint();
-        mCalibrationPaint.setAntiAlias(true);
-        mCalibrationPaint.setStyle(Paint.Style.STROKE);
-        mCalibrationPaint.setStrokeJoin(Paint.Join.ROUND);
-        mCalibrationPaint.setStrokeWidth(20f);
-        mCalibrationPaint.setColor(Color.BLACK);
+        final Paint calibrationPaint  = new Paint();
+        calibrationPaint.setAntiAlias(true);
+        calibrationPaint.setStyle(Paint.Style.STROKE);
+        calibrationPaint.setStrokeJoin(Paint.Join.ROUND);
+        calibrationPaint.setStrokeWidth(20f);
+        calibrationPaint.setColor(Color.BLACK);
 
         // Paint dedicated to calibration points
-        mLocationPaint = new Paint();
-        mLocationPaint.setAntiAlias(true);
-        mLocationPaint.setStyle(Paint.Style.STROKE);
-        mLocationPaint.setStrokeJoin(Paint.Join.ROUND);
-        mLocationPaint.setStrokeWidth(20f);
-        mLocationPaint.setColor(Color.WHITE);
+        final Paint locationPaint = new Paint();
+        locationPaint.setAntiAlias(true);
+        locationPaint.setStyle(Paint.Style.STROKE);
+        locationPaint.setStrokeJoin(Paint.Join.ROUND);
+        locationPaint.setStrokeWidth(20f);
+        locationPaint.setColor(Color.WHITE);
 
         // Paint dedicated to calibration points
         mGridPaint = new Paint();
@@ -56,9 +53,22 @@ public class WorldMap implements Serializable {
         mGridPaint.setColor(Color.WHITE);
 
         paints = new HashMap<Position.Type , Paint>() {{
-            put(Position.Type.CALIBRATION, mCalibrationPaint);
-            put(Position.Type.LOCATION, mLocationPaint);
+            put(Position.Type.CALIBRATION, calibrationPaint);
+            put(Position.Type.LOCATION, locationPaint);
         }};
+
+        mPositions = new HashMap<Position.Type, List<Position>>() {{
+            put(Position.Type.CALIBRATION, new ArrayList<Position>());
+            put(Position.Type.LOCATION, new ArrayList<Position>());
+        }};
+    }
+
+    /**
+     * Give the bounds of the world map
+     * @return bounds
+     */
+    public RectF getBounds() {
+        return mBounds;
     }
 
     /**
@@ -68,7 +78,7 @@ public class WorldMap implements Serializable {
      * @param t position type
      */
     public void addPosition(float x, float y, Position.Type t) {
-        mPositions.add(new Position(x, y, t));
+        mPositions.get(t).add(new Position(x, y));
     }
 
     /**
@@ -76,50 +86,44 @@ public class WorldMap implements Serializable {
      */
     @SuppressWarnings("unused")
     public void clearAll() {
-        mPositions.clear();
+        mPositions.get(Position.Type.CALIBRATION).clear();
+        mPositions.get(Position.Type.LOCATION).clear();
     }
 
     /**
-     * Get a list of positions
-     * @return list of positions
-     */
-    public List<Position> getPositions () {
-        return mPositions;
-    }
-
-    /**
-     * Get a list of positions which are of type given
-     * @param t type
-     * @return list of positions of type t
-     */
-    public List<Position> getPositionsOfType (Position.Type t) {
-        List<Position> ret = new ArrayList<>();
-        for (Position p:mPositions) {
-            if(p.type == t) {
-                ret.add(p);
-            }
-        }
-        return ret;
-    }
-
-    public RectF getBounds() {
-        return mBounds;
-    }
-
-    /**
-     * Clear all position of type given
-     * @param t type
+     * Clear position of type given
+     * @param t type of position
      */
     @SuppressWarnings("unused")
-    public void clearType(Position.Type t) {
+    public void clear (Position.Type t) {
+        mPositions.get(t).clear();
+    }
 
-        for (Position p:mPositions ) {
-            if (p.type == t) {
-                mPositions.remove(p);
-            }
+    /**
+     * Draw all positions of given type in the canvas
+     * @param canvas canvas where to draw
+     * @param t type of position
+     */
+    public void drawPositions (Canvas canvas, Position.Type t) {
+        for (Position p : mPositions.get(t)) {
+            canvas.drawPoint(p.x, p.y, paints.get(t));
         }
     }
 
+    /**
+     * Draw all positions of both types in the canvas
+     * @param canvas canvas where to draw
+     */
+    public void drawPositions (Canvas canvas) {
+        drawPositions(canvas, Position.Type.CALIBRATION);
+        drawPositions(canvas, Position.Type.LOCATION);
+    }
+
+
+    /**
+     * Draw the grid in the canvas
+     * @param canvas canvas where to draw
+     */
     public void drawGrid(Canvas canvas) {
 
         float dx = mBounds.width() / GRID_WIDTH;

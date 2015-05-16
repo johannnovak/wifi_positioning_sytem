@@ -17,9 +17,7 @@ public class LocationViewport extends AbstractViewport{
     protected void onDraw (Canvas canvas) {
         super.onDraw(canvas);
 
-        for (Position p : mMap.getPositions()) {
-            canvas.drawPoint(p.x, p.y, mMap.paints.get(p.type));
-        }
+        mMap.drawPositions(canvas);
     }
 
 }
