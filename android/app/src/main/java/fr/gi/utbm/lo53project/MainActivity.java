@@ -1,22 +1,21 @@
 package fr.gi.utbm.lo53project;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public static String TAG_WORLDMAP = "Global WorldMap";
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -27,10 +26,19 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
+    private Bundle mWorldMapBundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Create a Bundle containing the WorldMap
+        mWorldMapBundle = new Bundle();
+        mWorldMapBundle.putSerializable(TAG_WORLDMAP, new WorldMap());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibration);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -49,12 +57,16 @@ public class MainActivity extends ActionBarActivity
 
         switch(position) {
             case 0 :
-                objFragment = new menuCalibration_Fragment();
+                objFragment = new CalibrationFragment();
                 break;
             case 1 :
-                objFragment = new menuDetection_Fragment();
+                objFragment = new LocationFragment();
                 break;
         }
+
+        // Give the bundle (containing the WorldMap) to the fragment
+        objFragment.setArguments(mWorldMapBundle);
+
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()

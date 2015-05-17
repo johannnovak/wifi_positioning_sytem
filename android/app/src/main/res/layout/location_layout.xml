@@ -7,8 +7,18 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Detection"
-        android:id="@+id/textView_detection"
+        android:id="@+id/textView_location"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="137dp" />
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/location_viewport_layout"
+        android:layout_below="@+id/textView_location">
+    </LinearLayout>
+
+
 </RelativeLayout>
