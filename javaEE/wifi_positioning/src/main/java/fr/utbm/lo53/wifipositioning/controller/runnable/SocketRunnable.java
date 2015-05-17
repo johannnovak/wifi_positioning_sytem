@@ -44,7 +44,7 @@ public abstract class SocketRunnable implements Runnable
 	/**
 	 * Array of {@link ApRunnable} needed to communicate afterwards with the APs
 	 */
-	private final ApRunnable[]			m_apRssiRunnable;
+	private final ApRunnable[]			m_apRunnable;
 
 	/**
 	 * Array of {@link Thread} that will be started when the server is willing
@@ -91,12 +91,12 @@ public abstract class SocketRunnable implements Runnable
 
 		/* Creates the runnables and the associated threads for the APs */
 		m_apSocketThreads = new Thread[apIPs.length];
-		m_apRssiRunnable = new ApRunnable[apIPs.length];
+		m_apRunnable = new ApRunnable[apIPs.length];
 		m_rssiMeasurements = new HashSet<Measurement>();
 		for (int i = 0; i < m_apSocketThreads.length; ++i)
 		{
-			m_apRssiRunnable[i] = new ApRunnable(apIPs[i], apPort, this);
-			m_apSocketThreads[i] = new Thread(m_apRssiRunnable[i]);
+			m_apRunnable[i] = new ApRunnable(apIPs[i], apPort, this);
+			m_apSocketThreads[i] = new Thread(m_apRunnable[i]);
 		}
 	}
 
@@ -133,9 +133,9 @@ public abstract class SocketRunnable implements Runnable
 
 			/* Connects to the APs to get RSSI values. */
 			s_logger.debug("Thread-{} : Launching AP threads ({})...", m_threadID, m_runnableName);
-			for (int i = 0; i < m_apRssiRunnable.length; ++i)
+			for (int i = 0; i < m_apRunnable.length; ++i)
 			{
-				m_apRssiRunnable[i].setMobileRequestData(mobileRequestData);
+				m_apRunnable[i].setMobileRequestData(mobileRequestData);
 				m_apSocketThreads[i].start();
 			}
 
