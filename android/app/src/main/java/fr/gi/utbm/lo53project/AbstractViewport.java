@@ -76,6 +76,7 @@ public abstract class AbstractViewport extends View {
         boolean isScalingOrDragging = mScaleGestureDetector.onTouchEvent(event);
         isScalingOrDragging = mGestureDetector.onTouchEvent(event) || isScalingOrDragging;
 
+
         if (isScalingOrDragging) invalidate();
         return isScalingOrDragging || super.onTouchEvent(event);
     }
@@ -238,8 +239,11 @@ public abstract class AbstractViewport extends View {
          */
         @Override
         public void onLongPress(MotionEvent e) {
-            if (mSelectionListener != null)
+            if (mSelectionListener != null) {
                 mState = State.SELECTING;
+                updateHoverSelection(e);
+
+            }
         }
 
         /**

@@ -14,14 +14,31 @@ public class Position extends Point {
     }
 
     public int life;
+    public static int LIFE_MAX = 255;
+    public static int LIFE_SPEED = 10;
+    private boolean bDead;
 
     public Position(int x, int y) {
         super(x, y);
-        life = 255;
+        life = LIFE_MAX;
+        bDead = false;
     }
 
     public boolean equals (Position p) {
         return (x == p.x && y == p.y);
+    }
+
+    public void decreaseLife () {
+        life = (life - LIFE_SPEED < 0) ? 0 : life - LIFE_SPEED;
+        if (life == 0) bDead = true;
+    }
+
+    public void recoverLife() {
+        life = LIFE_MAX;
+    }
+
+    public boolean isDead() {
+        return bDead;
     }
 
 }

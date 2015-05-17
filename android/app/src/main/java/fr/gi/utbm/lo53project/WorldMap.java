@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * Created by celian on 29/04/15 for LO53Project
@@ -30,8 +29,8 @@ public class WorldMap implements Serializable {
 
     public Map<Position.Type , Paint> paints;
 
-    private Stack<Position> mHoverPositions;
     private boolean b_selecting;
+    private Position mCurrentHoverPosition;
 
     public WorldMap() {
 
@@ -68,17 +67,18 @@ public class WorldMap implements Serializable {
         mGridPaint.setColor(Color.WHITE);
 
         paints = new HashMap<Position.Type , Paint>() {{
-            put(Position.Type.HOVER, hoverPaint);
-            put(Position.Type.CALIBRATION, calibrationPaint);
-            put(Position.Type.LOCATION, locationPaint);
+            put(Position.Type.HOVER,        hoverPaint);
+            put(Position.Type.CALIBRATION,  calibrationPaint);
+            put(Position.Type.LOCATION,     locationPaint);
         }};
 
         mPositions = new HashMap<Position.Type, List<Position>>() {{
             put(Position.Type.CALIBRATION, new ArrayList<Position>());
             put(Position.Type.LOCATION, new ArrayList<Position>());
+            put(Position.Type.HOVER, new ArrayList<Position>());
         }};
 
-        mHoverPositions = new Stack<>();
+        mCurrentHoverPosition = null;
     }
 
     /**
@@ -90,6 +90,7 @@ public class WorldMap implements Serializable {
     }
 
     public void unhovered() {
+        mCurrentHoverPosition = null;
         b_selecting = false;
     }
 
@@ -110,6 +111,7 @@ public class WorldMap implements Serializable {
     public void clearAll() {
         mPositions.get(Position.Type.CALIBRATION).clear();
         mPositions.get(Position.Type.LOCATION).clear();
+        mPositions.get(Position.Type.HOVER).clear();
     }
 
     /**
@@ -121,36 +123,12 @@ public class WorldMap implements Serializable {
         mPositions.get(t).clear();
     }
 
-    /**
-     * Draw all positions of given type in the canvas
-     * @param canvas canvas where to draw
-     * @param t type of position
-     */
-    public void drawPositions (Canvas canvas, Position.Type t) {
-        for (Position p : mPositions.get(t)) {
-            drawPosition(canvas, p, t);
-        }
-    }
-
     public void drawPosition (Canvas canvas, Position p, Position.Type t) {
 
         Paint paint = paints.get(t);
 
         if (t == Position.Type.HOVER) {
-            // If we are selecting
-            if (b_selecting) {
-                // ... and the current point is the selecting one
-                if (!p.equals(mHoverPositions.peek())) {
-                    paint.setAlpha(p.life -= 5);
-                }
-                else {
-                    paint.setAlpha(255);
-                }
-            }
-            // else the finger is out the screen so we can fade
-            else {
-                paint.setAlpha(p.life -= 5);
-            }
+            paint.setAlpha(p.life);
         }
 
         canvas.drawRect(
@@ -163,14 +141,62 @@ public class WorldMap implements Serializable {
     }
 
     /**
-     * Draw all positions of both types in the canvas
+     * Draw all positions of given type in the canvas
+     * @param canvas canvas where to draw
+     * @param t type of position
+     */
+    public boolean drawPositions (Canvas canvas, Position.Type t) {
+        boolean result = false;
+
+        if (t == Position.Type.HOVER) {
+            result = updateLife();
+        }
+
+        for (Position p : mPositions.get(t)) {
+            drawPosition(canvas, p, t);
+        }
+
+        return result;
+    }
+
+    private boolean updateLife() {
+
+        // Update life value of hover positions
+        for (Position p : mPositions.get(Position.Type.HOVER)) {
+            // If we are selecting
+            if (b_selecting) {
+                // ... and the current point is the hovered one
+                if (p.equals(mCurrentHoverPosition)) {
+                    p.recoverLife();
+                } else {
+                    p.decreaseLife();
+                }
+            }
+            // else the finger is out the screen so we can fade
+            else {
+                p.decreaseLife();
+            }
+        }
+
+        // Remove dead positions
+        Iterator it = mPositions.get(Position.Type.HOVER).listIterator();
+        while(it.hasNext()) {
+            if (((Position) it.next()).isDead()) {
+                it.remove();
+            }
+        }
+
+        return mPositions.get(Position.Type.HOVER).size() != 0;
+    }
+
+    /**
+     * Draw all positions of both types CALIBRATION & LOCATION in the canvas
      * @param canvas canvas where to draw
      */
     public void drawPositions (Canvas canvas) {
         drawPositions(canvas, Position.Type.CALIBRATION);
         drawPositions(canvas, Position.Type.LOCATION);
     }
-
 
     /**
      * Draw the grid in the canvas
@@ -214,29 +240,12 @@ public class WorldMap implements Serializable {
 
     public void addHoverPosition (float x, float y) {
         Position p = toPosition(x, y);
-        if (!mHoverPositions.contains(p)) {
-            mHoverPositions.push(toPosition(x, y));
+        if (!mPositions.get(Position.Type.HOVER).contains(p)) {
+            mPositions.get(Position.Type.HOVER).add(p);
         }
+        mCurrentHoverPosition = p;
 
         b_selecting = true;
-    }
-
-    public boolean drawHoverPositions(Canvas canvas) {
-
-        // Remove dead hover-positions
-        Iterator it = mHoverPositions.listIterator();
-        while(it.hasNext()) {
-            Position p = (Position)it.next();
-            if (p.life <= 0) {
-                it.remove();
-            }
-        }
-
-        for (Position p : mHoverPositions) {
-            drawPosition(canvas, p, Position.Type.HOVER);
-        }
-
-        return mHoverPositions.size() != 0;
     }
 
     /**
