@@ -163,16 +163,10 @@ public class WorldMap implements Serializable {
 
         // Update life value of hover positions
         for (Position p : mPositions.get(Position.Type.HOVER)) {
-            // If we are selecting
-            if (b_selecting) {
-                // ... and the current point is the hovered one
-                if (p.equals(mCurrentHoverPosition)) {
-                    p.recoverLife();
-                } else {
-                    p.decreaseLife();
-                }
+            // If we are selecting and the point p is the hovered one
+            if (b_selecting && p.equals(mCurrentHoverPosition)) {
+                p.recoverLife();
             }
-            // else the finger is out the screen so we can fade
             else {
                 p.decreaseLife();
             }
