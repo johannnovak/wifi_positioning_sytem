@@ -3,11 +3,11 @@ package fr.utbm.lo53.wifipositioning.controller.runnable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,9 +136,8 @@ public class ApRunnable implements Runnable
 	private void writeSocket(
 			final Socket _socket) throws IOException
 	{
-		ObjectOutputStream oos = new ObjectOutputStream(_socket.getOutputStream());
 		/* index 0 <=> phone macAddress */
-		oos.writeObject(m_mobileRequestData.get(0));
+		_socket.getOutputStream().write(((String) m_mobileRequestData.get(0)).getBytes());
 	}
 
 	/* --------------------------------------------------------------------- */
@@ -188,8 +187,7 @@ public class ApRunnable implements Runnable
 	{
 		ArrayList<Object> list = new ArrayList<Object>();
 
-		ObjectInputStream ois = new ObjectInputStream(_inputStream);
-		String data = (String) ois.readObject();
+		String data = new String(IOUtils.toByteArray(_inputStream));
 		s_logger.debug("data : {}", data);
 		String[] dataArray = data.split(";");
 

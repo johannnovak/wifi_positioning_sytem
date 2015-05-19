@@ -45,7 +45,7 @@ public class Launcher
 		s_logger.debug("Loading properties...");
 		Properties properties = new Properties();
 		properties.load(Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("conf/server.properties"));
+				.getResourceAsStream("conf/dummy_server.properties"));
 
 		/* Retrieves the APs properties */
 		System.setProperty("ap.port", properties.getProperty("ap.port"));
@@ -57,11 +57,12 @@ public class Launcher
 		/* Retrieves the properties concerning the location */
 		System.setProperty("locate.port", properties.getProperty("locate.port"));
 
-		s_logger.debug("Properties loaded.");
+		s_logger.debug("Properties loaded : \n{}", properties);
 
 		/* Runs standalone controllers */
 		new Thread(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				CalibrateStandalone.main(null);
@@ -70,6 +71,7 @@ public class Launcher
 
 		new Thread(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				LocateStandalone.main(null);

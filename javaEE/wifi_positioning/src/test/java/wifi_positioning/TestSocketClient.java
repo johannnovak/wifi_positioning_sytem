@@ -1,9 +1,9 @@
 package wifi_positioning;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
+
+import org.apache.commons.io.IOUtils;
 
 public class TestSocketClient
 {
@@ -13,15 +13,13 @@ public class TestSocketClient
 		System.out.println("client");
 
 		Socket s;
-		s = new Socket("127.0.0.1", 1111);
+		s = new Socket("192.168.2.12", 3000);
 
 		System.out.println("client writing");
-		ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-		oos.writeObject("00:00:00:00:00:01;5;6;");
+		s.getOutputStream().write("00:00:00:00:00:01;5;6;".getBytes());
 
 		System.out.println("client reading");
-		ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-		System.out.println((String) ois.readObject());
+		System.out.println(new String(IOUtils.toByteArray(s.getInputStream())));
 		s.close();
 	}
 }
