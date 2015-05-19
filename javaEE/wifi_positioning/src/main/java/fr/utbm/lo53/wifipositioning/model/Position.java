@@ -13,9 +13,6 @@ import java.util.Set;
  */
 public class Position
 {
-	/** Serial ID */
-	private static final long	serialVersionUID	= 1L;
-
 	/** ID of the database table. DO NOT SET. */
 	private int					id;
 
@@ -26,7 +23,7 @@ public class Position
 	private float				y;
 
 	/** Associated {@link Measurement} for this {@link Position} */
-	private Set<Measurement>	measurements		= new HashSet<Measurement>(0);
+	private Set<Measurement>	measurements	= new HashSet<Measurement>(0);
 
 	/* --------------------------------------------------------------------- */
 

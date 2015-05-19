@@ -85,6 +85,7 @@ public class ApRunnable implements Runnable
 	 * AP's macAddress and the RSSI. Finally it adds these informations to the
 	 * runnable.
 	 */
+	@Override
 	public void run()
 	{
 		Socket clientSocket = null;
@@ -151,6 +152,7 @@ public class ApRunnable implements Runnable
 	private void readSocket(
 			final Socket _socket)
 	{
+
 		try
 		{
 			/* Parse the AP response */
