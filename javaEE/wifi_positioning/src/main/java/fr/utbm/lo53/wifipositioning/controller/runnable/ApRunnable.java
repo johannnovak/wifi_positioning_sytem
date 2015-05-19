@@ -2,7 +2,6 @@ package fr.utbm.lo53.wifipositioning.controller.runnable;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -191,7 +190,7 @@ public class ApRunnable implements Runnable
 		s_logger.debug("data : {}", data);
 		String[] dataArray = data.split(";");
 
-		if (dataArray.length != 3)
+		if (dataArray.length != 2)
 		{
 			s_logger.error("Can't parse AP response data, the number of parameter is not equal to 2 ! ");
 			return null;

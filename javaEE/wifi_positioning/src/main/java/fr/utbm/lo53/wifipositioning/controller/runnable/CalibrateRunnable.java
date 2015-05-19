@@ -188,8 +188,8 @@ public class CalibrateRunnable extends SocketRunnable
 			final List<Object> _mobileRequestData)
 	{
 		/* Casts the coordinates */
-		int x = Integer.parseInt((String) _mobileRequestData.get(1));
-		int y = Integer.parseInt((String) _mobileRequestData.get(2));
+		float x = Float.parseFloat((String) _mobileRequestData.get(1));
+		float y = Float.parseFloat((String) _mobileRequestData.get(2));
 
 		return calibrate(x, y, m_rssiMeasurements);
 	}

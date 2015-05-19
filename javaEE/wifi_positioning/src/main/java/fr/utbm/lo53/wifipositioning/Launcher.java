@@ -45,7 +45,7 @@ public class Launcher
 		s_logger.debug("Loading properties...");
 		Properties properties = new Properties();
 		properties.load(Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("conf/dummy_server.properties"));
+				.getResourceAsStream("conf/server.properties"));
 
 		/* Retrieves the APs properties */
 		System.setProperty("ap.port", properties.getProperty("ap.port"));
