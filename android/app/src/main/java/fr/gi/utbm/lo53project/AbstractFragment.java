@@ -21,45 +21,14 @@ public abstract class AbstractFragment extends Fragment {
     protected String mMacAddress;
     protected AbstractViewport mViewport;
 
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//
-//        if (savedInstanceState != null) {
-//            mMap = (WorldMap) savedInstanceState.getSerializable(MainActivity.TAG_WORLDMAP);
-//        }
-//        else {
-//            mMap = new WorldMap();
-//        }
-//
-//        System.out.println("Abstract fragment : Creating activity...");
-//    }
-
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putSerializable(MainActivity.TAG_WORLDMAP, mMap);
-//
-//        System.out.println("Abstract fragment : Saving fragment instance...");
-//    }
-//
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        mViewport.initializeMap(mMap);
-//        System.out.println("Abstract fragment : Starting and Initializing map...");
-//    }
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         System.out.println("Abstract fragment : Creating view...");
+
         // Load the world map from Main Activity
         Bundle args = getArguments();
-        System.out.println(args.toString());
         mMap = (WorldMap) args.getSerializable(MainActivity.TAG_WORLDMAP);
-
-        System.out.println(mMap);
 
         mMacAddress = getMacAddress(getActivity());
 

@@ -267,4 +267,49 @@ public class WorldMap implements Serializable {
             (int)Math.floor(y * GRID_HEIGHT / mBounds.height())
         );
     }
+
+    public String toString() {
+        String str = "--------------World map------------------\n";
+        str += "| Calibration \t\tLocation \t\tHover\n";
+
+        List<Position> c_pos = mPositions.get(Position.Type.CALIBRATION);
+        List<Position> l_pos = mPositions.get(Position.Type.LOCATION);
+        List<Position> h_pos = mPositions.get(Position.Type.HOVER);
+
+        int c_pos_size = c_pos.size();
+        int l_pos_size = l_pos.size();
+        int h_pos_size = h_pos.size();
+
+        int max = Math.max(Math.max(c_pos.size(), l_pos.size()), h_pos.size());
+
+        // Print calibration positions
+        for (int i = 0; i < max; i++) {
+
+            if ( i < c_pos_size ) {
+                str += "| " + c_pos.get(i).toString() + "\t\t\t";
+            }
+            else {
+                str += "|\t\t\t\t\t";
+            }
+
+            if ( i < l_pos_size ) {
+                str += l_pos.get(i).toString() + "\t\t\t";
+            }
+            else {
+                str += "\t\t\t\t";
+            }
+
+            if ( i < h_pos_size ) {
+                str += h_pos.get(i).toString() + "\t";
+            }
+            else {
+                str += "";
+            }
+            str += "\n";
+        }
+
+        str += "-----------------------------------------\n";
+
+        return str;
+    }
 }

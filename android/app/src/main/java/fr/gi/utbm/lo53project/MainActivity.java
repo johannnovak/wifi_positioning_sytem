@@ -2,6 +2,7 @@ package fr.gi.utbm.lo53project;
 
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -16,7 +17,6 @@ public class MainActivity extends ActionBarActivity
 
     public static String TAG_WORLDMAP = "Global WorldMap";
     public static String TAG_WORLDMAP_BUNDLE = "Global WorldMap Bundle";
-    public static String TAG_FRAGMENT = "Fragment bundle";
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -26,9 +26,8 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-
+    
     private Bundle mWorldMap;
-//    private Fragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +65,15 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onRestoreInstanceState (Bundle savedInstanceState) {
+    public void onRestoreInstanceState (@NonNull Bundle savedInstanceState) {
         mWorldMap = savedInstanceState.getBundle(TAG_WORLDMAP_BUNDLE);
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
-        System.out.println("MainActivity : Selecting navigation drawer item ...");
+        System.out.println("##############################");
+        System.out.println("MainActivity : Selecting item ...");
         Fragment objFragment = null;
 
         switch(position) {
@@ -98,7 +98,7 @@ public class MainActivity extends ActionBarActivity
                 .replace(R.id.container, objFragment)
                 .commit();
 
-        System.out.println("MainActivity : Navigation drawer item selected !");
+        System.out.println("MainActivity : Item " + mTitle + " selected !");
     }
 
     public void restoreActionBar() {

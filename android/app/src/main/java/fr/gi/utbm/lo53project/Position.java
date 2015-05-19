@@ -43,4 +43,8 @@ public class Position extends Point implements Serializable {
         return bDead;
     }
 
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+
 }
