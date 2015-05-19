@@ -9,6 +9,10 @@ import android.util.AttributeSet;
  */
 public class LocationViewport extends AbstractViewport{
 
+    public LocationViewport(Context context, AttributeSet attrs) {
+        super(context, attrs, null);
+    }
+
     public LocationViewport(Context context, AttributeSet attrs, WorldMap map) {
         super(context, attrs, map);
     }

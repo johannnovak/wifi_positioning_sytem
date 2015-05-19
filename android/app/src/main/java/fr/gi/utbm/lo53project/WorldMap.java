@@ -18,28 +18,28 @@ import java.util.Map;
 public class WorldMap implements Serializable {
 
     private Map< Position.Type, List<Position>> mPositions;
-    private Paint mGridPaint;
+    private SPaint mGridPaint;
 
-    private RectF mBounds;
+    private SRectF mBounds;
 
     private static int GRID_WIDTH = 10;
     private static int GRID_HEIGHT = 10;
     private float mSquareWidth;
     private float mSquareHeight;
 
-    public Map<Position.Type , Paint> paints;
+    public Map<Position.Type , SPaint> paints;
 
     private boolean b_selecting;
     private Position mCurrentHoverPosition;
 
     public WorldMap() {
 
-        mBounds = new RectF(0, 0, 2000, 2000);
+        mBounds = new SRectF(0, 0, 2000, 2000);
         mSquareWidth = mBounds.width() / GRID_WIDTH;
         mSquareHeight = mBounds.height() / GRID_HEIGHT;
 
         // Paint dedicated to calibration points
-        final Paint calibrationPaint  = new Paint();
+        final SPaint calibrationPaint  = new SPaint();
         calibrationPaint.setAntiAlias(true);
         calibrationPaint.setStyle(Paint.Style.STROKE);
         calibrationPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -47,7 +47,7 @@ public class WorldMap implements Serializable {
         calibrationPaint.setColor(Color.BLACK);
 
         // Paint dedicated to calibration points
-        final Paint locationPaint = new Paint();
+        final SPaint locationPaint = new SPaint();
         locationPaint.setAntiAlias(true);
         locationPaint.setStyle(Paint.Style.STROKE);
         locationPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -55,18 +55,18 @@ public class WorldMap implements Serializable {
         locationPaint.setColor(Color.WHITE);
 
         // Paint dedicated to calibration points
-        final Paint hoverPaint = new Paint();
+        final SPaint hoverPaint = new SPaint();
         hoverPaint.setAntiAlias(true);
         hoverPaint.setStyle(Paint.Style.FILL);
         hoverPaint.setColor(Color.GREEN);
 
         // Paint dedicated to calibration points
-        mGridPaint = new Paint();
+        mGridPaint = new SPaint();
         mGridPaint.setAntiAlias(true);
         mGridPaint.setStyle(Paint.Style.STROKE);
         mGridPaint.setColor(Color.WHITE);
 
-        paints = new HashMap<Position.Type , Paint>() {{
+        paints = new HashMap<Position.Type , SPaint>() {{
             put(Position.Type.HOVER,        hoverPaint);
             put(Position.Type.CALIBRATION,  calibrationPaint);
             put(Position.Type.LOCATION,     locationPaint);
@@ -79,6 +79,8 @@ public class WorldMap implements Serializable {
         }};
 
         mCurrentHoverPosition = null;
+
+        System.out.println("WorldMap : constructor");
     }
 
     /**
@@ -89,7 +91,7 @@ public class WorldMap implements Serializable {
         return mBounds;
     }
 
-    public void unhovered() {
+    public void outFinger() {
         mCurrentHoverPosition = null;
         b_selecting = false;
     }
@@ -123,6 +125,12 @@ public class WorldMap implements Serializable {
         mPositions.get(t).clear();
     }
 
+    /**
+     * Draw a position of the given type into the canvas
+     * @param canvas canvas where to draw
+     * @param p position to draw
+     * @param t type of the position to draw
+     */
     public void drawPosition (Canvas canvas, Position p, Position.Type t) {
 
         Paint paint = paints.get(t);
@@ -144,21 +152,26 @@ public class WorldMap implements Serializable {
      * Draw all positions of given type in the canvas
      * @param canvas canvas where to draw
      * @param t type of position
+     * @return have to redraw after that
      */
     public boolean drawPositions (Canvas canvas, Position.Type t) {
-        boolean result = false;
+        boolean redraw = false;
 
         if (t == Position.Type.HOVER) {
-            result = updateLife();
+            redraw = updateLife();
         }
 
         for (Position p : mPositions.get(t)) {
             drawPosition(canvas, p, t);
         }
 
-        return result;
+        return redraw;
     }
 
+    /**
+     * Recover or decrease life and remove hovered points if are dead
+     * @return have to redraw after that
+     */
     private boolean updateLife() {
 
         // Update life value of hover positions
@@ -180,7 +193,7 @@ public class WorldMap implements Serializable {
             }
         }
 
-        return mPositions.get(Position.Type.HOVER).size() != 0;
+        return !mPositions.get(Position.Type.HOVER).isEmpty();
     }
 
     /**

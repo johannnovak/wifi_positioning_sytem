@@ -1,6 +1,5 @@
 package fr.gi.utbm.lo53project;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -16,6 +15,8 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     public static String TAG_WORLDMAP = "Global WorldMap";
+    public static String TAG_WORLDMAP_BUNDLE = "Global WorldMap Bundle";
+    public static String TAG_FRAGMENT = "Fragment bundle";
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -26,13 +27,13 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
-    private Bundle mWorldMapBundle;
+    private Bundle mWorldMap;
+//    private Fragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Create a Bundle containing the WorldMap
-        mWorldMapBundle = new Bundle();
-        mWorldMapBundle.putSerializable(TAG_WORLDMAP, new WorldMap());
+
+        System.out.println("MainActivity : Creating ...");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibration);
@@ -48,48 +49,63 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        if (savedInstanceState == null || !savedInstanceState.containsKey(TAG_WORLDMAP_BUNDLE)) {
+            mWorldMap = new Bundle();
+            mWorldMap.putSerializable(TAG_WORLDMAP, new WorldMap());
+        }
+
+        System.out.println("MainActivity : Created !");
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putBundle(TAG_WORLDMAP_BUNDLE, mWorldMap);
+    }
+
+    @Override
+    public void onRestoreInstanceState (Bundle savedInstanceState) {
+        mWorldMap = savedInstanceState.getBundle(TAG_WORLDMAP_BUNDLE);
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
+        System.out.println("MainActivity : Selecting navigation drawer item ...");
         Fragment objFragment = null;
 
         switch(position) {
             case 0 :
+                mTitle = getString(R.string.title_section1);
                 objFragment = new CalibrationFragment();
                 break;
             case 1 :
+                mTitle = getString(R.string.title_section2);
                 objFragment = new LocationFragment();
                 break;
         }
 
+        restoreActionBar();
+
         // Give the bundle (containing the WorldMap) to the fragment
-        objFragment.setArguments(mWorldMapBundle);
+        objFragment.setArguments(mWorldMap);
 
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, objFragment)
                 .commit();
-    }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-        }
+        System.out.println("MainActivity : Navigation drawer item selected !");
     }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        actionBar.setSubtitle(mTitle);
+        actionBar.setTitle(getTitle());
     }
 
 
@@ -119,36 +135,6 @@ public class MainActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
     }
 
 }

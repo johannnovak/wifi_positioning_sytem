@@ -17,15 +17,16 @@ import java.net.Socket;
  */
 public class CalibrationFragment extends AbstractFragment {
 
-    private CalibrationViewport mViewport;
-    private static int mServerPort = 1111;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        System.out.println("Calibration fragment : Creating view...");
 
         // the super function fetch mMap from bundle
         super.onCreateView(inflater, container, savedInstanceState);
+
+        // Get server port from resources
+        mServerPort = getResources().getInteger(R.integer.server_port_calibration);
 
         // Initialize view
         View rootView = inflater.inflate(R.layout.calibration_layout, container, false);
@@ -43,6 +44,7 @@ public class CalibrationFragment extends AbstractFragment {
         LinearLayout calibration_viewport_layout = (LinearLayout)rootView.findViewById(R.id.calib_viewport_layout);
         calibration_viewport_layout.addView(mViewport);
 
+        System.out.println("Calibration fragment : View created !");
         return rootView;
     }
 

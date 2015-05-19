@@ -27,8 +27,8 @@ public abstract class AbstractViewport extends View {
     private State mState;
 
     // Limits
-    private static float MIN_ZOOM = 1f;
-    private static float MAX_ZOOM = 5f;
+    public static float MIN_ZOOM = 1f;
+    public static float MAX_ZOOM = 5f;
 
     // Scale factor
     private float mScaleFactor = 1.f;
@@ -45,6 +45,13 @@ public abstract class AbstractViewport extends View {
 
     private SelectionListener mSelectionListener;
 
+    /**
+     * Constructor with a selection listener
+     * @param c context
+     * @param attrs attribute set
+     * @param map world map
+     * @param listener if not null, allows the viewport to select a position.
+     */
     public AbstractViewport(Context c, AttributeSet attrs, WorldMap map, SelectionListener listener) {
         super(c, attrs);
 
@@ -60,6 +67,12 @@ public abstract class AbstractViewport extends View {
         mSelectionListener = listener;
     }
 
+    /**
+     * Constructor without selection listener
+     * @param c context
+     * @param attrs attribute set
+     * @param map world map
+     */
     public AbstractViewport(Context c, AttributeSet attrs, WorldMap map) {
         this(c, attrs, map, null);
     }
@@ -96,7 +109,7 @@ public abstract class AbstractViewport extends View {
                 if (mState == State.SELECTING) {
                     PointF selected = fromViewToWorld(e.getX(), e.getY());
                     mSelectionListener.onSelect(selected.x, selected.y);
-                    mMap.unhovered();
+                    mMap.outFinger();
                 }
                 mState = State.NONE;
                 break;
@@ -106,6 +119,10 @@ public abstract class AbstractViewport extends View {
         }
     }
 
+    /**
+     * Add hover position to the world map if we are selecting
+     * @param e motion event
+     */
     private void updateHoverSelection(MotionEvent e) {
         if(mState == State.SELECTING) {
             PointF hover = fromViewToWorld(e.getX(), e.getY());
@@ -137,11 +154,23 @@ public abstract class AbstractViewport extends View {
         );
     }
 
+    /**
+     * Convert distance from view space to world space
+     * @param d distance to convert
+     * @return the converted distance
+     */
     public float fromViewToWorld (float d) {
         return d / mScaleFactor;
     }
 
 
+    /**
+     * Convert coordinates from world space to view space
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return the converted point
+     */
+    @SuppressWarnings("unused")
     public PointF fromWorldToView (float x, float y) {
         return new PointF(
             (x - mViewportFrame.left) * mScaleFactor,
@@ -149,11 +178,15 @@ public abstract class AbstractViewport extends View {
         );
     }
 
+    /**
+     * Convert distance from world space to view space
+     * @param d distance to convert
+     * @return the converted distance
+     */
+    @SuppressWarnings("unused")
     public float fromWorldToView (float d) {
         return d * mScaleFactor;
     }
-
-
 
     /**
      * Perform the scale, the translation

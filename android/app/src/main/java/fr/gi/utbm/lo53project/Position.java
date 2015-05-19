@@ -2,10 +2,12 @@ package fr.gi.utbm.lo53project;
 
 import android.graphics.Point;
 
+import java.io.Serializable;
+
 /**
  * Created by celian on 29/04/15 for LO53Project
  */
-public class Position extends Point {
+public class Position extends Point implements Serializable {
 
     public enum Type {
         HOVER,

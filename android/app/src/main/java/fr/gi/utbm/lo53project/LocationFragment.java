@@ -12,14 +12,15 @@ import android.widget.LinearLayout;
  */
 public class LocationFragment extends AbstractFragment {
 
-    private LocationViewport mViewport;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // the super function fetch mMap from bundle
         super.onCreateView(inflater, container, savedInstanceState);
+
+        // Get server port from resources
+        mServerPort = getResources().getInteger(R.integer.server_port_location);
 
         // Initialize view
         View rootView = inflater.inflate(R.layout.location_layout, container, false);
@@ -32,6 +33,7 @@ public class LocationFragment extends AbstractFragment {
         return rootView;
     }
 
+    @SuppressWarnings("unused")
     private void receivePoint() {
         // TO DO
         // - create a thread which loop ?

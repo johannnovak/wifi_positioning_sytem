@@ -9,6 +9,10 @@ import android.util.AttributeSet;
  */
 public class CalibrationViewport extends AbstractViewport {
 
+    public CalibrationViewport(Context context, AttributeSet attrs) {
+        super(context, attrs, null);
+    }
+
     public CalibrationViewport(Context context, AttributeSet attrs, WorldMap map, SelectionListener listener) {
         super(context, attrs, map, listener);
     }
@@ -21,4 +25,5 @@ public class CalibrationViewport extends AbstractViewport {
         if (mMap.drawPositions(canvas, Position.Type.HOVER))
             invalidate();
     }
+
 }
