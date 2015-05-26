@@ -136,6 +136,7 @@ public abstract class AbstractViewport extends View {
      * @param x x coordinate
      * @param y y coordinate
      */
+//    synchronized
     protected void addPoint(float x, float y, Position.Type t) {
         mMap.addPosition(x, y, t);
         this.invalidate(); // Force the viewport to redraw

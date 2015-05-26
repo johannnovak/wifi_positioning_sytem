@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import java.net.Socket;
-
 /**
  * Created by Android on 06/04/2015 for LO53Project
  */
@@ -34,40 +32,43 @@ public class LocationFragment extends AbstractFragment {
         LinearLayout location_viewport_layout = (LinearLayout)rootView.findViewById(R.id.location_viewport_layout);
         location_viewport_layout.addView(mViewport);
 
-        //New thread to listen to incoming connections
-        new Thread(new Runnable() {
+        ReceiverAsyncTask receiver = new ReceiverAsyncTask();
+        receiver.execute();
 
-            @Override
-            public void run() {
-//                try {
-//                    Socket clientSocket = new Socket(mServerIP, mServerPort);
-                Socket clientSocket = new Socket();
-
-                    while(true) {
-//                        try {
-//                            ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-//                            String code = (String) ois.readObject();
-
-
-
-                            //For each client new instance of AsyncTask will be created
-                            ReceiverAsyncTask receiverAsyncTask = new ReceiverAsyncTask();
-                            //Start the AsyncTask execution
-                            //Accepted client socket object will pass as the parameter
-                            receiverAsyncTask.execute(new Socket[]{clientSocket});
-
-//                          clientSocket.close();
-//                        } catch (ClassNotFoundException e) {
-//                            e.printStackTrace();
-//                        }
-                    }
-//                }
-//                catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-
-            }
-        }).start();
+//        //New thread to listen to incoming connections
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+////                try {
+////                    Socket clientSocket = new Socket(mServerIP, mServerPort);
+//                Socket clientSocket = new Socket();
+//
+//                    while(true) {
+////                        try {
+////                            ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+////                            String code = (String) ois.readObject();
+//
+//
+//
+//                            //For each client new instance of AsyncTask will be created
+//                            ReceiverAsyncTask receiverAsyncTask = new ReceiverAsyncTask();
+//                            //Start the AsyncTask execution
+//                            //Accepted client socket object will pass as the parameter
+//                            receiverAsyncTask.execute(new Socket[]{clientSocket});
+//
+////                          clientSocket.close();
+////                        } catch (ClassNotFoundException e) {
+////                            e.printStackTrace();
+////                        }
+//                    }
+////                }
+////                catch (IOException e) {
+////                    e.printStackTrace();
+////                }
+//
+//            }
+//        }).start();
 
         return rootView;
     }
@@ -103,11 +104,13 @@ public class LocationFragment extends AbstractFragment {
 //        }
 //    }
 
-    public class ReceiverAsyncTask extends AsyncTask<Socket, Void, PointF> {
+    public class ReceiverAsyncTask extends AsyncTask<Void, PointF, Void> {
+
+        private boolean mRun = true;
+
         //Background task which serve for the client
         @Override
-        protected PointF doInBackground(Socket... params) {
-            PointF result = null;
+        protected Void doInBackground(Void... params) {
 
             // Get the accepted socket object
 //            Socket socket = params[0];
@@ -121,19 +124,31 @@ public class LocationFragment extends AbstractFragment {
 //                e.printStackTrace();
 //            }
 
-            result = new PointF(
-                    (int)Math.random() * 1000,
-                    (int)Math.random() * 1000);
+            while(!this.isCancelled() && mRun) {
 
-            return result;
+                publishProgress(
+                    new PointF(
+                        (int) Math.random() * 1000,
+                        (int) Math.random() * 1000
+                    )
+                );
+
+            }
+
+            return null;
         }
 
         @Override
-        protected void onPostExecute(PointF p) {
-//            if (p != null) {
-//                mViewport.addPoint(p.x, p.y, Position.Type.LOCATION);
-//            }
+        protected void onProgressUpdate(PointF... p) {
+            mViewport.addPoint(p[0].x, p[0].y, Position.Type.LOCATION);
         }
+
+//        @Override
+//        protected void onPostExecute(PointF p) {
+////            if (p != null) {
+////                mViewport.addPoint(p.x, p.y, Position.Type.LOCATION);
+////            }
+//        }
 
         private PointF decode (String code) {
             //TODO : decode the string received
