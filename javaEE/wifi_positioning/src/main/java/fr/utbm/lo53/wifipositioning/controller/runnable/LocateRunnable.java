@@ -212,7 +212,7 @@ public class LocateRunnable extends SocketRunnable
 			 * Sets the server's response to the mobile content with the
 			 * position.
 			 */
-			m_mobileResponse = "x:" + p.getX() + ";y:" + p.getY();
+			m_mobileResponse = p.getX() + ";" + p.getY();
 			return true;
 		} else
 			return false;

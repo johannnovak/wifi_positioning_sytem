@@ -56,6 +56,7 @@ public class Launcher
 
 		/* Retrieves the properties concerning the location */
 		System.setProperty("locate.port", properties.getProperty("locate.port"));
+		System.setProperty("locate.rssi.epsilon", properties.getProperty("locate.rssi.epsilon"));
 
 		s_logger.debug("Properties loaded : \n{}", properties);
 
