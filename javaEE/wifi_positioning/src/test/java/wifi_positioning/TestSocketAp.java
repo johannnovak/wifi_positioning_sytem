@@ -12,7 +12,7 @@ public class TestSocketAp
 			final String[] args) throws IOException, ClassNotFoundException
 	{
 		@SuppressWarnings("resource")
-		ServerSocket serverSocket = new ServerSocket(1110);
+		ServerSocket serverSocket = new ServerSocket(3000);
 
 		while (true)
 		{

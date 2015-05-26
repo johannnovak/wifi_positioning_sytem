@@ -2,6 +2,7 @@ package fr.utbm.lo53.wifipositioning.controller.runnable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +106,9 @@ public class ApRunnable implements Runnable
 
 		} catch (IOException e)
 		{
-			s_logger.error("An error occured when opening socket to the AP.", e);
+			s_logger.error(
+					"An error occured when opening socket to the AP : the daemon is maybe not launched on the APs side.",
+					e);
 		} finally
 		{
 			/* Closes the socket. */
@@ -156,8 +159,19 @@ public class ApRunnable implements Runnable
 			/* Parse the AP response */
 			s_logger.debug("Parsing AP response from byte...");
 			List<Object> responseData = parseResponse(_socket.getInputStream());
-			String apMacAddress = (String) responseData.get(0);
-			float rssi = Float.parseFloat((String) responseData.get(1));
+
+			String apMacAddress = "";
+			byte[] bytes = NetworkInterface.getByInetAddress(_socket.getLocalAddress())
+					.getHardwareAddress();
+			StringBuilder sb = new StringBuilder();
+			if (bytes != null)
+			{
+				for (int i = 0; i < bytes.length; ++i)
+					sb.append(String
+							.format("%02X%s", bytes[i], (i < (bytes.length - 1)) ? ":" : ""));
+			}
+			apMacAddress = sb.toString();
+			float rssi = Float.parseFloat((String) responseData.get(0));
 
 			/* Adds a new measurement to the set */
 			m_socketRunnable.addApMeasurement(new Measurement(rssi, apMacAddress));
@@ -190,24 +204,14 @@ public class ApRunnable implements Runnable
 		s_logger.debug("data : {}", data);
 		String[] dataArray = data.split(";");
 
-		if (dataArray.length != 2)
-		{
-			s_logger.error("Can't parse AP response data, the number of parameter is not equal to 2 ! ");
-			return null;
-		}
-
-		/* Adds the macAddress */
-		list.add(dataArray[0]);
+		// if (dataArray.length != 1)
+		// {
+		// s_logger.error("Can't parse AP response data, the number of parameter is not equal to 1 ! ");
+		// return null;
+		// }
 
 		/* Adds the rssi */
 		list.add(dataArray[1]);
-
-		/* Verify that the data sent are not null or empty */
-		if (((String) list.get(0) == null) || ((String) list.get(0) == ""))
-		{
-			s_logger.error("The ap mac address is empty! ");
-			return null;
-		}
 
 		return list;
 	}
