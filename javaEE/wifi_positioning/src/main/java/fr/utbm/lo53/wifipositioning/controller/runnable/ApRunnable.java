@@ -160,7 +160,6 @@ public class ApRunnable implements Runnable
 			s_logger.debug("Parsing AP response from byte...");
 			List<Object> responseData = parseResponse(_socket.getInputStream());
 
-			String apMacAddress = "";
 			byte[] bytes = NetworkInterface.getByInetAddress(_socket.getLocalAddress())
 					.getHardwareAddress();
 			StringBuilder sb = new StringBuilder();
@@ -170,7 +169,7 @@ public class ApRunnable implements Runnable
 					sb.append(String
 							.format("%02X%s", bytes[i], (i < (bytes.length - 1)) ? ":" : ""));
 			}
-			apMacAddress = sb.toString();
+			String apMacAddress = sb.toString();
 			float rssi = Float.parseFloat((String) responseData.get(0));
 
 			/* Adds a new measurement to the set */
