@@ -29,8 +29,9 @@ public class LocateStandalone
 	public static void main(
 			final String[] args)
 	{
-		s_logger.info("Launching the LocateController...");
 		LocateController locateController = new LocateController();
+
+		s_logger.info("Launching the LocateController...");
 		locateController.listen();
 	}
 }

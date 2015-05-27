@@ -29,8 +29,9 @@ public class CalibrateStandalone
 	public static void main(
 			final String[] args)
 	{
-		s_logger.info("Launching the CalibrateController...");
 		CalibrateController calibrateController = new CalibrateController();
+
+		s_logger.info("Launching the CalibrateController...");
 		calibrateController.listen();
 	}
 }
