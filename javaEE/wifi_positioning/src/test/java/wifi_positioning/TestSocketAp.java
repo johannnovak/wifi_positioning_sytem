@@ -19,7 +19,7 @@ public class TestSocketAp
 	{
 		@SuppressWarnings("resource")
 		ServerSocketChannel m_serverSocketChannel = ServerSocketChannel.open();
-		m_serverSocketChannel.bind(new InetSocketAddress("172.20.44.197", 3000));
+		m_serverSocketChannel.bind(new InetSocketAddress("localhost", 3000));
 		m_serverSocketChannel.configureBlocking(false);
 
 		Selector selector = Selector.open();
