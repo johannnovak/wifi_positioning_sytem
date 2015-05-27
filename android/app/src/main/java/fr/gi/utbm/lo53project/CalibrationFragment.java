@@ -35,8 +35,8 @@ public class CalibrationFragment extends AbstractFragment {
         mViewport = new CalibrationViewport(getActivity(), null, mMap, new AbstractViewport.SelectionListener() {
             @Override
             public void onSelect(float x, float y) {
-//                sendPoint(x, y);
-                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+                sendPoint(x, y);
+//                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
             }
         });
 

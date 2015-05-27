@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import java.io.ObjectInputStream;
+import java.net.Socket;
+
 /**
  * Created by Android on 06/04/2015 for LO53Project
  */
@@ -112,35 +115,59 @@ public class LocationFragment extends AbstractFragment {
         @Override
         protected Void doInBackground(Void... params) {
 
-            // Get the accepted socket object
-//            Socket socket = params[0];
-//            try {
-//                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-//                String code = (String) ois.readObject();
-//                result = decode(code);
-//
-//                socket.close();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+            while(!this.isCancelled()) {
+                try {
+                    // Get the accepted socket object
+                    Socket socket = new Socket(mServerIP, mServerPort);
+                    try {
+                        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                        String code = (String) ois.readObject();
 
-            while(!this.isCancelled() && mRun) {
+                        //TODO : tread.sleep
 
-                publishProgress(
-                    new PointF(
-                        (int) Math.random() * 1000,
-                        (int) Math.random() * 1000
-                    )
-                );
+                        // Publish the received data
+                        publishProgress(decode(code));
 
+                        socket.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+//
+//                publishProgress(
+//                    new PointF(
+//                        500,
+//                        1000
+//                    )
+//                );
+//
+//
+//                publishProgress(
+//                    new PointF(
+//                        1000,
+//                        1000
+//                    )
+//                );
+//
+//                publishProgress(
+//                    new PointF(
+//                        1000,
+//                        1500
+//                    )
+//                );
+
 
             return null;
         }
 
         @Override
         protected void onProgressUpdate(PointF... p) {
-            mViewport.addPoint(p[0].x, p[0].y, Position.Type.LOCATION);
+            super.onProgressUpdate(p);
+            //mViewport.addPoint(p[0].x, p[0].y, Position.Type.LOCATION);
+            System.out.println(p);
         }
 
 //        @Override
@@ -151,10 +178,11 @@ public class LocationFragment extends AbstractFragment {
 //        }
 
         private PointF decode (String code) {
-            //TODO : decode the string received
             float x, y;
-            x = 0;
-            y = 0;
+
+            String[] coordinates = code.split(";");
+            x = Integer.getInteger(coordinates[0]);
+            y = Integer.getInteger(coordinates[1]);
             return new PointF(x, y);
         }
     }
