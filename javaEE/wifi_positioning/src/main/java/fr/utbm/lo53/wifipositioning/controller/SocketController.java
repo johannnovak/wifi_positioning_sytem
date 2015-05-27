@@ -367,9 +367,6 @@ public abstract class SocketController
 					(errorOccured) ? s_httpInternalServerErrorCode : m_clientResponse);
 			addPropertyToKey(writableKey, s_channelIDKey, channelID);
 
-			System.out.println(writableKey.attachment());
-			System.out.println(_key.attachment());
-
 		} catch (ClosedChannelException e)
 		{
 			s_logger.error(String.format(
