@@ -26,9 +26,8 @@ public abstract class AbstractViewport extends View {
     }
     private State mState;
 
-    // Limits
-    public static float MIN_ZOOM = 1f;
-    public static float MAX_ZOOM = 5f;
+    public static float OFFSET_X = 25f;
+    public static float OFFSET_Y = 25f;
 
     // Scale factor
     private float mScaleFactor = 1.f;
@@ -256,9 +255,30 @@ public abstract class AbstractViewport extends View {
          */
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
+            float scaleFactor_backup = mScaleFactor;
             mScaleFactor *= detector.getScaleFactor();
-            mScaleFactor  = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
 
+            // Limit zoom out
+            float worldMap_width = mMap.getBounds().width();
+            float worldMap_height = mMap.getBounds().height();
+            float worldMap_view_width = fromWorldToView(worldMap_width);
+            float worldMap_view_height = fromWorldToView(worldMap_height);
+
+            if (worldMap_view_width + 2 * OFFSET_X < mViewportFrame.width() &&
+                    worldMap_view_height + 2 * OFFSET_Y < mViewportFrame.height()    ) {
+                mScaleFactor = scaleFactor_backup;
+            }
+
+            // Limit zoom in
+            float square_width = mMap.getSquareWidth();
+            float square_height = mMap.getSquareHeight();
+            float square_view_width = fromWorldToView(square_width);
+            float square_view_height = fromWorldToView(square_height);
+
+            if (3 * square_view_width + OFFSET_X > mViewportFrame.width() ||
+                    3 * square_view_height + OFFSET_Y > mViewportFrame.height()) {
+                mScaleFactor = scaleFactor_backup;
+            }
             return true;
         }
     }

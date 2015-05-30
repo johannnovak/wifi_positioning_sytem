@@ -91,6 +91,13 @@ public class WorldMap implements Serializable {
         return mBounds;
     }
 
+    public float getSquareWidth () {
+        return this.mSquareWidth;
+    }
+    public float getSquareHeight () {
+        return this.mSquareHeight;
+    }
+
     public void outFinger() {
         mCurrentHoverPosition = null;
         b_selecting = false;
