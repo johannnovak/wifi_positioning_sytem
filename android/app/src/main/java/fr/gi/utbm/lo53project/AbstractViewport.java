@@ -316,34 +316,40 @@ public abstract class AbstractViewport extends View {
 
                 RectF bounds = mMap.getBounds();
 
+                PointF map_top_left = fromWorldToView(bounds.left, bounds.top);
+                PointF map_bot_right = fromWorldToView(bounds.right, bounds.bottom);
+                float world_offset_x = fromViewToWorld(OFFSET_X);
+                float world_offset_y = fromViewToWorld(OFFSET_Y);
+                float world_viewport_width = fromViewToWorld(mViewportFrame.width());
+                float world_viewport_height = fromViewToWorld(mViewportFrame.height());
+
                 // Offset along X-axis
-                if (mViewportFrame.width() < bounds.width()) {
-                    float dx = (distanceX / mScaleFactor);
+                if (!(mViewportFrame.left < map_top_left.x - OFFSET_X && mViewportFrame.right > map_bot_right.x - OFFSET_X)) {
+                    float dx = fromWorldToView(distanceX);
 
                     // Offset the viewport according to the finger distance
                     mViewportFrame.offset(dx, 0);
 
-
                     // Now, we just have to ensure that we are not crossing world bounds
-                    if (mViewportFrame.left < bounds.left) {
-                        mViewportFrame.offsetTo(bounds.left, mViewportFrame.top);
-                    } else if (mViewportFrame.left > bounds.right - fromViewToWorld(mViewportFrame.width())) {
-                        mViewportFrame.offsetTo(bounds.right - fromViewToWorld(mViewportFrame.width()), mViewportFrame.top);
+                    if (mViewportFrame.left < bounds.left - world_offset_x) {
+                        mViewportFrame.offsetTo(bounds.left - world_offset_x, mViewportFrame.top);
+                    } else if (mViewportFrame.left > bounds.right + world_offset_x - world_viewport_width) {
+                        mViewportFrame.offsetTo(bounds.right + world_offset_x - world_viewport_width, mViewportFrame.top);
                     }
                 }
 
                 // Offset along Y-axis
-                if (mViewportFrame.height() < bounds.height()) {
-                    float dy = (distanceY / mScaleFactor);
+                if (!(mViewportFrame.top < map_top_left.y - OFFSET_Y && mViewportFrame.bottom > map_bot_right.y - OFFSET_Y)) {
+                    float dy = fromWorldToView(distanceY);
 
                     // Offset the viewport according to the finger distance
                     mViewportFrame.offset(0, dy);
 
                     // Now, we just have to ensure that we are not crossing world bounds
-                    if (mViewportFrame.top < bounds.top) {
-                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.top);
-                    } else if (mViewportFrame.top > bounds.bottom - fromViewToWorld(mViewportFrame.height())) {
-                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.bottom - fromViewToWorld(mViewportFrame.height()));
+                    if (mViewportFrame.top < bounds.top - world_offset_y) {
+                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.top - world_offset_y);
+                    } else if (mViewportFrame.top > bounds.bottom + world_offset_y - world_viewport_height) {
+                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.bottom + world_offset_y - world_viewport_height);
                     }
                 }
             }
