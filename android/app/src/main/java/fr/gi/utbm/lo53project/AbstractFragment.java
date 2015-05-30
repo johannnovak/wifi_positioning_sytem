@@ -44,7 +44,6 @@ public abstract class AbstractFragment extends Fragment {
         String macAddress = wifimanager.getConnectionInfo().getMacAddress();
         if (macAddress == null) {
             macAddress = "Device don't have mac address or wi-fi is disabled";
-
         }
         return macAddress;
     }

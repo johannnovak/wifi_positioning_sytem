@@ -35,8 +35,10 @@ public class LocationFragment extends AbstractFragment {
         LinearLayout location_viewport_layout = (LinearLayout)rootView.findViewById(R.id.location_viewport_layout);
         location_viewport_layout.addView(mViewport);
 
-        ReceiverAsyncTask receiver = new ReceiverAsyncTask();
-        receiver.execute();
+        if (getResources().getBoolean(R.bool.using_server)) {
+            ReceiverAsyncTask receiver = new ReceiverAsyncTask();
+            receiver.execute();
+        }
 
 //        //New thread to listen to incoming connections
 //        new Thread(new Runnable() {

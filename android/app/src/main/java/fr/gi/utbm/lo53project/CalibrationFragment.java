@@ -28,6 +28,8 @@ public class CalibrationFragment extends AbstractFragment {
         // Get server port from resources
         mServerPort = getResources().getInteger(R.integer.server_port_calibration);
 
+        final boolean using_server = getResources().getBoolean(R.bool.using_server);
+
         // Initialize view
         View rootView = inflater.inflate(R.layout.calibration_layout, container, false);
 
@@ -35,8 +37,12 @@ public class CalibrationFragment extends AbstractFragment {
         mViewport = new CalibrationViewport(getActivity(), null, mMap, new AbstractViewport.SelectionListener() {
             @Override
             public void onSelect(float x, float y) {
-                sendPoint(x, y);
-//                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+                if (using_server) {
+                    sendPoint(x, y);
+                }
+                else {
+                    mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+                }
             }
         });
 
