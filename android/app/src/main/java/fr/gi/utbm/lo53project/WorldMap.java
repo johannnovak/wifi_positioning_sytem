@@ -22,10 +22,10 @@ public class WorldMap implements Serializable {
 
     private SRectF mBounds;
 
-    private static int GRID_WIDTH = 10;
-    private static int GRID_HEIGHT = 10;
-    private float mSquareWidth;
-    private float mSquareHeight;
+    private int gridWidth;
+    private int gridHeight;
+    public float squareWidth;
+    public float squareHeight;
 
     public Map<Position.Type , SPaint> paints;
 
@@ -33,10 +33,11 @@ public class WorldMap implements Serializable {
     private Position mCurrentHoverPosition;
 
     public WorldMap() {
-
-        mBounds = new SRectF(0, 0, 2000, 2000);
-        mSquareWidth = mBounds.width() / GRID_WIDTH;
-        mSquareHeight = mBounds.height() / GRID_HEIGHT;
+        squareWidth = 200;
+        squareHeight = 200;
+        gridHeight = 3;
+        gridWidth = 3;
+        mBounds = new SRectF(0, 0, squareWidth * gridWidth, squareHeight * gridHeight);
 
         // Paint dedicated to calibration points
         final SPaint calibrationPaint  = new SPaint();
@@ -91,13 +92,6 @@ public class WorldMap implements Serializable {
         return mBounds;
     }
 
-    public float getSquareWidth () {
-        return this.mSquareWidth;
-    }
-    public float getSquareHeight () {
-        return this.mSquareHeight;
-    }
-
     public void outFinger() {
         mCurrentHoverPosition = null;
         b_selecting = false;
@@ -147,10 +141,10 @@ public class WorldMap implements Serializable {
         }
 
         canvas.drawRect(
-                p.x * mSquareWidth,
-                p.y * mSquareHeight,
-                p.x * mSquareWidth + mSquareWidth,
-                p.y * mSquareHeight + mSquareHeight,
+                p.x * squareWidth,
+                p.y * squareHeight,
+                p.x * squareWidth + squareWidth,
+                p.y * squareHeight + squareHeight,
                 paint
         );
     }
@@ -218,11 +212,11 @@ public class WorldMap implements Serializable {
      */
     public void drawGrid(Canvas canvas) {
 
-        float dx = mBounds.width() / GRID_WIDTH;
-        float dy = mBounds.height() / GRID_HEIGHT;
+        float dx = squareWidth;
+        float dy = squareHeight;
 
         // Row lines
-        for (int i = 0; i < GRID_HEIGHT; i++)
+        for (int i = 0; i < gridHeight; i++)
         {
             canvas.drawLine(
                 mBounds.left, i * dy, // start X & Y
@@ -231,13 +225,13 @@ public class WorldMap implements Serializable {
             );
         }
         canvas.drawLine(
-                mBounds.left, mBounds.height(), // start X & Y
-                mBounds.right, mBounds.height(), // end X & Y
-                mGridPaint
+            mBounds.left, mBounds.height(), // start X & Y
+            mBounds.right, mBounds.height(), // end X & Y
+            mGridPaint
         );
 
         // Column lines
-        for (int i = 0; i < GRID_WIDTH; i++)
+        for (int i = 0; i < gridWidth; i++)
         {
             canvas.drawLine(
                 i * dx, mBounds.top, // start X & Y
@@ -246,9 +240,9 @@ public class WorldMap implements Serializable {
             );
         }
         canvas.drawLine(
-                mBounds.width(), mBounds.top, // start X & Y
-                mBounds.width(), mBounds.bottom, // end X & Y
-                mGridPaint
+            mBounds.width(), mBounds.top, // start X & Y
+            mBounds.width(), mBounds.bottom, // end X & Y
+            mGridPaint
         );
     }
 
@@ -262,6 +256,16 @@ public class WorldMap implements Serializable {
         b_selecting = true;
     }
 
+    public void addRow() {
+        gridHeight ++;
+        mBounds.bottom += squareHeight;
+    }
+
+    public void addColumn() {
+        gridWidth ++;
+        mBounds.right += squareWidth;
+    }
+
     /**
      * Take real coordinates and translate it in a position in the grid
      * @param x real x coordinate
@@ -270,8 +274,8 @@ public class WorldMap implements Serializable {
      */
     private Position toPosition (float x, float y) {
         return new Position (
-            (int)Math.floor(x * GRID_WIDTH / mBounds.width()),
-            (int)Math.floor(y * GRID_HEIGHT / mBounds.height())
+            (int)Math.floor(x / squareWidth),
+            (int)Math.floor(y / squareHeight)
         );
     }
 

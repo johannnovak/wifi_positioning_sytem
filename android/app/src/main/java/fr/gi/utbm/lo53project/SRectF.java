@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by celian on 19/05/15 for LO53Project
  */
 public class SRectF extends RectF implements Serializable {
-    public SRectF (int left, int top, int right, int bottom ) {
+    public SRectF (float left, float top, float right, float bottom ) {
         super(left, top, right, bottom);
     }
 }
