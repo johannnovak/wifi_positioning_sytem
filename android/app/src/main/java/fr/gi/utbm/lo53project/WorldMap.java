@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.RectF;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -89,7 +88,7 @@ public class WorldMap implements Serializable {
      * Give the bounds of the world map
      * @return bounds
      */
-    public RectF getBounds() {
+    public SRectF getBounds() {
         return mBounds;
     }
 

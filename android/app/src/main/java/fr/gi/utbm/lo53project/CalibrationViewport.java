@@ -45,34 +45,24 @@ public class CalibrationViewport extends AbstractViewport {
 
     private void updateAddRowButton() {
 
-        float map_view_width = fromWorldToView(mMap.getBounds().width());
+        float map_left = mMap.getBounds().left;
+        float map_right = mMap.getBounds().right;
         mAddRowButton.top = mMap.getBounds().height() ;
         mAddRowButton.bottom = mAddRowButton.top + fromViewToWorld(ADD_ROW_HEIGHT);
 
-        if (map_view_width < mViewportFrame.width()) {
-            mAddRowButton.left = 0;
-            mAddRowButton.right = mAddRowButton.left + mMap.getBounds().width();
-        }
-        else {
-            mAddRowButton.left = mViewportFrame.left + fromViewToWorld(OFFSET_X);
-            mAddRowButton.right = mAddRowButton.left + fromViewToWorld(mViewportFrame.width()- 2*OFFSET_X);
-        }
+        mAddRowButton.left = (mViewportFrame.left < map_left) ? map_left : mViewportFrame.left;
+        mAddRowButton.right = (mViewportFrame.right > map_right) ? map_right : mViewportFrame.right;
     }
 
     private void updateAddColumnButton() {
 
-        float map_view_height = fromWorldToView(mMap.getBounds().height());
+        float map_top = mMap.getBounds().top;
+        float map_bottom = mMap.getBounds().bottom;
         mAddColumnButton.left = mMap.getBounds().width() ;
         mAddColumnButton.right = mAddColumnButton.left + fromViewToWorld(ADD_COL_WIDTH);
 
-        if (map_view_height < mViewportFrame.height()) {
-            mAddColumnButton.top = 0;
-            mAddColumnButton.bottom = mAddColumnButton.top + mMap.getBounds().height();
-        }
-        else {
-            mAddColumnButton.top = mViewportFrame.top + fromViewToWorld(OFFSET_Y);
-            mAddColumnButton.bottom = mAddColumnButton.top + fromViewToWorld(mViewportFrame.height()- 2*OFFSET_Y);
-        }
+        mAddColumnButton.top = (mViewportFrame.top < map_top) ? map_top : mViewportFrame.top;
+        mAddColumnButton.bottom = (mViewportFrame.bottom > map_bottom) ? map_bottom : mViewportFrame.bottom;
     }
 
 }

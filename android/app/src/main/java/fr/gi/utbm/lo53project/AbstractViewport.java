@@ -36,7 +36,8 @@ public abstract class AbstractViewport extends View {
     private float mScaleFactor = 1.f;
 
     // Frames
-    protected RectF mViewportFrame = new RectF();
+    protected SRectF mViewportFrame = new SRectF();
+    protected SRectF mOldViewportFrame = new SRectF();
 
     // Gesture Detectors
     private ScaleGestureDetector mScaleGestureDetector;
@@ -207,12 +208,12 @@ public abstract class AbstractViewport extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        // Update viewport frame
+        mViewportFrame.bottom = mViewportFrame.top + fromViewToWorld(canvas.getHeight());
+        mViewportFrame.right = mViewportFrame.left + fromViewToWorld(canvas.getWidth());
+
         // Scale the viewport
         canvas.scale(mScaleFactor, mScaleFactor);
-
-        // Update viewport frame
-        mViewportFrame.bottom = mViewportFrame.top + canvas.getHeight();
-        mViewportFrame.right = mViewportFrame.left + canvas.getWidth();
 
         // Translate the viewport
         canvas.translate(-mViewportFrame.left, -mViewportFrame.top);
@@ -266,32 +267,91 @@ public abstract class AbstractViewport extends View {
          */
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            float scaleFactor_backup = mScaleFactor;
-            mScaleFactor *= detector.getScaleFactor();
+            SRectF bounds = mMap.getBounds();
 
-            // Limit zoom out
-            float worldMap_width = mMap.getBounds().width();
-            float worldMap_height = mMap.getBounds().height();
-            float worldMap_view_width = fromWorldToView(worldMap_width);
-            float worldMap_view_height = fromWorldToView(worldMap_height);
+            float dS = detector.getScaleFactor();
+            // We need to update viewportFrame size without onDraw function
+            mViewportFrame.right = mViewportFrame.left + mViewportFrame.width() * dS;
+            mViewportFrame.bottom = mViewportFrame.top + mViewportFrame.height() * dS;
 
-            if (worldMap_view_width + 2 * OFFSET_X + ADD_COL_WIDTH < mViewportFrame.width() &&
-                    worldMap_view_height + 2 * OFFSET_Y + ADD_ROW_HEIGHT < mViewportFrame.height()    ) {
-                mScaleFactor = scaleFactor_backup;
+            float world_offset_x_start = fromViewToWorld(OFFSET_X);
+            float world_offset_y_start = fromViewToWorld(OFFSET_Y);
+            float world_offset_x_end = fromViewToWorld(OFFSET_X + ADD_COL_WIDTH);
+            float world_offset_y_end = fromViewToWorld(OFFSET_Y + ADD_ROW_HEIGHT);
+
+            // Backup the viewport cloning it
+            mOldViewportFrame.left = mViewportFrame.left;
+            mOldViewportFrame.right = mViewportFrame.right;
+            mOldViewportFrame.top = mViewportFrame.top;
+            mOldViewportFrame.bottom = mViewportFrame.bottom;
+
+            if (!limitViewportToBounds(
+                    bounds.left - world_offset_x_start,
+                    bounds.top - world_offset_y_start,
+                    bounds.right + world_offset_x_end,
+                    bounds.bottom + world_offset_y_end
+                )|| dS > 1.00f
+            ) {
+                mScaleFactor *= dS;
             }
 
-            // Limit zoom in
-            float square_width = mMap.squareWidth;
-            float square_height = mMap.squareHeight;
-            float square_view_width = fromWorldToView(square_width);
-            float square_view_height = fromWorldToView(square_height);
-
-            if (3 * square_view_width + OFFSET_X + ADD_COL_WIDTH > mViewportFrame.width() ||
-                    3 * square_view_height + OFFSET_Y + ADD_ROW_HEIGHT > mViewportFrame.height()) {
-                mScaleFactor = scaleFactor_backup;
-            }
             return true;
         }
+    }
+
+    public boolean limitViewportToXBounds(float left, float right) {
+        float new_left = mViewportFrame.left;
+        boolean zoom_is_max = mOldViewportFrame.containsX(left, right);
+
+        if (zoom_is_max) {
+            new_left = left;
+        }
+        else {
+            // Check limits
+            if (mViewportFrame.left < left) {
+                new_left = left;
+            } else if (mViewportFrame.right > right) {
+                new_left = right - mViewportFrame.width();
+            }
+        }
+
+        // Offset viewport
+        mViewportFrame.offsetTo(new_left, mViewportFrame.top);
+
+        return zoom_is_max;
+    }
+
+    public boolean limitViewportToYBounds(float top, float bottom) {
+        float new_top = mViewportFrame.top;
+        boolean zoom_is_max = mOldViewportFrame.containsY(top, bottom);
+
+        if (zoom_is_max) {
+            new_top = top;
+        }
+        else {
+            // Check limits
+            if (mViewportFrame.top < top) {
+                new_top = top;
+            } else if (mViewportFrame.bottom > bottom) {
+                new_top = bottom - mViewportFrame.height();
+            }
+        }
+
+        // Offset viewport
+        mViewportFrame.offsetTo(mViewportFrame.left, new_top);
+
+        return zoom_is_max;
+    }
+
+    public boolean limitViewportToBounds(float left, float top, float right, float bottom) {
+        return (
+            limitViewportToXBounds(left, right) &&
+            limitViewportToYBounds(top, bottom)
+        );
+    }
+
+    public void limitViewportToBounds(RectF bounds) {
+        limitViewportToBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
     }
 
     /**
@@ -326,42 +386,35 @@ public abstract class AbstractViewport extends View {
 
                 RectF bounds = mMap.getBounds();
 
-                PointF map_top_left = fromWorldToView(bounds.left, bounds.top);
-                PointF map_bot_right = fromWorldToView(bounds.right, bounds.bottom);
+                // Backup the viewport cloning it
+                mOldViewportFrame.left = mViewportFrame.left;
+                mOldViewportFrame.right = mViewportFrame.right;
+                mOldViewportFrame.top = mViewportFrame.top;
+                mOldViewportFrame.bottom = mViewportFrame.bottom;
+
                 float world_offset_x_start = fromViewToWorld(OFFSET_X);
                 float world_offset_y_start = fromViewToWorld(OFFSET_Y);
                 float world_offset_x_end = fromViewToWorld(OFFSET_X + ADD_COL_WIDTH);
                 float world_offset_y_end = fromViewToWorld(OFFSET_Y + ADD_ROW_HEIGHT);
-                float world_viewport_width = fromViewToWorld(mViewportFrame.width());
-                float world_viewport_height = fromViewToWorld(mViewportFrame.height());
 
-                // Offset along X-axis
-                if (!(mViewportFrame.left < map_top_left.x - OFFSET_X && mViewportFrame.right > map_bot_right.x - OFFSET_X)) {
+                // Offset the viewport according to the finger distance
+                mViewportFrame.offset(distanceX, 0);
 
-                    // Offset the viewport according to the finger distance
-                    mViewportFrame.offset(distanceX, 0);
+                // Now, we just have to ensure that we are not crossing world bounds
+                limitViewportToXBounds(
+                    bounds.left - world_offset_x_start,
+                    bounds.right + world_offset_x_end
+                );
 
-                    // Now, we just have to ensure that we are not crossing world bounds
-                    if (mViewportFrame.left < bounds.left - world_offset_x_start) {
-                        mViewportFrame.offsetTo(bounds.left - world_offset_x_start, mViewportFrame.top);
-                    } else if (mViewportFrame.left > bounds.right + world_offset_x_end - world_viewport_width) {
-                        mViewportFrame.offsetTo(bounds.right + world_offset_x_end - world_viewport_width, mViewportFrame.top);
-                    }
-                }
+                // Offset the viewport according to the finger distance
+                mViewportFrame.offset(0, distanceY);
 
-                // Offset along Y-axis
-                if (!(mViewportFrame.top < map_top_left.y - OFFSET_Y && mViewportFrame.bottom > map_bot_right.y - OFFSET_Y)) {
+                // Now, we just have to ensure that we are not crossing world bounds
+                limitViewportToYBounds(
+                    bounds.top - world_offset_y_start,
+                    bounds.bottom + world_offset_y_end
+                );
 
-                    // Offset the viewport according to the finger distance
-                    mViewportFrame.offset(0, distanceY);
-
-                    // Now, we just have to ensure that we are not crossing world bounds
-                    if (mViewportFrame.top < bounds.top - world_offset_y_start) {
-                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.top - world_offset_y_start);
-                    } else if (mViewportFrame.top > bounds.bottom + world_offset_y_end - world_viewport_height) {
-                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.bottom + world_offset_y_end - world_viewport_height);
-                    }
-                }
             }
 
             return true;
