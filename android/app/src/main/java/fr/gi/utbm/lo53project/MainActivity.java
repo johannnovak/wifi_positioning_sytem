@@ -116,6 +116,7 @@ public class MainActivity extends ActionBarActivity
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.calibration, menu);
+            menu.findItem(R.id.action_send).setVisible(false);
             restoreActionBar();
             return true;
         }
