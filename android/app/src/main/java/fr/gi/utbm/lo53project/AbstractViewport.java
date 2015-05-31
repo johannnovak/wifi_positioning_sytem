@@ -29,14 +29,14 @@ public abstract class AbstractViewport extends View {
 
     public static float OFFSET_X = 25f;
     public static float OFFSET_Y = 25f;
-    public static int ADD_ROW_HEIGHT = 150;
-    public static int ADD_COL_WIDTH = 150;
+    protected int ADD_ROW_HEIGHT = 0;
+    protected int ADD_COL_WIDTH = 0;
 
     // Scale factor
     private float mScaleFactor = 1.f;
 
     // Frames
-    private RectF mViewportFrame = new RectF();
+    protected RectF mViewportFrame = new RectF();
 
     // Gesture Detectors
     private ScaleGestureDetector mScaleGestureDetector;
@@ -46,9 +46,11 @@ public abstract class AbstractViewport extends View {
     protected WorldMap mMap;
 
     private SelectionListener mSelectionListener;
-    private RectF mAddRowButton;
-    private RectF mAddColumnButton;
-    private Paint mButtonPaint;
+
+    protected RectF mAddRowButton;
+    protected RectF mAddColumnButton;
+    protected Paint mButtonPaint;
+
 
     /**
      * Constructor with a selection listener
@@ -71,10 +73,9 @@ public abstract class AbstractViewport extends View {
         mState = State.NONE;
         mSelectionListener = listener;
 
-        mAddRowButton = new RectF();
-        mAddColumnButton = new RectF();
-        mButtonPaint = new Paint();
-        mButtonPaint.setColor(Color.WHITE);
+        mAddRowButton = null;
+        mAddColumnButton = null;
+        mButtonPaint = null;
     }
 
     /**
@@ -218,12 +219,6 @@ public abstract class AbstractViewport extends View {
 
         // Draw the world map grid
         mMap.drawGrid(canvas);
-
-        // Draw add row and add column buttons
-        this.updateAddRowButton();
-        this.updateAddColumnButton();
-        canvas.drawRect(mAddRowButton, mButtonPaint);
-        canvas.drawRect(mAddColumnButton, mButtonPaint);
     }
 
     /**
@@ -234,38 +229,6 @@ public abstract class AbstractViewport extends View {
         mScaleFactor = 1.0f;
         mViewportFrame.set(0, 0, 0, 0);
         invalidate();
-    }
-
-    private void updateAddRowButton() {
-
-        float map_view_width = fromWorldToView(mMap.getBounds().width());
-        mAddRowButton.top = mMap.getBounds().height() ;
-        mAddRowButton.bottom = mAddRowButton.top + ADD_ROW_HEIGHT;
-
-        if (map_view_width < mViewportFrame.width()) {
-            mAddRowButton.left = 0;
-            mAddRowButton.right = mAddRowButton.left + mMap.getBounds().width();
-        }
-        else {
-            mAddRowButton.left = mViewportFrame.left + fromViewToWorld(OFFSET_X);
-            mAddRowButton.right = mAddRowButton.left + fromViewToWorld(mViewportFrame.width()- 2*OFFSET_X);
-        }
-    }
-
-    private void updateAddColumnButton() {
-
-        float map_view_height = fromWorldToView(mMap.getBounds().height());
-        mAddColumnButton.left = mMap.getBounds().width() ;
-        mAddColumnButton.right = mAddColumnButton.left + ADD_COL_WIDTH;
-
-        if (map_view_height < mViewportFrame.height()) {
-            mAddColumnButton.top = 0;
-            mAddColumnButton.bottom = mAddColumnButton.top + mMap.getBounds().height();
-        }
-        else {
-            mAddColumnButton.top = mViewportFrame.top + fromViewToWorld(OFFSET_Y);
-            mAddColumnButton.bottom = mAddColumnButton.top + fromViewToWorld(mViewportFrame.height()- 2*OFFSET_Y);
-        }
     }
 
     /***********************************************
@@ -407,13 +370,17 @@ public abstract class AbstractViewport extends View {
         @Override
         public boolean onSingleTapConfirmed (MotionEvent e) {
             PointF tap = fromViewToWorld(e.getX(), e.getY());
-            if (mAddRowButton.contains(tap.x, tap.y)) {
-                mMap.addRow();
-                invalidate();
+            try {
+                if (mAddRowButton.contains(tap.x, tap.y)) {
+                    mMap.addRow();
+                    invalidate();
+                } else if (mAddColumnButton.contains(tap.x, tap.y)) {
+                    mMap.addColumn();
+                    invalidate();
+                }
             }
-            else if (mAddColumnButton.contains(tap.x, tap.y)) {
-                mMap.addColumn();
-                invalidate();
+            catch(NullPointerException ex) {
+                return false;
             }
             return true;
         }
