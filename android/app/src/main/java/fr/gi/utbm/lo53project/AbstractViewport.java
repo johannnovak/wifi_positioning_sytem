@@ -99,7 +99,6 @@ public abstract class AbstractViewport extends View {
         boolean isScalingOrDragging = mScaleGestureDetector.onTouchEvent(event);
         isScalingOrDragging = mGestureDetector.onTouchEvent(event) || isScalingOrDragging;
 
-
         if (isScalingOrDragging) invalidate();
         return isScalingOrDragging || super.onTouchEvent(event);
     }
@@ -112,14 +111,14 @@ public abstract class AbstractViewport extends View {
 
         // Ensure that we are not in SELECTING state when selection listener is not defined
         if (mState == State.SELECTING && mSelectionListener == null)
-            throw new AssertionError("Error SELECTING State reached meanwhile but listener is not defined.");
+            throw new AssertionError("Error SELECTING State reached but listener is not defined.");
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
                 if (mState == State.SELECTING) {
-                    PointF selected = fromViewToWorld(e.getX(), e.getY());
-                    mSelectionListener.onSelect(selected.x, selected.y);
-                    mMap.outFinger();
+                    PointF selected = mMap.fingerUp();
+                    if(selected != null)
+                        mSelectionListener.onSelect(selected.x, selected.y);
                 }
                 mState = State.NONE;
                 break;

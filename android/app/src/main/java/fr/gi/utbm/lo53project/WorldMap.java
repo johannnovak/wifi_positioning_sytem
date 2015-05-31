@@ -3,6 +3,7 @@ package fr.gi.utbm.lo53project;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.RectF;
 
 import java.io.Serializable;
@@ -92,9 +93,13 @@ public class WorldMap implements Serializable {
         return mBounds;
     }
 
-    public void outFinger() {
-        mCurrentHoverPosition = null;
-        b_selecting = false;
+    public PointF fingerUp() {
+        if(b_selecting) {
+            b_selecting = false;
+            return toReal(mCurrentHoverPosition);
+        }
+
+        return null;
     }
 
     /**
@@ -240,20 +245,25 @@ public class WorldMap implements Serializable {
             );
         }
         canvas.drawLine(
-            mBounds.width(), mBounds.top, // start X & Y
-            mBounds.width(), mBounds.bottom, // end X & Y
-            mGridPaint
+                mBounds.width(), mBounds.top, // start X & Y
+                mBounds.width(), mBounds.bottom, // end X & Y
+                mGridPaint
         );
     }
 
     public void addHoverPosition (float x, float y) {
-        Position p = toPosition(x, y);
-        if (!mPositions.get(Position.Type.HOVER).contains(p)) {
-            mPositions.get(Position.Type.HOVER).add(p);
-        }
-        mCurrentHoverPosition = p;
+        if (mBounds.contains(x, y)) {
+            Position p = toPosition(x, y);
+            if (!mPositions.get(Position.Type.HOVER).contains(p)) {
+                mPositions.get(Position.Type.HOVER).add(p);
+            }
+            mCurrentHoverPosition = p;
 
-        b_selecting = true;
+            b_selecting = true;
+        }
+        else {
+            b_selecting = false;
+        }
     }
 
     public void addRow() {
@@ -276,6 +286,13 @@ public class WorldMap implements Serializable {
         return new Position (
             (int)Math.floor(x / squareWidth),
             (int)Math.floor(y / squareHeight)
+        );
+    }
+
+    private PointF toReal(Position p) {
+        return new PointF(
+            p.x * squareWidth,
+            p.y * squareHeight
         );
     }
 
