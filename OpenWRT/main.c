@@ -3,7 +3,7 @@
 #include <pcap.h>
 #include <pthread.h>
 
-#include "pcap-thread.h"
+#include "rssi/pcap-thread.h"
 #include "socket/helper.h"
 
 volatile sig_atomic_t got_sigint;

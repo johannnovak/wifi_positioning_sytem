@@ -13,7 +13,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#include "../rssi_list.h"
+#include "../rssi/rssi_list.h"
 
 void* server_start(void * _args);
 void* client_start(void * _args);
