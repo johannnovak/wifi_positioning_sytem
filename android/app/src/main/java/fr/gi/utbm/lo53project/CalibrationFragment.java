@@ -109,13 +109,15 @@ public class CalibrationFragment extends AbstractFragment {
             sent = sendPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y);
         }
         else {
-            mViewport.addPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y, Position.Type.CALIBRATION);
             sent = true;
         }
 
+        // If position have been sent correctly, we add the point to the viewport
         if (sent) {
+            mViewport.addPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y, Position.Type.CALIBRATION);
             Toast.makeText(getActivity(), "Position " + mPointWaitingForValidation.toString() + " sent !", Toast.LENGTH_SHORT).show();
         }
+        // Else we just display an error message
         else {
             Toast.makeText(getActivity(), "Server unable to receive that ... :(", Toast.LENGTH_SHORT).show();
         }
@@ -134,6 +136,10 @@ public class CalibrationFragment extends AbstractFragment {
      * @param y
      */
     private void startWaitingForValidation (float x, float y) {
+
+        // World map start waiting (fix the current hover point)
+        mMap.startWaiting();
+
         // Save the current selected point
         mPointWaitingForValidation = new PointF(x, y);
 
@@ -145,6 +151,10 @@ public class CalibrationFragment extends AbstractFragment {
      *
      */
     private void stopWaitingForValidation () {
+
+        // World map stop waiting
+        mMap.stopWaiting();
+
         // We remove the waiting point
         mPointWaitingForValidation = null;
 
@@ -175,7 +185,6 @@ public class CalibrationFragment extends AbstractFragment {
 
                 // Check server answer
                 if (code.equals("200")) {
-                    mViewport.addPoint(x, y, Position.Type.CALIBRATION);
                     sent = true;
                 }
                 else {

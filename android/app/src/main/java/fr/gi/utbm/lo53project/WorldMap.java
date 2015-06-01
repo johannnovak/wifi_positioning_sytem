@@ -29,7 +29,7 @@ public class WorldMap implements Serializable {
 
     public Map<Position.Type , SPaint> paints;
 
-    private boolean b_selecting;
+    private boolean bCurrentHoverPositionIsImmortal;
     private Position mCurrentHoverPosition;
 
     public WorldMap() {
@@ -92,13 +92,26 @@ public class WorldMap implements Serializable {
         return mBounds;
     }
 
+    /**
+     *
+     * @return
+     */
     public PointF fingerUp() {
-        if(b_selecting) {
-            b_selecting = false;
-            return toReal(mCurrentHoverPosition);
-        }
+        return toReal(mCurrentHoverPosition);
+    }
 
-        return null;
+    /**
+     *
+     */
+    public void startWaiting () {
+        bCurrentHoverPositionIsImmortal = true;
+    }
+
+    /**
+     *
+     */
+    public void stopWaiting () {
+        bCurrentHoverPositionIsImmortal = false;
     }
 
     /**
@@ -137,7 +150,6 @@ public class WorldMap implements Serializable {
      * @param t type of the position to draw
      */
     public void drawPosition (Canvas canvas, Position p, Position.Type t) {
-
         Paint paint = paints.get(t);
 
         if (t == Position.Type.HOVER) {
@@ -182,7 +194,7 @@ public class WorldMap implements Serializable {
         // Update life value of hover positions
         for (Position p : mPositions.get(Position.Type.HOVER)) {
             // If we are selecting and the point p is the hovered one
-            if (b_selecting && p.equals(mCurrentHoverPosition)) {
+            if ((bCurrentHoverPositionIsImmortal) && p.equals(mCurrentHoverPosition)) {
                 p.recoverLife();
             }
             else {
@@ -258,10 +270,7 @@ public class WorldMap implements Serializable {
             }
             mCurrentHoverPosition = p;
 
-            b_selecting = true;
-        }
-        else {
-            b_selecting = false;
+            bCurrentHoverPositionIsImmortal = true;
         }
     }
 
