@@ -78,7 +78,7 @@ public abstract class SocketController
 	/* --------------------------------------------------------------------- */
 
 	/**
-	 * Default consstructor.<br>
+	 * Default constructor.<br>
 	 * Mainly used just to create the {@link ServerSocket} attribute from the
 	 * String property given in parameter.
 	 * 
