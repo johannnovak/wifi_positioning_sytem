@@ -117,6 +117,7 @@ public class MainActivity extends ActionBarActivity
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.calibration, menu);
             menu.findItem(R.id.action_send).setVisible(false);
+            menu.findItem(R.id.action_cancel).setVisible(false);
             restoreActionBar();
             return true;
         }

@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".CalibrationActivity">
     <item android:id="@+id/action_send" android:title="@string/action_send"
         app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/action_cancel" android:title="@string/action_cancel"
+        app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

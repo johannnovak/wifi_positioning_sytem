@@ -24,8 +24,14 @@ public class CalibrationFragment extends AbstractFragment {
 
     private PointF mPointWaitingForValidation;
 
-    @Nullable
-    @Override
+    /**
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
+    @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         System.out.println("Calibration fragment : Creating view...");
 
@@ -42,11 +48,7 @@ public class CalibrationFragment extends AbstractFragment {
         mViewport = new CalibrationViewport(getActivity(), null, mMap, new AbstractViewport.SelectionListener() {
             @Override
             public void onSelect(float x, float y) {
-                // Enable user to select send button
-                setHasOptionsMenu(true);
-
-                // Get the current selected point
-                mPointWaitingForValidation = new PointF(x, y);
+                startWaitingForValidation(x, y);
             }
         });
 
@@ -59,18 +61,112 @@ public class CalibrationFragment extends AbstractFragment {
     }
 
     /**
+     * Enable fragment to use send & cancel buttons
+     * @param menu menu
+     * @param inflater menu inflater
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.calibration, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * Choose a handler according to the button clicked (i.e. options item selected)
+     * @param item options item selected
+     * @return true if all is fine
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // If we clicked on the send action button
+        if (item.getItemId() == R.id.action_send) {
+
+            handleSendButton();
+            stopWaitingForValidation ();
+            return true;
+        }
+
+        // If we clicked on the cancel action button
+        if (item.getItemId() == R.id.action_cancel) {
+
+            handleCancelButton();
+            stopWaitingForValidation();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     *
+     */
+    private void handleSendButton() {
+        boolean sent;
+
+        // Send the point or directly add it according to the configuration
+        if (getResources().getBoolean(R.bool.using_server)) {
+            sent = sendPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y);
+        }
+        else {
+            mViewport.addPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y, Position.Type.CALIBRATION);
+            sent = true;
+        }
+
+        if (sent) {
+            Toast.makeText(getActivity(), "Position " + mPointWaitingForValidation.toString() + " sent !", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(getActivity(), "Server unable to receive that ... :(", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     *
+     */
+    private void handleCancelButton() {
+        Toast.makeText(getActivity(), "Position " + mPointWaitingForValidation.toString() + " cancelled !", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     */
+    private void startWaitingForValidation (float x, float y) {
+        // Save the current selected point
+        mPointWaitingForValidation = new PointF(x, y);
+
+        // Enable user to select buttons
+        setHasOptionsMenu(true);
+    }
+
+    /**
+     *
+     */
+    private void stopWaitingForValidation () {
+        // We remove the waiting point
+        mPointWaitingForValidation = null;
+
+        // User can't use buttons anymore until he'll make a new selection
+        setHasOptionsMenu(false);
+    }
+
+    /**
      * Send a point to the server and call addPoint if server return OK
      * @param x x coordinate
      * @param y y coordinate
      */
-    private void sendPoint(float x, float y) {
+    private boolean sendPoint(float x, float y) {
+        boolean sent = false;
+
         try {
             // Open a client socket
             Socket clientSocket = new Socket(mServerIP, mServerPort);
 
             // Send calibration position to the server
             ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            oos.writeObject(mMacAddress + ";" + (int)x + ";" + (int)y + ";"); // "mobileMacAddress;x;y"
+            oos.writeObject(mMacAddress + ";" + (int) x + ";" + (int) y + ";"); // "mobileMacAddress;x;y"
 
             try {
                 // Wait for an answer from the server
@@ -79,11 +175,11 @@ public class CalibrationFragment extends AbstractFragment {
 
                 // Check server answer
                 if (code.equals("200")) {
-                    Toast.makeText(getActivity(), "Position " + new PointF(x, y).toString()+ " sent !", Toast.LENGTH_SHORT).show();
                     mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+                    sent = true;
                 }
                 else {
-                    Toast.makeText(getActivity(), "Server unable to receive that ... :(", Toast.LENGTH_SHORT).show();
+                    sent = false;
                 }
 
                 // Close socket
@@ -96,37 +192,7 @@ public class CalibrationFragment extends AbstractFragment {
         catch (IOException e) {
             e.printStackTrace();
         }
+
+        return sent;
     }
-
-    // the create options menu with a MenuInflater to have the menu from your fragment
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.calibration, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        // If we clicked on the send action button
-        if (item.getItemId() == R.id.action_send) {
-            if (getResources().getBoolean(R.bool.using_server)) {
-                sendPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y);
-            }
-            else {
-                mViewport.addPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y, Position.Type.CALIBRATION);
-                Toast.makeText(getActivity(), "Position " + mPointWaitingForValidation.toString() + " sent !", Toast.LENGTH_SHORT).show();
-            }
-
-            // We don't need anymore this point
-            mPointWaitingForValidation = null;
-
-            // User can't use anymore the send action until he'll make a new selection
-            setHasOptionsMenu(false);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 }
