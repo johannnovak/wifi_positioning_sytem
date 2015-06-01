@@ -12,14 +12,17 @@ public class TestSocketClient
 	{
 		System.out.println("client");
 
-		Socket s;
-		s = new Socket("192.168.2.12", 3000);
+		int port = 3001;
+		String ip = "127.0.0.1";
 
-		System.out.println("client writing");
-		s.getOutputStream().write("00:00:00:00:00:01;5;6;".getBytes());
+		Socket socke = new Socket(ip, port);
 
-		System.out.println("client reading");
-		System.out.println(new String(IOUtils.toByteArray(s.getInputStream())));
-		s.close();
+		System.out.println("client writing ...");
+		socke.getOutputStream().write(new String("00:00:00:00:00:01;5;6;").getBytes());
+		System.out.println("writing ok !");
+
+		System.out.println("reading ....");
+		String message = new String(IOUtils.toByteArray(socke.getInputStream()));
+		System.out.println("reading over : " + message);
 	}
 }

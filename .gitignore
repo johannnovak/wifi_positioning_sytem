@@ -6,3 +6,4 @@
 /build
 pom.properties
 javaEE/wifi_positioning/log
+.classpath

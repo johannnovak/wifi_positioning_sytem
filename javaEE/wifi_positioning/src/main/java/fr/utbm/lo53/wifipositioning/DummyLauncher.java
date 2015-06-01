@@ -18,10 +18,10 @@ import fr.utbm.lo53.wifipositioning.util.FilesUtils;
  * @author jnovak
  *
  */
-public class Launcher
+public class DummyLauncher
 {
 	/** Logger of the class */
-	private final static Logger	s_logger	= LoggerFactory.getLogger(Launcher.class);
+	private final static Logger	s_logger	= LoggerFactory.getLogger(DummyLauncher.class);
 
 	/* --------------------------------------------------------------------- */
 
