@@ -1,5 +1,8 @@
 #include "helper.h"
 
+extern Element * rssi_list;
+extern sem_t synchro;
+
 void* connection_handler(void * _args)
 {
 	char buffer[256];
@@ -12,8 +15,32 @@ void* connection_handler(void * _args)
 		error("ERROR: reading from socket");
 	printf("<CT> Here is the message: %s\n", buffer);
 
+	sem_wait(&synchro);
+	
+	u_char mac[6];
+	string_to_mac(buffer, mac);
+	Element* elem = find_mac(rssi_list, mac);
+	double avg = 0;
+	if(elem != NULL)
+	{
+		int nbVal = 0;
+		Rssi_sample* curr = elem->measurements.head;
+		while(curr != NULL)
+		{
+			avg += curr->rssi_mW;
+			nbVal++;
+			curr = curr->next;
+		}
+		
+		if(nbVal > 0)
+			avg = avg / (double)nbVal;
+	}
+	sem_post(&synchro);
+	
+	char answer[256];
+	sprintf(answer, "%s;%.10f", buffer, avg);
 	printf("<CT> Now sending back a message.\n");
-	n = write(clientSocket, "I got your message.\n", 20);
+	n = write(clientSocket, answer, strlen(answer));
 	if(n < 0)
 		error("ERROR: writing to socket");
 
