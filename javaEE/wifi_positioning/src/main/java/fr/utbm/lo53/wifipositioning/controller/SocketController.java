@@ -1,6 +1,7 @@
 package fr.utbm.lo53.wifipositioning.controller;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.utbm.lo53.wifipositioning.model.Measurement;
 import fr.utbm.lo53.wifipositioning.util.ApQuerier;
+import fr.utbm.lo53.wifipositioning.util.MiscUtils;
 
 /**
  * Abstract class.<br>
@@ -94,7 +96,10 @@ public abstract class SocketController
 		{
 			/* Creates a new ServerSocketChannel. */
 			m_serverSocketChannel = ServerSocketChannel.open();
-			m_serverSocketChannel.bind(new InetSocketAddress("localhost", port));
+			InetAddress localAddress = MiscUtils.getHostIP4Address();
+			if (localAddress == null)
+				throw new IOException("Error could not obtain the IPv4 address.");
+			m_serverSocketChannel.bind(new InetSocketAddress(localAddress, port));
 			m_serverSocketChannel.configureBlocking(false);
 
 			m_channelIDCount = new AtomicInteger();

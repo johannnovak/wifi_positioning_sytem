@@ -76,9 +76,11 @@ public class CalibrateDAO
 		{
 			/* Begins the transaction of data. */
 			session.beginTransaction();
+			// session.save(_position);
 
 			/* Query to see if the position already exists. */
-			Query hqlQuery = session.createQuery("FROM Position where x = :x and y = :y");
+			Query hqlQuery = session
+					.createQuery("SELECT p FROM Position p where x = :x and y = :y");
 			hqlQuery.setParameter("x", _position.getX());
 			hqlQuery.setParameter("y", _position.getY());
 
@@ -86,7 +88,8 @@ public class CalibrateDAO
 			List<Object> posList = hqlQuery.list();
 
 			/*
-			 * If it doesn't exist, we save the new position and its associated
+			 * If it doesn't exist, we save the new position and its
+			 * associated
 			 * measurement.
 			 */
 			if (posList.isEmpty())
@@ -102,23 +105,31 @@ public class CalibrateDAO
 			{
 				s_logger.debug("The coordinates (x,y) have been found in the database.");
 
+				Position p = (Position) posList.get(0);
+				Measurement requestMeasurement = _position.getMeasurements().iterator().next();
+
 				hqlQuery = session
-						.createQuery("SELECT m FROM Measurement m join m.position p where p.x = :x and p.y = :y");
+						.createQuery("SELECT m FROM Measurement m join m.position p where m.macAddress=:mac_address and p.x = :x and p.y = :y");
+				hqlQuery.setParameter("mac_address", requestMeasurement.getMacAddress());
 				hqlQuery.setParameter("x", _position.getX());
 				hqlQuery.setParameter("y", _position.getY());
 
 				@SuppressWarnings("unchecked")
-				List<Object> rssiList = hqlQuery.list();
-				Measurement requestMeasurement = _position.getMeasurements().iterator().next();
+				List<Object> measurements = hqlQuery.list();
 
 				/*
 				 * If there is no mac address associated with the (x,y) => add
 				 * new measurement
 				 */
-				if (rssiList.isEmpty())
+				if (measurements.isEmpty())
 				{
-					requestMeasurement.setPosition((Position) posList.get(0));
+					// requestMeasurement.setPosition((Position)
+					// posList.get(0));
+					// session.save(requestMeasurement);
+					requestMeasurement.setPosition(p);
 					session.save(requestMeasurement);
+					p.getMeasurements().add(requestMeasurement);
+					session.saveOrUpdate(p);
 
 					/*
 					 * If there is already a macAddress for the (x,y) => update
@@ -126,14 +137,23 @@ public class CalibrateDAO
 					 */
 				} else
 				{
-					Measurement m = (Measurement) rssiList.get(0);
-					m.setRssi(requestMeasurement.getRssi());
-					session.update(m);
+					Measurement m = (Measurement) measurements.get(0);
+					if (!requestMeasurement.getMacAddress().equals(m.getMacAddress()))
+					{
+						requestMeasurement.setPosition(p);
+						session.save(requestMeasurement);
+						p.getMeasurements().add(requestMeasurement);
+						session.saveOrUpdate(p);
+					} else
+					{
+						m.setRssi(requestMeasurement.getRssi());
+						session.merge(m);
+					}
 				}
 			}
 
 			/*
-			 * There hasn' been any errors, we can safely commit our database
+			 * No errors, we can safely commit our database
 			 * updates.
 			 */
 			session.getTransaction().commit();
