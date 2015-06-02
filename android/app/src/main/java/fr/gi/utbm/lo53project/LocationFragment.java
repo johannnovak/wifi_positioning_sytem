@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -125,7 +126,7 @@ public class LocationFragment extends AbstractFragment {
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         String code = (String) ois.readObject();
 
-                        //TODO : tread.sleep
+                        //TODO : thread.sleep
 
                         // Publish the received data
                         publishProgress(decode(code));
@@ -169,7 +170,7 @@ public class LocationFragment extends AbstractFragment {
         protected void onProgressUpdate(PointF... p) {
             super.onProgressUpdate(p);
             //mViewport.addPoint(p[0].x, p[0].y, Position.Type.LOCATION);
-            System.out.println(p);
+            Toast.makeText(getActivity(), "Position " + p[0].toString() + " received !", Toast.LENGTH_SHORT).show();
         }
 
 //        @Override
