@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity
         System.out.println("MainActivity : Creating ...");
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calibration);
+        setContentView(R.layout.settings_layout);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);

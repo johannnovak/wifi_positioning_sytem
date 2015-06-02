@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -119,7 +120,7 @@ public class CalibrationFragment extends AbstractFragment {
         }
         // Else we just display an error message
         else {
-            Toast.makeText(getActivity(), "Server unable to receive that ... :(", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Server unable to receive request ... :(", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -170,9 +171,11 @@ public class CalibrationFragment extends AbstractFragment {
     private boolean sendPoint(float x, float y) {
         boolean sent = false;
 
+        // Open a client socket
+        Socket clientSocket = new Socket();
+
         try {
-            // Open a client socket
-            Socket clientSocket = new Socket(mServerIP, mServerPort);
+            clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort));//, 20000);
 
             // Send calibration position to the server
             ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -197,7 +200,11 @@ public class CalibrationFragment extends AbstractFragment {
             catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
+
         }
+//        catch (ConnectException e) {
+//            Toast.makeText(getActivity(), "Server connection timeout !", Toast.LENGTH_SHORT).show();
+//        }
         catch (IOException e) {
             e.printStackTrace();
         }
