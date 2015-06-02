@@ -1,6 +1,5 @@
 package fr.utbm.lo53.wifipositioning.model;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,11 +11,8 @@ import java.util.Set;
  * @author jnovak
  *
  */
-public class Position implements Serializable
+public class Position
 {
-	/** Serial ID */
-	private static final long	serialVersionUID	= 1L;
-
 	/** ID of the database table. DO NOT SET. */
 	private int					id;
 
@@ -27,7 +23,7 @@ public class Position implements Serializable
 	private float				y;
 
 	/** Associated {@link Measurement} for this {@link Position} */
-	private Set<Measurement>	measurements		= new HashSet<Measurement>(0);
+	private Set<Measurement>	measurements	= new HashSet<Measurement>(0);
 
 	/* --------------------------------------------------------------------- */
 

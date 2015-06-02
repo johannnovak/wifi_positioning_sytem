@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.net.URL;
+
 /**
  * Created by celian on 05/05/15 for LO53Project
  */
