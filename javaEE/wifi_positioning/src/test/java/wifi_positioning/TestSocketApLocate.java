@@ -10,19 +10,25 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.Iterator;
-import java.util.Scanner;
 import java.util.Set;
 
-public class TestSocketAp
+public class TestSocketApLocate
 {
 	public static void main(
 			final String[] args) throws IOException, ClassNotFoundException
 	{
 		int apCount = 0;
-		float x = 0, y = 0;
-		String[] macAdresses = { "00:00:00:00:00:00", "11:11:11:11:11:11", "22:22:22:22:22:22" };
+		String[] macAdresses = { "00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03" };
+		double[] xAp = { 600, 800, 40000 };
+		double[] yAp = { 200, 30000, 15000 };
 
-		Scanner sc = new Scanner(System.in);
+		double xIni = 200.f;
+		double yIni = 0.f;
+
+		double currentX;
+		double currentY;
+
+		long time = System.currentTimeMillis();
 
 		@SuppressWarnings("resource")
 		ServerSocketChannel m_serverSocketChannel = ServerSocketChannel.open();
@@ -76,8 +82,6 @@ public class TestSocketAp
 					}
 
 					System.out.println("Read : " + data);
-					x = sc.nextFloat();
-					y = sc.nextFloat();
 					key.channel().register(selector, SelectionKey.OP_WRITE);
 
 				} else if (key.isWritable())
@@ -86,11 +90,24 @@ public class TestSocketAp
 
 					/* Writing back the message. */
 					SocketChannel clientSocketChannel = (SocketChannel) key.channel();
-					CharBuffer buf = CharBuffer.wrap("00:00:00:00:22:21;20046");
+					String returned = macAdresses[apCount] + ";";
+
+					long t = System.currentTimeMillis() - time;
+					currentX = xIni + (t * 1000);
+					currentY = yIni + (t * 500);
+
+					double rssi = Math.sqrt(((currentX - xAp[apCount]) * (currentX - xAp[apCount]))
+							+ ((currentY - yAp[apCount]) * (currentY - yAp[apCount])));
+
+					returned += rssi;
+
+					CharBuffer buf = CharBuffer.wrap(returned);
 					while (buf.hasRemaining())
 						clientSocketChannel.write(Charset.defaultCharset().encode(buf));
 					clientSocketChannel.close();
 					apCount++;
+					apCount %= 3;
+					time = t;
 				}
 
 				/* Removes the current key from the set. */
