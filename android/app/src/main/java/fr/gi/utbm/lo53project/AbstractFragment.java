@@ -10,14 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.net.URL;
-
 /**
  * Created by celian on 05/05/15 for LO53Project
  */
 public abstract class AbstractFragment extends Fragment {
 
     protected WorldMap mMap;
+    protected boolean mUsingServer;
     protected String mServerIP;
     protected int mServerPort;
     protected String mMacAddress;
@@ -35,7 +34,17 @@ public abstract class AbstractFragment extends Fragment {
         mMacAddress = getMacAddress(getActivity());
 
         // Get the server IP from resources
-        mServerIP = getResources().getString(R.string.server_ip);
+//        mServerIP = getResources().getString(R.string.server_ip);
+
+        mServerIP = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getString(
+                MainActivity.TAG_PREF_SERVER_IP,
+                getResources().getString(R.string.server_ip) // default value
+        );
+
+        mUsingServer = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getBoolean(
+                MainActivity.TAG_PREF_USING_SERVER,
+                getResources().getBoolean(R.bool.using_server) // default value
+        );
 
         System.out.println("Abstract fragment : View created !");
         return null;

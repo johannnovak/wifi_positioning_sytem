@@ -17,6 +17,12 @@ public class MainActivity extends ActionBarActivity
 
     public static String TAG_WORLDMAP = "Global WorldMap";
     public static String TAG_WORLDMAP_BUNDLE = "Global WorldMap Bundle";
+    public static String TAG_PREF_USING_SERVER = "Using Server Boolean";
+    public static String TAG_PREF_SERVER_IP = "Server IP String";
+    public static String TAG_PREF_SERVER_PORT_LOCATION = "ServerLocation Port Integer";
+    public static String TAG_PREF_SERVER_PORT_CALIBRATION = "Server Calibration Port Integer";
+
+    public static final int PREFERENCE_MODE_PRIVATE = 0;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -35,7 +41,7 @@ public class MainActivity extends ActionBarActivity
         System.out.println("MainActivity : Creating ...");
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_layout);
+        setContentView(R.layout.main_layout);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -54,6 +60,17 @@ public class MainActivity extends ActionBarActivity
             mWorldMap.putSerializable(TAG_WORLDMAP, new WorldMap());
         }
 
+        // Initialize the fragment container with settings
+        if (findViewById(R.id.container) != null) {
+
+            // Create a new Fragment to be placed in the activity layout
+            SettingsFragment settings_frag = new SettingsFragment();
+
+            // Replace the empty 'container' FrameLayout to the settings one
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, settings_frag).commit();
+
+        }
         System.out.println("MainActivity : Created !");
     }
 

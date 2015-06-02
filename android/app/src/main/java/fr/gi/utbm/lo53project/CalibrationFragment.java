@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -40,7 +40,11 @@ public class CalibrationFragment extends AbstractFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Get server port from resources
-        mServerPort = getResources().getInteger(R.integer.server_port_calibration);
+//        mServerPort = getResources().getInteger(R.integer.server_port_calibration);
+        mServerPort = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getInt(
+                MainActivity.TAG_PREF_SERVER_PORT_CALIBRATION,
+                getResources().getInteger(R.integer.server_port_calibration) // default value
+        );
 
         // Initialize view
         View rootView = inflater.inflate(R.layout.calibration_layout, container, false);
@@ -106,7 +110,11 @@ public class CalibrationFragment extends AbstractFragment {
         boolean sent;
 
         // Send the point or directly add it according to the configuration
-        if (getResources().getBoolean(R.bool.using_server)) {
+//        if (getResources().getBoolean(R.bool.using_server)) {
+
+        System.out.println(mUsingServer);
+        System.out.println(mServerIP);
+        if (mUsingServer) {
             sent = sendPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y);
         }
         else {
@@ -117,10 +125,6 @@ public class CalibrationFragment extends AbstractFragment {
         if (sent) {
             mViewport.addPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y, Position.Type.CALIBRATION);
             Toast.makeText(getActivity(), "Position " + mPointWaitingForValidation.toString() + " sent !", Toast.LENGTH_SHORT).show();
-        }
-        // Else we just display an error message
-        else {
-            Toast.makeText(getActivity(), "Server unable to receive request ... :(", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -175,37 +179,29 @@ public class CalibrationFragment extends AbstractFragment {
         Socket clientSocket = new Socket();
 
         try {
-            clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort));//, 20000);
+            clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 20000);
 
             // Send calibration position to the server
-            ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-            oos.writeObject(mMacAddress + ";" + (int) x + ";" + (int) y + ";"); // "mobileMacAddress;x;y"
+            clientSocket.getOutputStream().write((mMacAddress + ";" + (int) x + ";" + (int) y + ";").getBytes()); // "mobileMacAddress;x;y"
 
-            try {
-                // Wait for an answer from the server
-                ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-                String code = (String) ois.readObject();
+            String code = new String(IOUtils.toByteArray(clientSocket.getInputStream()));
 
-                // Check server answer
-                if (code.equals("200")) {
-                    sent = true;
-                }
-                else {
-                    sent = false;
-                }
+            Toast.makeText(getActivity(), "Server answer is : " + code, Toast.LENGTH_SHORT).show();
 
-                // Close socket
-                clientSocket.close();
+            // Check server answer
+            if (code.equals("200")) {
+                sent = true;
             }
-            catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            else {
+                sent = false;
             }
+
+            // Close socket
+            clientSocket.close();
 
         }
-//        catch (ConnectException e) {
-//            Toast.makeText(getActivity(), "Server connection timeout !", Toast.LENGTH_SHORT).show();
-//        }
         catch (IOException e) {
+            Toast.makeText(getActivity(), "IOException : unable to make a connection with the server.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
 

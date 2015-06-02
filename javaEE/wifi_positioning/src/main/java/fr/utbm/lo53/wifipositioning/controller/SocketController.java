@@ -94,7 +94,7 @@ public abstract class SocketController
 		{
 			/* Creates a new ServerSocketChannel. */
 			m_serverSocketChannel = ServerSocketChannel.open();
-			m_serverSocketChannel.bind(new InetSocketAddress("localhost", port));
+			m_serverSocketChannel.bind(new InetSocketAddress("192.168.43.39", port));
 			m_serverSocketChannel.configureBlocking(false);
 
 			m_channelIDCount = new AtomicInteger();

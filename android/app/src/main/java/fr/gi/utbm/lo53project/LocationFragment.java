@@ -26,7 +26,11 @@ public class LocationFragment extends AbstractFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Get server port from resources
-        mServerPort = getResources().getInteger(R.integer.server_port_location);
+//        mServerPort = getResources().getInteger(R.integer.server_port_location);
+        mServerPort = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getInt(
+                MainActivity.TAG_PREF_SERVER_PORT_LOCATION,
+                getResources().getInteger(R.integer.server_port_location) // default value
+        );
 
         // Initialize view
         View rootView = inflater.inflate(R.layout.location_layout, container, false);
@@ -36,7 +40,8 @@ public class LocationFragment extends AbstractFragment {
         LinearLayout location_viewport_layout = (LinearLayout)rootView.findViewById(R.id.location_viewport_layout);
         location_viewport_layout.addView(mViewport);
 
-        if (getResources().getBoolean(R.bool.using_server)) {
+//        if (getResources().getBoolean(R.bool.using_server)) {
+        if (mUsingServer) {
             ReceiverAsyncTask receiver = new ReceiverAsyncTask();
             receiver.execute();
         }
