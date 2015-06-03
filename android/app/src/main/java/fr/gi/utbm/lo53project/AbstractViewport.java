@@ -153,6 +153,11 @@ public abstract class AbstractViewport extends View {
         this.invalidate(); // Force the viewport to redraw
     }
 
+    protected void addPosition(int x, int y, Position.Type t) {
+        mMap.addPosition(x, y, t);
+        this.invalidate(); // Force the viewport to redraw
+    }
+
     /**
      * Convert coordinates from view space to world space
      * @param x x coordinate

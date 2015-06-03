@@ -22,6 +22,9 @@ public class LocationViewport extends AbstractViewport{
         super.onDraw(canvas);
 
         mMap.drawPositions(canvas);
+
+        if (mMap.drawPositions(canvas, Position.Type.HOVER))
+            invalidate();
     }
 
 }

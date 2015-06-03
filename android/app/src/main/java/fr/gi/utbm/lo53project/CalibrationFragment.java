@@ -181,8 +181,8 @@ public class CalibrationFragment extends AbstractFragment {
         try {
             clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 20000);
 
-            // Send calibration position to the server
-            clientSocket.getOutputStream().write((mMacAddress + ";" + (int) x + ";" + (int) y + ";").getBytes()); // "mobileMacAddress;x;y"
+            // Send calibration position to the server "mobileMacAddress;x;y"
+            clientSocket.getOutputStream().write((mMacAddress + ";" + (int) x + ";" + (int) y + ";").getBytes());
 
             String code = new String(IOUtils.toByteArray(clientSocket.getInputStream()));
 

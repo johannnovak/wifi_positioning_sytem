@@ -1,6 +1,5 @@
 package fr.gi.utbm.lo53project;
 
-import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +9,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.io.ObjectInputStream;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -26,7 +29,6 @@ public class LocationFragment extends AbstractFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Get server port from resources
-//        mServerPort = getResources().getInteger(R.integer.server_port_location);
         mServerPort = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getInt(
                 MainActivity.TAG_PREF_SERVER_PORT_LOCATION,
                 getResources().getInteger(R.integer.server_port_location) // default value
@@ -40,82 +42,13 @@ public class LocationFragment extends AbstractFragment {
         LinearLayout location_viewport_layout = (LinearLayout)rootView.findViewById(R.id.location_viewport_layout);
         location_viewport_layout.addView(mViewport);
 
-//        if (getResources().getBoolean(R.bool.using_server)) {
-        if (mUsingServer) {
-            ReceiverAsyncTask receiver = new ReceiverAsyncTask();
-            receiver.execute();
-        }
-
-//        //New thread to listen to incoming connections
-//        new Thread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-////                try {
-////                    Socket clientSocket = new Socket(mServerIP, mServerPort);
-//                Socket clientSocket = new Socket();
-//
-//                    while(true) {
-////                        try {
-////                            ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-////                            String code = (String) ois.readObject();
-//
-//
-//
-//                            //For each client new instance of AsyncTask will be created
-//                            ReceiverAsyncTask receiverAsyncTask = new ReceiverAsyncTask();
-//                            //Start the AsyncTask execution
-//                            //Accepted client socket object will pass as the parameter
-//                            receiverAsyncTask.execute(new Socket[]{clientSocket});
-//
-////                          clientSocket.close();
-////                        } catch (ClassNotFoundException e) {
-////                            e.printStackTrace();
-////                        }
-//                    }
-////                }
-////                catch (IOException e) {
-////                    e.printStackTrace();
-////                }
-//
-//            }
-//        }).start();
+        ReceiverAsyncTask receiver = new ReceiverAsyncTask();
+        receiver.execute();
 
         return rootView;
     }
 
-//    @SuppressWarnings("unused")
-//    private void receivePoint() {
-//        // TO DO
-//        // - create a thread which loop ?
-//        // - receiver already implemented
-//
-//        // use mViewport.addPoint(x, y, Position.Type.LOCATION);
-//        try {
-//            Socket clientSocket = new Socket(mServerIP, mServerPort);
-//
-////            ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-////
-////            oos.writeObject(mMacAddress + ";" + (int)x + ";" + (int)y + ";"); // "mobileMacAddress;x;y"
-//
-//            try {
-//                ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-//                String code = (String) ois.readObject();
-//                PointF data = decode(code);
-//                mViewport.addPoint(data.x, data.y, Position.Type.CALIBRATION);
-//
-//                clientSocket.close();
-//            }
-//            catch (ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public class ReceiverAsyncTask extends AsyncTask<Void, PointF, Void> {
+    public class ReceiverAsyncTask extends AsyncTask<Void, Position, Void> {
 
         private boolean mRun = true;
 
@@ -124,74 +57,63 @@ public class LocationFragment extends AbstractFragment {
         protected Void doInBackground(Void... params) {
 
             while(!this.isCancelled()) {
-                try {
-                    // Get the accepted socket object
-                    Socket socket = new Socket(mServerIP, mServerPort);
+
+                if (mUsingServer) {
                     try {
-                        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                        String code = (String) ois.readObject();
+                        // Get the accepted socket object
+                        Socket socket = new Socket();
+                        socket.connect(new InetSocketAddress(mServerIP, mServerPort), 500);
+                        try {
+                            String code = new String(IOUtils.toByteArray(socket.getInputStream()));
 
-                        //TODO : thread.sleep
+                            // Publish the received data
+                            publishProgress(decode(code));
 
-                        // Publish the received data
-                        publishProgress(decode(code));
-
-                        socket.close();
-                    } catch (Exception e) {
+                            socket.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    catch (ConnectException e) {
                         e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    catch (IOException e) {
+
+                    }
+                }
+                else {
+                    try {
+                        Thread.sleep(500);
+                        publishProgress(
+                            new Position(
+                                (int)(Math.random()*5),
+                                (int)(Math.random()*5)
+                            )
+                        );
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-//
-//                publishProgress(
-//                    new PointF(
-//                        500,
-//                        1000
-//                    )
-//                );
-//
-//
-//                publishProgress(
-//                    new PointF(
-//                        1000,
-//                        1000
-//                    )
-//                );
-//
-//                publishProgress(
-//                    new PointF(
-//                        1000,
-//                        1500
-//                    )
-//                );
-
 
             return null;
         }
 
         @Override
-        protected void onProgressUpdate(PointF... p) {
+        protected void onProgressUpdate(Position... p) {
             super.onProgressUpdate(p);
-            //mViewport.addPoint(p[0].x, p[0].y, Position.Type.LOCATION);
+            mViewport.addPosition(p[0].x, p[0].y, Position.Type.HOVER);
             Toast.makeText(getActivity(), "Position " + p[0].toString() + " received !", Toast.LENGTH_SHORT).show();
         }
 
-//        @Override
-//        protected void onPostExecute(PointF p) {
-////            if (p != null) {
-////                mViewport.addPoint(p.x, p.y, Position.Type.LOCATION);
-////            }
-//        }
-
-        private PointF decode (String code) {
-            float x, y;
+        private Position decode (String code) {
+            int x, y;
 
             String[] coordinates = code.split(";");
             x = Integer.getInteger(coordinates[0]);
             y = Integer.getInteger(coordinates[1]);
-            return new PointF(x, y);
+            return new Position(x, y);
         }
     }
 }

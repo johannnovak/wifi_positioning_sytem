@@ -124,6 +124,10 @@ public class WorldMap implements Serializable {
         mPositions.get(t).add(toPosition(x, y));
     }
 
+    public void addPosition(int x, int y, Position.Type t) {
+        mPositions.get(t).add(new Position(x, y));
+    }
+
     /**
      * Clear all positions from the map
      */
