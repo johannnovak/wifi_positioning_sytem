@@ -31,16 +31,14 @@ public abstract class AbstractFragment extends Fragment {
         Bundle args = getArguments();
         mMap = (WorldMap) args.getSerializable(MainActivity.TAG_WORLDMAP);
 
+        // Get the Mac Address
         mMacAddress = getMacAddress(getActivity());
 
-        // Get the server IP from resources
-//        mServerIP = getResources().getString(R.string.server_ip);
-
+        // Some preferences : server IP and "using server" boolean
         mServerIP = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getString(
                 MainActivity.TAG_PREF_SERVER_IP,
                 getResources().getString(R.string.server_ip) // default value
         );
-
         mUsingServer = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getBoolean(
                 MainActivity.TAG_PREF_USING_SERVER,
                 getResources().getBoolean(R.bool.using_server) // default value

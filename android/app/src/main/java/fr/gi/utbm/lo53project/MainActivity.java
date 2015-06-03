@@ -1,5 +1,6 @@
 package fr.gi.utbm.lo53project;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -10,6 +11,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 
 public class MainActivity extends ActionBarActivity
@@ -21,6 +24,8 @@ public class MainActivity extends ActionBarActivity
     public static String TAG_PREF_SERVER_IP = "Server IP String";
     public static String TAG_PREF_SERVER_PORT_LOCATION = "ServerLocation Port Integer";
     public static String TAG_PREF_SERVER_PORT_CALIBRATION = "Server Calibration Port Integer";
+    public static String TAG_PREF_DEFAULT_MAP_WIDTH = "Default Map Width";
+    public static String TAG_PREF_DEFAULT_MAP_HEIGHT = "Default Map Height";
 
     public static final int PREFERENCE_MODE_PRIVATE = 0;
     /**
@@ -33,7 +38,7 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     
-    private Bundle mWorldMap;
+    private Bundle mMapSaveBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,34 +61,35 @@ public class MainActivity extends ActionBarActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         if (savedInstanceState == null || !savedInstanceState.containsKey(TAG_WORLDMAP_BUNDLE)) {
-            mWorldMap = new Bundle();
-            mWorldMap.putSerializable(TAG_WORLDMAP, new WorldMap());
+            mMapSaveBundle = new Bundle();
+
+            // Initialize the fragment container with settings
+            if (findViewById(R.id.container) != null) {
+
+                // Create a new Fragment to be placed in the activity layout
+                SettingsFragment settings_frag = new SettingsFragment();
+
+                // Replace the empty 'container' FrameLayout to the settings one
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, settings_frag).commit();
+
+            }
         }
 
-        // Initialize the fragment container with settings
-        if (findViewById(R.id.container) != null) {
 
-            // Create a new Fragment to be placed in the activity layout
-            SettingsFragment settings_frag = new SettingsFragment();
 
-            // Replace the empty 'container' FrameLayout to the settings one
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, settings_frag).commit();
-
-        }
         System.out.println("MainActivity : Created !");
     }
 
     @Override
     public void onSaveInstanceState (Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-
-        savedInstanceState.putBundle(TAG_WORLDMAP_BUNDLE, mWorldMap);
+        savedInstanceState.putBundle(TAG_WORLDMAP_BUNDLE, mMapSaveBundle);
     }
 
     @Override
     public void onRestoreInstanceState (@NonNull Bundle savedInstanceState) {
-        mWorldMap = savedInstanceState.getBundle(TAG_WORLDMAP_BUNDLE);
+        mMapSaveBundle = savedInstanceState.getBundle(TAG_WORLDMAP_BUNDLE);
     }
 
     @Override
@@ -91,6 +97,10 @@ public class MainActivity extends ActionBarActivity
 
         System.out.println("##############################");
         System.out.println("MainActivity : Selecting item ...");
+
+        // Force to close the keyboard
+        hideKeyboard();
+
         Fragment objFragment = null;
 
         switch(position) {
@@ -106,8 +116,15 @@ public class MainActivity extends ActionBarActivity
 
         restoreActionBar();
 
+        // Initialize world map and its bundle
+        if(mMapSaveBundle.size() == 0) {
+            int width = getPreferences(PREFERENCE_MODE_PRIVATE).getInt(TAG_PREF_DEFAULT_MAP_WIDTH, 3);
+            int height = getPreferences(PREFERENCE_MODE_PRIVATE).getInt(TAG_PREF_DEFAULT_MAP_HEIGHT, 3);
+            mMapSaveBundle.putSerializable(TAG_WORLDMAP, new WorldMap(width, height));
+        }
+
         // Give the bundle (containing the WorldMap) to the fragment
-        objFragment.setArguments(mWorldMap);
+        objFragment.setArguments(mMapSaveBundle);
 
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -156,4 +173,12 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void hideKeyboard() {
+        // Check if no view has focus:
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
 }

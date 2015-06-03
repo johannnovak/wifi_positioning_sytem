@@ -38,8 +38,7 @@ public class CalibrationFragment extends AbstractFragment {
         // the super function fetch mMap from bundle
         super.onCreateView(inflater, container, savedInstanceState);
 
-        // Get server port from resources
-//        mServerPort = getResources().getInteger(R.integer.server_port_calibration);
+        // Get server port from preferences
         mServerPort = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getInt(
                 MainActivity.TAG_PREF_SERVER_PORT_CALIBRATION,
                 getResources().getInteger(R.integer.server_port_calibration) // default value

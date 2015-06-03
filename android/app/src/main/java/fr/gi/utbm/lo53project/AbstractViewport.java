@@ -89,6 +89,14 @@ public abstract class AbstractViewport extends View {
         this(c, attrs, map, null);
     }
 
+    public float getScaleFactor() {
+        return this.mScaleFactor;
+    }
+
+    public SRectF getViewportFrame () {
+        return this.mViewportFrame;
+    }
+
     /**
      * Transmit the motionEvent to the detectors and say to the canvas to redraw.
      * @param event the motion event
@@ -137,7 +145,7 @@ public abstract class AbstractViewport extends View {
     private void updateHoverSelection(MotionEvent e) {
         if(mState == State.SELECTING) {
             PointF hover = fromViewToWorld(e.getX(), e.getY());
-            mMap.addHoverPosition(hover.x, hover.y);
+            mMap.addPosition(hover.x, hover.y, Square.Type.HOVER);
             invalidate();
         }
     }

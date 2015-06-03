@@ -23,7 +23,7 @@ public class LocationViewport extends AbstractViewport{
 
         mMap.drawSquares(canvas);
 
-        if (mMap.drawSquares(canvas, Square.Type.HOVER))
+        if (mMap.drawSquares(canvas, Square.Type.LOCATION))
             invalidate();
     }
 

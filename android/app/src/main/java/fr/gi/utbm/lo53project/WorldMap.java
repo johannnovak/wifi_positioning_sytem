@@ -17,27 +17,24 @@ import java.util.Map;
  */
 public class WorldMap implements Serializable {
 
-    private Map< Square.Type, List<Square>> mPositions;
+    private Map< Square.Type, List<Square>> mSquares;
     private SPaint mGridPaint;
 
     private SRectF mBounds;
 
-    private int gridWidth;
-    private int gridHeight;
+    private int mGridWidth;
+    private int mGridHeight;
     public float squareWidth;
     public float squareHeight;
 
     public Map<Square.Type , SPaint> paints;
 
-    private boolean bCurrentHoverPositionIsImmortal;
-    private Square mCurrentHoverPosition;
+    private Square mCurrentHoverSquare;
+    private Square mCurrentLocateSquare;
 
-    public WorldMap() {
+    protected WorldMap() {
         squareWidth = 200;
         squareHeight = 200;
-        gridHeight = 3;
-        gridWidth = 3;
-        mBounds = new SRectF(0, 0, squareWidth * gridWidth, squareHeight * gridHeight);
 
         // Paint dedicated to calibration points
         final SPaint calibrationPaint  = new SPaint();
@@ -73,15 +70,22 @@ public class WorldMap implements Serializable {
             put(Square.Type.LOCATION,     locationPaint);
         }};
 
-        mPositions = new HashMap<Square.Type, List<Square>>() {{
+        mSquares = new HashMap<Square.Type, List<Square>>() {{
             put(Square.Type.CALIBRATION, new ArrayList<Square>());
             put(Square.Type.LOCATION, new ArrayList<Square>());
             put(Square.Type.HOVER, new ArrayList<Square>());
         }};
 
-        mCurrentHoverPosition = null;
+        mCurrentHoverSquare = null;
 
         System.out.println("WorldMap : constructor");
+    }
+
+    public WorldMap (int width, int height) {
+        this();
+        mGridWidth = width;
+        mGridHeight = height;
+        mBounds = new SRectF(0, 0, squareWidth * mGridWidth, squareHeight * mGridHeight);
     }
 
     /**
@@ -97,21 +101,23 @@ public class WorldMap implements Serializable {
      * @return
      */
     public PointF fingerUp() {
-        return toReal(mCurrentHoverPosition);
+        return toReal(mCurrentHoverSquare);
     }
 
     /**
      *
      */
     public void startWaiting () {
-        bCurrentHoverPositionIsImmortal = true;
+        int lastIndex = mSquares.get(Square.Type.HOVER).size()-1;
+        mSquares.get(Square.Type.HOVER).get(lastIndex).setImmortality(true);
     }
 
     /**
      *
      */
     public void stopWaiting () {
-        bCurrentHoverPositionIsImmortal = false;
+        int lastIndex = mSquares.get(Square.Type.HOVER).size()-1;
+        mSquares.get(Square.Type.HOVER).get(lastIndex).setImmortality(false);
     }
 
     /**
@@ -121,21 +127,92 @@ public class WorldMap implements Serializable {
      * @param t position type
      */
     public void addPosition(float x, float y, Square.Type t) {
-        mPositions.get(t).add(toSquare(x, y));
+        addSquare(toSquare(x, y), t);
     }
 
     public void addSquare(int x, int y, Square.Type t) {
-        mPositions.get(t).add(new Square(x, y));
+        addSquare(new Square(x, y), t);
     }
+
+    public void addSquare(Square s, Square.Type t) {
+        boolean add_permission = false;
+
+        // Set immortality according to the type of square
+        switch (t) {
+            case HOVER:
+
+                // If the square appear to be inside the grid bounds
+                if (s.x >= 0 && s.x < mGridWidth && s.y >= 0 && s.y < mGridHeight ) {
+                    // And if it is not already stored
+                    if (!mSquares.get(t).contains(s)) {
+
+                        // We set the previous square to mortal
+                        if (mCurrentHoverSquare != null ) {
+                            mCurrentHoverSquare.setImmortality(false);
+                        }
+
+                        // We can know assign the current square
+                        mCurrentHoverSquare = s;
+                        mCurrentHoverSquare.setImmortality(true); // It becomes the new immortal
+
+                        // Let the function add it to the stored squares
+                        add_permission = true;
+                    }
+                }
+                else return;
+                break;
+
+            case CALIBRATION:
+
+                // Calibration square is always immortal and cannot be killed
+                s.setImmortality(true);
+
+                // Useless to make several draw of the same point at the same time, so we verify if
+                // it is stored or not
+                if (!mSquares.get(t).contains(s)) {
+                    add_permission = true;
+                }
+                break;
+
+            case LOCATION:
+
+                // We set the previous square to mortal
+                if (mCurrentLocateSquare != null ) {
+                    mCurrentLocateSquare.setImmortality(false);
+                }
+
+                // We can know assign the current square
+                mCurrentLocateSquare = s;
+                mCurrentLocateSquare.setImmortality(true); // It becomes the new immortal
+
+                // A location square is always drawn
+                add_permission = true;
+                break;
+        }
+
+        // Add the square if it is permitted
+        if (add_permission) mSquares.get(t).add(s);
+    }
+
+//    public void addHoverPosition (float x, float y) {
+//        if (mBounds.contains(x, y)) {
+//            Square p = toSquare(x, y);
+//            if (!mSquares.get(Square.Type.HOVER).contains(p)) {
+//                mSquares.get(Square.Type.HOVER).add(p);
+//            }
+//            mCurrentHoverSquare = p;
+//            mCurrentHoverSquare.setImmortality(true);
+//        }
+//    }
 
     /**
      * Clear all positions from the map
      */
     @SuppressWarnings("unused")
     public void clearAll() {
-        mPositions.get(Square.Type.CALIBRATION).clear();
-        mPositions.get(Square.Type.LOCATION).clear();
-        mPositions.get(Square.Type.HOVER).clear();
+        mSquares.get(Square.Type.CALIBRATION).clear();
+        mSquares.get(Square.Type.LOCATION).clear();
+        mSquares.get(Square.Type.HOVER).clear();
     }
 
     /**
@@ -144,27 +221,26 @@ public class WorldMap implements Serializable {
      */
     @SuppressWarnings("unused")
     public void clear (Square.Type t) {
-        mPositions.get(t).clear();
+        mSquares.get(t).clear();
     }
 
     /**
-     * Draw a position of the given type into the canvas
+     * Draw a square of the given type into the canvas
      * @param canvas canvas where to draw
-     * @param p position to draw
-     * @param t type of the position to draw
+     * @param s square to draw
+     * @param t type of the square to draw
      */
-    public void drawSquare (Canvas canvas, Square p, Square.Type t) {
+    public void drawSquare (Canvas canvas, Square s, Square.Type t) {
         Paint paint = paints.get(t);
 
-        if (t == Square.Type.HOVER) {
-            paint.setAlpha(p.life);
-        }
+        // Setting the alpha value according to its life
+        paint.setAlpha(s.life);
 
         canvas.drawRect(
-                p.x * squareWidth,
-                p.y * squareHeight,
-                p.x * squareWidth + squareWidth,
-                p.y * squareHeight + squareHeight,
+                s.x * squareWidth,
+                s.y * squareHeight,
+                s.x * squareWidth + squareWidth,
+                s.y * squareHeight + squareHeight,
                 paint
         );
     }
@@ -176,55 +252,71 @@ public class WorldMap implements Serializable {
      * @return have to redraw after that
      */
     public boolean drawSquares (Canvas canvas, Square.Type t) {
-        boolean redraw = false;
+        boolean redraw = updateLives(t);
 
-        if (t == Square.Type.HOVER) {
-            redraw = updateLife();
-        }
-
-        for (Square p : mPositions.get(t)) {
-            drawSquare(canvas, p, t);
+        for (Square s : mSquares.get(t)) {
+            drawSquare(canvas, s, t);
         }
 
         return redraw;
     }
 
     /**
-     * Recover or decrease life and remove hovered points if are dead
-     * @return have to redraw after that
+     * Draw all positions of both types CALIBRATION & LOCATION in the canvas
+     * @param canvas canvas where to draw
      */
-    private boolean updateLife() {
+    public boolean drawSquares (Canvas canvas) {
+        boolean r1 = drawSquares(canvas, Square.Type.CALIBRATION);
+        boolean r2 = drawSquares(canvas, Square.Type.LOCATION);
+        boolean r3 = drawSquares(canvas, Square.Type.HOVER);
+        return r1 || r2 || r3;
+    }
 
-        // Update life value of hover positions
-        for (Square p : mPositions.get(Square.Type.HOVER)) {
-            // If we are selecting and the point p is the hovered one
-            if ((bCurrentHoverPositionIsImmortal) && p.equals(mCurrentHoverPosition)) {
-                p.recoverLife();
-            }
-            else {
-                p.decreaseLife();
-            }
+    private boolean updateLives (Square.Type t) {
+        // Update life value of squares of type t
+        for (Square s : mSquares.get(t)) {
+            s.decreaseLife(); // will not decrease if the square is immortal
         }
 
-        // Remove dead positions
-        Iterator it = mPositions.get(Square.Type.HOVER).listIterator();
+        // Remove dead squares
+        Iterator it = mSquares.get(t).listIterator();
         while(it.hasNext()) {
             if (((Square) it.next()).isDead()) {
                 it.remove();
             }
         }
 
-        return !mPositions.get(Square.Type.HOVER).isEmpty();
+        return !mSquares.get(t).isEmpty();
     }
+//
+//    /**
+//     * Recover or decrease life and remove hovered points if are dead
+//     * @return have to redraw after that
+//     */
+//    private boolean updateLife() {
+//
+//        // Update life value of hover positions
+//        for (Square p : mSquares.get(Square.Type.HOVER)) {
+//            // If we are selecting and the point p is the hovered one
+//            if ((mCurrentHoverSquare.isImmortal()) && p.equals(mCurrentHoverSquare)) {
+//                p.recoverLife();
+//            }
+//            else {
+//                p.decreaseLife();
+//            }
+//        }
+//
+//        // Remove dead positions
+//        Iterator it = mSquares.get(Square.Type.HOVER).listIterator();
+//        while(it.hasNext()) {
+//            if (((Square) it.next()).isDead()) {
+//                it.remove();
+//            }
+//        }
+//
+//        return !mSquares.get(Square.Type.HOVER).isEmpty();
+//    }
 
-    /**
-     * Draw all positions of both types CALIBRATION & LOCATION in the canvas
-     * @param canvas canvas where to draw
-     */
-    public void drawSquares (Canvas canvas) {
-        drawSquares(canvas, Square.Type.CALIBRATION);
-        drawSquares(canvas, Square.Type.LOCATION);
-    }
 
     /**
      * Draw the grid in the canvas
@@ -236,27 +328,27 @@ public class WorldMap implements Serializable {
         float dy = squareHeight;
 
         // Row lines
-        for (int i = 0; i < gridHeight; i++)
+        for (int i = 0; i < mGridHeight; i++)
         {
             canvas.drawLine(
-                mBounds.left, i * dy, // start X & Y
-                mBounds.right, i * dy, // end X & Y
-                mGridPaint
+                    mBounds.left, i * dy, // start X & Y
+                    mBounds.right, i * dy, // end X & Y
+                    mGridPaint
             );
         }
         canvas.drawLine(
-            mBounds.left, mBounds.height(), // start X & Y
-            mBounds.right, mBounds.height(), // end X & Y
-            mGridPaint
+                mBounds.left, mBounds.height(), // start X & Y
+                mBounds.right, mBounds.height(), // end X & Y
+                mGridPaint
         );
 
         // Column lines
-        for (int i = 0; i < gridWidth; i++)
+        for (int i = 0; i < mGridWidth; i++)
         {
             canvas.drawLine(
-                i * dx, mBounds.top, // start X & Y
-                i * dx, mBounds.bottom, // end X & Y
-                mGridPaint
+                    i * dx, mBounds.top, // start X & Y
+                    i * dx, mBounds.bottom, // end X & Y
+                    mGridPaint
             );
         }
         canvas.drawLine(
@@ -266,25 +358,13 @@ public class WorldMap implements Serializable {
         );
     }
 
-    public void addHoverPosition (float x, float y) {
-        if (mBounds.contains(x, y)) {
-            Square p = toSquare(x, y);
-            if (!mPositions.get(Square.Type.HOVER).contains(p)) {
-                mPositions.get(Square.Type.HOVER).add(p);
-            }
-            mCurrentHoverPosition = p;
-
-            bCurrentHoverPositionIsImmortal = true;
-        }
-    }
-
     public void addRow() {
-        gridHeight ++;
+        mGridHeight ++;
         mBounds.bottom += squareHeight;
     }
 
     public void addColumn() {
-        gridWidth ++;
+        mGridWidth ++;
         mBounds.right += squareWidth;
     }
 
@@ -296,15 +376,15 @@ public class WorldMap implements Serializable {
      */
     public Square toSquare (float x, float y) {
         return new Square(
-            (int)Math.floor(x / squareWidth),
-            (int)Math.floor(y / squareHeight)
+                (int)Math.floor(x / squareWidth),
+                (int)Math.floor(y / squareHeight)
         );
     }
 
     private PointF toReal(Square p) {
         return new PointF(
-            p.x * squareWidth,
-            p.y * squareHeight
+                p.x * squareWidth,
+                p.y * squareHeight
         );
     }
 
@@ -312,9 +392,9 @@ public class WorldMap implements Serializable {
         String str = "--------------World map------------------\n";
         str += "| Calibration \t\tLocation \t\tHover\n";
 
-        List<Square> c_pos = mPositions.get(Square.Type.CALIBRATION);
-        List<Square> l_pos = mPositions.get(Square.Type.LOCATION);
-        List<Square> h_pos = mPositions.get(Square.Type.HOVER);
+        List<Square> c_pos = mSquares.get(Square.Type.CALIBRATION);
+        List<Square> l_pos = mSquares.get(Square.Type.LOCATION);
+        List<Square> h_pos = mSquares.get(Square.Type.HOVER);
 
         int c_pos_size = c_pos.size();
         int l_pos_size = l_pos.size();

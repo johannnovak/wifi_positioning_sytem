@@ -1,5 +1,6 @@
 package fr.gi.utbm.lo53project;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,6 +21,11 @@ import java.net.Socket;
  */
 public class LocationFragment extends AbstractFragment {
 
+    private int default_width;
+    private int default_height;
+
+    private ReceiverAsyncTask mReceiverTask;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -27,10 +33,20 @@ public class LocationFragment extends AbstractFragment {
         // the super function fetch mMap from bundle
         super.onCreateView(inflater, container, savedInstanceState);
 
+        SharedPreferences prefs = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE);
         // Get server port from resources
-        mServerPort = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getInt(
+        mServerPort = prefs.getInt(
                 MainActivity.TAG_PREF_SERVER_PORT_LOCATION,
                 getResources().getInteger(R.integer.server_port_location) // default value
+        );
+
+        default_width = prefs.getInt(
+                MainActivity.TAG_PREF_DEFAULT_MAP_WIDTH,
+                3
+        );
+        default_height = prefs.getInt(
+                MainActivity.TAG_PREF_DEFAULT_MAP_HEIGHT,
+                3
         );
 
         // Initialize view
@@ -41,15 +57,25 @@ public class LocationFragment extends AbstractFragment {
         LinearLayout location_viewport_layout = (LinearLayout)rootView.findViewById(R.id.location_viewport_layout);
         location_viewport_layout.addView(mViewport);
 
-        ReceiverAsyncTask receiver = new ReceiverAsyncTask();
-        receiver.execute();
-
         return rootView;
     }
 
-    public class ReceiverAsyncTask extends AsyncTask<Void, Square, Void> {
+    @Override
+    public void onPause() {
+        super.onPause();
+        mReceiverTask.cancel(false);
+    }
 
-        private boolean mRun = true;
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // A task can be executed only once so we need to instantiate a new
+        mReceiverTask = new ReceiverAsyncTask();
+        mReceiverTask.execute();
+    }
+
+    public class ReceiverAsyncTask extends AsyncTask<Void, Square, Void> {
 
         //Background task which serve for the client
         @Override
@@ -83,10 +109,11 @@ public class LocationFragment extends AbstractFragment {
                 else {
                     try {
                         Thread.sleep(500);
+
                         publishProgress(
                             new Square(
-                                (int)(Math.random()*5),
-                                (int)(Math.random()*5)
+                                (int)(Math.random() * default_width),
+                                (int)(Math.random() * default_height)
                             )
                         );
                     }
@@ -102,10 +129,7 @@ public class LocationFragment extends AbstractFragment {
         @Override
         protected void onProgressUpdate(Square... p) {
             super.onProgressUpdate(p);
-            mViewport.addSquare(p[0].x, p[0].y, Square.Type.HOVER);
-
-            // Toast message is not able to draw on this speed and finally is always in late
-//            Toast.makeText(getActivity(), "Position " + p[0].toString() + " received !", Toast.LENGTH_SHORT).show();
+            mViewport.addSquare(p[0].x, p[0].y, Square.Type.LOCATION);
         }
 
         private Square decode (String code) {

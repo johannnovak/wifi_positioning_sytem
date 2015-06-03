@@ -19,11 +19,13 @@ public class Square extends Point implements Serializable {
     public static int LIFE_MAX = 255;
     public static int LIFE_SPEED = 10;
     private boolean bDead;
+    private boolean bImmortal;
 
     public Square(int x, int y) {
         super(x, y);
         life = LIFE_MAX;
         bDead = false;
+        bImmortal = false;
     }
 
     public boolean equals (Square p) {
@@ -31,7 +33,11 @@ public class Square extends Point implements Serializable {
     }
 
     public void decreaseLife () {
-        life = (life - LIFE_SPEED < 0) ? 0 : life - LIFE_SPEED;
+        if (!bImmortal)
+            life = (life - LIFE_SPEED < 0) ? 0 : life - LIFE_SPEED;
+        else {
+            recoverLife();
+        }
         if (life == 0) bDead = true;
     }
 
@@ -45,6 +51,13 @@ public class Square extends Point implements Serializable {
 
     public String toString() {
         return "(" + x + ", " + y + ")";
+    }
+
+    public void setImmortality( boolean immortality) {
+        bImmortal = immortality;
+    }
+    public boolean isImmortal () {
+        return bImmortal;
     }
 
 }
