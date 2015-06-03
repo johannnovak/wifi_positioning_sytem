@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class WorldMap implements Serializable {
 
-    private Map< Position.Type, List<Position>> mPositions;
+    private Map< Square.Type, List<Square>> mPositions;
     private SPaint mGridPaint;
 
     private SRectF mBounds;
@@ -27,10 +27,10 @@ public class WorldMap implements Serializable {
     public float squareWidth;
     public float squareHeight;
 
-    public Map<Position.Type , SPaint> paints;
+    public Map<Square.Type , SPaint> paints;
 
     private boolean bCurrentHoverPositionIsImmortal;
-    private Position mCurrentHoverPosition;
+    private Square mCurrentHoverPosition;
 
     public WorldMap() {
         squareWidth = 200;
@@ -67,16 +67,16 @@ public class WorldMap implements Serializable {
         mGridPaint.setStyle(Paint.Style.STROKE);
         mGridPaint.setColor(Color.WHITE);
 
-        paints = new HashMap<Position.Type , SPaint>() {{
-            put(Position.Type.HOVER,        hoverPaint);
-            put(Position.Type.CALIBRATION,  calibrationPaint);
-            put(Position.Type.LOCATION,     locationPaint);
+        paints = new HashMap<Square.Type , SPaint>() {{
+            put(Square.Type.HOVER,        hoverPaint);
+            put(Square.Type.CALIBRATION,  calibrationPaint);
+            put(Square.Type.LOCATION,     locationPaint);
         }};
 
-        mPositions = new HashMap<Position.Type, List<Position>>() {{
-            put(Position.Type.CALIBRATION, new ArrayList<Position>());
-            put(Position.Type.LOCATION, new ArrayList<Position>());
-            put(Position.Type.HOVER, new ArrayList<Position>());
+        mPositions = new HashMap<Square.Type, List<Square>>() {{
+            put(Square.Type.CALIBRATION, new ArrayList<Square>());
+            put(Square.Type.LOCATION, new ArrayList<Square>());
+            put(Square.Type.HOVER, new ArrayList<Square>());
         }};
 
         mCurrentHoverPosition = null;
@@ -120,12 +120,12 @@ public class WorldMap implements Serializable {
      * @param y y coordinate
      * @param t position type
      */
-    public void addPosition(float x, float y, Position.Type t) {
-        mPositions.get(t).add(toPosition(x, y));
+    public void addPosition(float x, float y, Square.Type t) {
+        mPositions.get(t).add(toSquare(x, y));
     }
 
-    public void addPosition(int x, int y, Position.Type t) {
-        mPositions.get(t).add(new Position(x, y));
+    public void addSquare(int x, int y, Square.Type t) {
+        mPositions.get(t).add(new Square(x, y));
     }
 
     /**
@@ -133,9 +133,9 @@ public class WorldMap implements Serializable {
      */
     @SuppressWarnings("unused")
     public void clearAll() {
-        mPositions.get(Position.Type.CALIBRATION).clear();
-        mPositions.get(Position.Type.LOCATION).clear();
-        mPositions.get(Position.Type.HOVER).clear();
+        mPositions.get(Square.Type.CALIBRATION).clear();
+        mPositions.get(Square.Type.LOCATION).clear();
+        mPositions.get(Square.Type.HOVER).clear();
     }
 
     /**
@@ -143,7 +143,7 @@ public class WorldMap implements Serializable {
      * @param t type of position
      */
     @SuppressWarnings("unused")
-    public void clear (Position.Type t) {
+    public void clear (Square.Type t) {
         mPositions.get(t).clear();
     }
 
@@ -153,10 +153,10 @@ public class WorldMap implements Serializable {
      * @param p position to draw
      * @param t type of the position to draw
      */
-    public void drawPosition (Canvas canvas, Position p, Position.Type t) {
+    public void drawSquare (Canvas canvas, Square p, Square.Type t) {
         Paint paint = paints.get(t);
 
-        if (t == Position.Type.HOVER) {
+        if (t == Square.Type.HOVER) {
             paint.setAlpha(p.life);
         }
 
@@ -175,15 +175,15 @@ public class WorldMap implements Serializable {
      * @param t type of position
      * @return have to redraw after that
      */
-    public boolean drawPositions (Canvas canvas, Position.Type t) {
+    public boolean drawSquares (Canvas canvas, Square.Type t) {
         boolean redraw = false;
 
-        if (t == Position.Type.HOVER) {
+        if (t == Square.Type.HOVER) {
             redraw = updateLife();
         }
 
-        for (Position p : mPositions.get(t)) {
-            drawPosition(canvas, p, t);
+        for (Square p : mPositions.get(t)) {
+            drawSquare(canvas, p, t);
         }
 
         return redraw;
@@ -196,7 +196,7 @@ public class WorldMap implements Serializable {
     private boolean updateLife() {
 
         // Update life value of hover positions
-        for (Position p : mPositions.get(Position.Type.HOVER)) {
+        for (Square p : mPositions.get(Square.Type.HOVER)) {
             // If we are selecting and the point p is the hovered one
             if ((bCurrentHoverPositionIsImmortal) && p.equals(mCurrentHoverPosition)) {
                 p.recoverLife();
@@ -207,23 +207,23 @@ public class WorldMap implements Serializable {
         }
 
         // Remove dead positions
-        Iterator it = mPositions.get(Position.Type.HOVER).listIterator();
+        Iterator it = mPositions.get(Square.Type.HOVER).listIterator();
         while(it.hasNext()) {
-            if (((Position) it.next()).isDead()) {
+            if (((Square) it.next()).isDead()) {
                 it.remove();
             }
         }
 
-        return !mPositions.get(Position.Type.HOVER).isEmpty();
+        return !mPositions.get(Square.Type.HOVER).isEmpty();
     }
 
     /**
      * Draw all positions of both types CALIBRATION & LOCATION in the canvas
      * @param canvas canvas where to draw
      */
-    public void drawPositions (Canvas canvas) {
-        drawPositions(canvas, Position.Type.CALIBRATION);
-        drawPositions(canvas, Position.Type.LOCATION);
+    public void drawSquares (Canvas canvas) {
+        drawSquares(canvas, Square.Type.CALIBRATION);
+        drawSquares(canvas, Square.Type.LOCATION);
     }
 
     /**
@@ -268,9 +268,9 @@ public class WorldMap implements Serializable {
 
     public void addHoverPosition (float x, float y) {
         if (mBounds.contains(x, y)) {
-            Position p = toPosition(x, y);
-            if (!mPositions.get(Position.Type.HOVER).contains(p)) {
-                mPositions.get(Position.Type.HOVER).add(p);
+            Square p = toSquare(x, y);
+            if (!mPositions.get(Square.Type.HOVER).contains(p)) {
+                mPositions.get(Square.Type.HOVER).add(p);
             }
             mCurrentHoverPosition = p;
 
@@ -294,14 +294,14 @@ public class WorldMap implements Serializable {
      * @param y real y coordinate
      * @return position in the grid
      */
-    private Position toPosition (float x, float y) {
-        return new Position (
+    public Square toSquare (float x, float y) {
+        return new Square(
             (int)Math.floor(x / squareWidth),
             (int)Math.floor(y / squareHeight)
         );
     }
 
-    private PointF toReal(Position p) {
+    private PointF toReal(Square p) {
         return new PointF(
             p.x * squareWidth,
             p.y * squareHeight
@@ -312,9 +312,9 @@ public class WorldMap implements Serializable {
         String str = "--------------World map------------------\n";
         str += "| Calibration \t\tLocation \t\tHover\n";
 
-        List<Position> c_pos = mPositions.get(Position.Type.CALIBRATION);
-        List<Position> l_pos = mPositions.get(Position.Type.LOCATION);
-        List<Position> h_pos = mPositions.get(Position.Type.HOVER);
+        List<Square> c_pos = mPositions.get(Square.Type.CALIBRATION);
+        List<Square> l_pos = mPositions.get(Square.Type.LOCATION);
+        List<Square> h_pos = mPositions.get(Square.Type.HOVER);
 
         int c_pos_size = c_pos.size();
         int l_pos_size = l_pos.size();

@@ -1,6 +1,5 @@
 package fr.gi.utbm.lo53project;
 
-import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -23,7 +22,7 @@ import java.net.Socket;
  */
 public class CalibrationFragment extends AbstractFragment {
 
-    private PointF mPointWaitingForValidation;
+    private Square mSquareWaitingForValidation;
 
     /**
      *
@@ -109,13 +108,8 @@ public class CalibrationFragment extends AbstractFragment {
     private void handleSendButton() {
         boolean sent;
 
-        // Send the point or directly add it according to the configuration
-//        if (getResources().getBoolean(R.bool.using_server)) {
-
-        System.out.println(mUsingServer);
-        System.out.println(mServerIP);
         if (mUsingServer) {
-            sent = sendPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y);
+            sent = sendPoint(mSquareWaitingForValidation.x, mSquareWaitingForValidation.y);
         }
         else {
             sent = true;
@@ -123,8 +117,8 @@ public class CalibrationFragment extends AbstractFragment {
 
         // If position have been sent correctly, we add the point to the viewport
         if (sent) {
-            mViewport.addPoint(mPointWaitingForValidation.x, mPointWaitingForValidation.y, Position.Type.CALIBRATION);
-            Toast.makeText(getActivity(), "Position " + mPointWaitingForValidation.toString() + " sent !", Toast.LENGTH_SHORT).show();
+            mViewport.addSquare(mSquareWaitingForValidation.x, mSquareWaitingForValidation.y, Square.Type.CALIBRATION);
+            Toast.makeText(getActivity(), "Position " + mSquareWaitingForValidation.toString() + " sent !", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -132,7 +126,7 @@ public class CalibrationFragment extends AbstractFragment {
      *
      */
     private void handleCancelButton() {
-        Toast.makeText(getActivity(), "Position " + mPointWaitingForValidation.toString() + " cancelled !", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Position " + mSquareWaitingForValidation.toString() + " cancelled !", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -146,7 +140,7 @@ public class CalibrationFragment extends AbstractFragment {
         mMap.startWaiting();
 
         // Save the current selected point
-        mPointWaitingForValidation = new PointF(x, y);
+        mSquareWaitingForValidation = mMap.toSquare(x, y);
 
         // Enable user to select buttons
         setHasOptionsMenu(true);
@@ -161,7 +155,7 @@ public class CalibrationFragment extends AbstractFragment {
         mMap.stopWaiting();
 
         // We remove the waiting point
-        mPointWaitingForValidation = null;
+        mSquareWaitingForValidation = null;
 
         // User can't use buttons anymore until he'll make a new selection
         setHasOptionsMenu(false);

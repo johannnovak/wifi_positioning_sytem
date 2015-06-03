@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Created by celian on 29/04/15 for LO53Project
  */
-public class Position extends Point implements Serializable {
+public class Square extends Point implements Serializable {
 
     public enum Type {
         HOVER,
@@ -20,13 +20,13 @@ public class Position extends Point implements Serializable {
     public static int LIFE_SPEED = 10;
     private boolean bDead;
 
-    public Position(int x, int y) {
+    public Square(int x, int y) {
         super(x, y);
         life = LIFE_MAX;
         bDead = false;
     }
 
-    public boolean equals (Position p) {
+    public boolean equals (Square p) {
         return (x == p.x && y == p.y);
     }
 

@@ -148,13 +148,13 @@ public abstract class AbstractViewport extends View {
      * @param y y coordinate
      */
 //    synchronized
-    protected void addPoint(float x, float y, Position.Type t) {
+    protected void addPosition(float x, float y, Square.Type t) {
         mMap.addPosition(x, y, t);
         this.invalidate(); // Force the viewport to redraw
     }
 
-    protected void addPosition(int x, int y, Position.Type t) {
-        mMap.addPosition(x, y, t);
+    protected void addSquare(int x, int y, Square.Type t) {
+        mMap.addSquare(x, y, t);
         this.invalidate(); // Force the viewport to redraw
     }
 

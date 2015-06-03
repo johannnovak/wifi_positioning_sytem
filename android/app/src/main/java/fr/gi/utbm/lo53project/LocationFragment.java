@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import org.apache.commons.io.IOUtils;
 
@@ -48,7 +47,7 @@ public class LocationFragment extends AbstractFragment {
         return rootView;
     }
 
-    public class ReceiverAsyncTask extends AsyncTask<Void, Position, Void> {
+    public class ReceiverAsyncTask extends AsyncTask<Void, Square, Void> {
 
         private boolean mRun = true;
 
@@ -85,7 +84,7 @@ public class LocationFragment extends AbstractFragment {
                     try {
                         Thread.sleep(500);
                         publishProgress(
-                            new Position(
+                            new Square(
                                 (int)(Math.random()*5),
                                 (int)(Math.random()*5)
                             )
@@ -101,19 +100,21 @@ public class LocationFragment extends AbstractFragment {
         }
 
         @Override
-        protected void onProgressUpdate(Position... p) {
+        protected void onProgressUpdate(Square... p) {
             super.onProgressUpdate(p);
-            mViewport.addPosition(p[0].x, p[0].y, Position.Type.HOVER);
-            Toast.makeText(getActivity(), "Position " + p[0].toString() + " received !", Toast.LENGTH_SHORT).show();
+            mViewport.addSquare(p[0].x, p[0].y, Square.Type.HOVER);
+
+            // Toast message is not able to draw on this speed and finally is always in late
+//            Toast.makeText(getActivity(), "Position " + p[0].toString() + " received !", Toast.LENGTH_SHORT).show();
         }
 
-        private Position decode (String code) {
+        private Square decode (String code) {
             int x, y;
 
             String[] coordinates = code.split(";");
             x = Integer.getInteger(coordinates[0]);
             y = Integer.getInteger(coordinates[1]);
-            return new Position(x, y);
+            return new Square(x, y);
         }
     }
 }

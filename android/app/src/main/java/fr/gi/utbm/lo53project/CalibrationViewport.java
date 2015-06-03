@@ -38,8 +38,8 @@ public class CalibrationViewport extends AbstractViewport {
         canvas.drawRect(mAddRowButton, mButtonPaint);
         canvas.drawRect(mAddColumnButton, mButtonPaint);
 
-        mMap.drawPositions(canvas, Position.Type.CALIBRATION);
-        if (mMap.drawPositions(canvas, Position.Type.HOVER))
+        mMap.drawSquares(canvas, Square.Type.CALIBRATION);
+        if (mMap.drawSquares(canvas, Square.Type.HOVER))
             invalidate();
     }
 
