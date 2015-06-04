@@ -11,8 +11,6 @@ import android.widget.LinearLayout;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -21,11 +19,24 @@ import java.net.Socket;
  */
 public class LocationFragment extends AbstractFragment {
 
+    /**
+     * Used in case of not using server, to display randomly between (0, 0) to (def_w, def_h)
+     */
     private int default_width;
     private int default_height;
 
+    /**
+     * Asynchronous task which handle reception of squares
+     */
     private ReceiverAsyncTask mReceiverTask;
 
+    /**
+     * {@inheritDoc}
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,12 +71,18 @@ public class LocationFragment extends AbstractFragment {
         return rootView;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPause() {
         super.onPause();
         mReceiverTask.cancel(false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -75,9 +92,17 @@ public class LocationFragment extends AbstractFragment {
         mReceiverTask.execute();
     }
 
+    /**
+     * ReceiverTask : used to make the reception of data asynchronously
+     * (otherwise, we could not drag and zoom the viewport at the same time)
+     */
     public class ReceiverAsyncTask extends AsyncTask<Void, Square, Void> {
 
-        //Background task which serve for the client
+        /**
+         * {@inheritDoc}
+         * @param params
+         * @return
+         */
         @Override
         protected Void doInBackground(Void... params) {
 
@@ -99,11 +124,8 @@ public class LocationFragment extends AbstractFragment {
                             e.printStackTrace();
                         }
                     }
-                    catch (ConnectException e) {
+                    catch (Exception e) {
                         e.printStackTrace();
-                    }
-                    catch (IOException e) {
-
                     }
                 }
                 else {
@@ -126,12 +148,21 @@ public class LocationFragment extends AbstractFragment {
             return null;
         }
 
+        /**
+         * {@inheritDoc}
+         * @param p
+         */
         @Override
         protected void onProgressUpdate(Square... p) {
             super.onProgressUpdate(p);
             mViewport.addSquare(p[0].x, p[0].y, Square.Type.LOCATION);
         }
 
+        /**
+         * Decode the string code received in a square to display
+         * @param code string code
+         * @return square to display
+         */
         private Square decode (String code) {
             int x, y;
 

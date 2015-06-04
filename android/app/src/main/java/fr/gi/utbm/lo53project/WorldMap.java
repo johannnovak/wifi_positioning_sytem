@@ -17,22 +17,55 @@ import java.util.Map;
  */
 public class WorldMap implements Serializable {
 
+    /**
+     * A map containing all squares of different types
+     */
     private Map< Square.Type, List<Square>> mSquares;
-    private SPaint mGridPaint;
 
+    /**
+     * Bounds (in real coordinates)
+     */
     private SRectF mBounds;
 
+    /**
+     * Sizes (in number of squares)
+     */
     private int mGridWidth;
     private int mGridHeight;
+
+    /**
+     * Size of a square
+     */
     public float squareWidth;
     public float squareHeight;
 
+    /**
+     * Paints
+     */
     public Map<Square.Type , SPaint> paints;
+    private SPaint mGridPaint;
 
+    /**
+     * Current Hover and Locate squares
+     */
     private Square mCurrentHoverSquare;
     private Square mCurrentLocateSquare;
 
-    protected WorldMap() {
+    /**
+     * Constructor
+     * @param width initial grid width (in number of squares)
+     * @param height initial grid height (in number of squares)
+     */
+    public WorldMap (int width, int height) {
+        initialize();
+        mGridWidth = width;
+        mGridHeight = height;
+        mBounds = new SRectF(0, 0, squareWidth * mGridWidth, squareHeight * mGridHeight);
+    }
+    /**
+     * Hard initialize all parameters of the world map
+     */
+    private void initialize() {
         squareWidth = 200;
         squareHeight = 200;
 
@@ -81,13 +114,6 @@ public class WorldMap implements Serializable {
         System.out.println("WorldMap : constructor");
     }
 
-    public WorldMap (int width, int height) {
-        this();
-        mGridWidth = width;
-        mGridHeight = height;
-        mBounds = new SRectF(0, 0, squareWidth * mGridWidth, squareHeight * mGridHeight);
-    }
-
     /**
      * Give the bounds of the world map
      * @return bounds
@@ -97,11 +123,11 @@ public class WorldMap implements Serializable {
     }
 
     /**
-     *
+     * Get the current hover square
      * @return
      */
-    public PointF fingerUp() {
-        return toReal(mCurrentHoverSquare);
+    public Square getCurrentHoverSquare() {
+        return mCurrentHoverSquare;
     }
 
     /**
@@ -288,34 +314,6 @@ public class WorldMap implements Serializable {
 
         return !mSquares.get(t).isEmpty();
     }
-//
-//    /**
-//     * Recover or decrease life and remove hovered points if are dead
-//     * @return have to redraw after that
-//     */
-//    private boolean updateLife() {
-//
-//        // Update life value of hover positions
-//        for (Square p : mSquares.get(Square.Type.HOVER)) {
-//            // If we are selecting and the point p is the hovered one
-//            if ((mCurrentHoverSquare.isImmortal()) && p.equals(mCurrentHoverSquare)) {
-//                p.recoverLife();
-//            }
-//            else {
-//                p.decreaseLife();
-//            }
-//        }
-//
-//        // Remove dead positions
-//        Iterator it = mSquares.get(Square.Type.HOVER).listIterator();
-//        while(it.hasNext()) {
-//            if (((Square) it.next()).isDead()) {
-//                it.remove();
-//            }
-//        }
-//
-//        return !mSquares.get(Square.Type.HOVER).isEmpty();
-//    }
 
 
     /**

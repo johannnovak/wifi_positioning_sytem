@@ -12,10 +12,22 @@ import android.util.AttributeSet;
  */
 public class CalibrationViewport extends AbstractViewport {
 
+    /**
+     * {@inheritDoc}
+     * @param context
+     * @param attrs
+     */
     public CalibrationViewport(Context context, AttributeSet attrs) {
         super(context, attrs, null);
     }
 
+    /**
+     * {@inheritDoc}
+     * @param context
+     * @param attrs
+     * @param map
+     * @param listener
+     */
     public CalibrationViewport(Context context, AttributeSet attrs, WorldMap map, SelectionListener listener) {
         super(context, attrs, map, listener);
 
@@ -28,6 +40,10 @@ public class CalibrationViewport extends AbstractViewport {
         ADD_COL_WIDTH = 150;
     }
 
+    /**
+     * {@inheritDoc}
+     * @param canvas canvas
+     */
     @Override
     protected void onDraw (Canvas canvas) {
         super.onDraw(canvas);
@@ -43,6 +59,9 @@ public class CalibrationViewport extends AbstractViewport {
             invalidate();
     }
 
+    /**
+     * Update size of "add row" button
+     */
     private void updateAddRowButton() {
 
         float map_left = mMap.getBounds().left;
@@ -54,6 +73,9 @@ public class CalibrationViewport extends AbstractViewport {
         mAddRowButton.right = (mViewportFrame.right > map_right) ? map_right : mViewportFrame.right;
     }
 
+    /**
+     * Update size of "add column" button
+     */
     private void updateAddColumnButton() {
 
         float map_top = mMap.getBounds().top;
