@@ -3,6 +3,7 @@ package fr.gi.utbm.lo53project;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
@@ -26,15 +27,17 @@ public abstract class AbstractViewport extends View {
     }
     private State mState;
 
-    // Limits
-    private static float MIN_ZOOM = 1f;
-    private static float MAX_ZOOM = 5f;
+    public static float OFFSET_X = 25f;
+    public static float OFFSET_Y = 25f;
+    protected int ADD_ROW_HEIGHT = 0;
+    protected int ADD_COL_WIDTH = 0;
 
     // Scale factor
     private float mScaleFactor = 1.f;
 
     // Frames
-    private RectF mViewportFrame = new RectF();
+    protected SRectF mViewportFrame = new SRectF();
+    protected SRectF mOldViewportFrame = new SRectF();
 
     // Gesture Detectors
     private ScaleGestureDetector mScaleGestureDetector;
@@ -45,6 +48,18 @@ public abstract class AbstractViewport extends View {
 
     private SelectionListener mSelectionListener;
 
+    protected RectF mAddRowButton;
+    protected RectF mAddColumnButton;
+    protected Paint mButtonPaint;
+
+
+    /**
+     * Constructor with a selection listener
+     * @param c context
+     * @param attrs attribute set
+     * @param map world map
+     * @param listener if not null, allows the viewport to select a position.
+     */
     public AbstractViewport(Context c, AttributeSet attrs, WorldMap map, SelectionListener listener) {
         super(c, attrs);
 
@@ -58,10 +73,28 @@ public abstract class AbstractViewport extends View {
 
         mState = State.NONE;
         mSelectionListener = listener;
+
+        mAddRowButton = null;
+        mAddColumnButton = null;
+        mButtonPaint = null;
     }
 
+    /**
+     * Constructor without selection listener
+     * @param c context
+     * @param attrs attribute set
+     * @param map world map
+     */
     public AbstractViewport(Context c, AttributeSet attrs, WorldMap map) {
         this(c, attrs, map, null);
+    }
+
+    public float getScaleFactor() {
+        return this.mScaleFactor;
+    }
+
+    public SRectF getViewportFrame () {
+        return this.mViewportFrame;
     }
 
     /**
@@ -71,13 +104,13 @@ public abstract class AbstractViewport extends View {
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         updateState(event);
+        updateHoverSelection(event);
 
         boolean isScalingOrDragging = mScaleGestureDetector.onTouchEvent(event);
         isScalingOrDragging = mGestureDetector.onTouchEvent(event) || isScalingOrDragging;
 
         if (isScalingOrDragging) invalidate();
         return isScalingOrDragging || super.onTouchEvent(event);
-
     }
 
     /**
@@ -88,13 +121,14 @@ public abstract class AbstractViewport extends View {
 
         // Ensure that we are not in SELECTING state when selection listener is not defined
         if (mState == State.SELECTING && mSelectionListener == null)
-            throw new AssertionError("Error SELECTING State reached meanwhile but listener is not defined.");
+            throw new AssertionError("Error SELECTING State reached but listener is not defined.");
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
                 if (mState == State.SELECTING) {
-                    PointF selected = fromViewToWorld(e.getX(), e.getY());
-                    mSelectionListener.onSelect(selected.x, selected.y);
+                    PointF selected = mMap.fingerUp();
+                    if(selected != null)
+                        mSelectionListener.onSelect(selected.x, selected.y);
                 }
                 mState = State.NONE;
                 break;
@@ -105,12 +139,30 @@ public abstract class AbstractViewport extends View {
     }
 
     /**
+     * Add hover position to the world map if we are selecting
+     * @param e motion event
+     */
+    private void updateHoverSelection(MotionEvent e) {
+        if(mState == State.SELECTING) {
+            PointF hover = fromViewToWorld(e.getX(), e.getY());
+            mMap.addPosition(hover.x, hover.y, Square.Type.HOVER);
+            invalidate();
+        }
+    }
+
+    /**
      * Add a point to the world map and force the viewport to redraw
      * @param x x coordinate
      * @param y y coordinate
      */
-    protected void addPoint(float x, float y, Position.Type t) {
+//    synchronized
+    protected void addPosition(float x, float y, Square.Type t) {
         mMap.addPosition(x, y, t);
+        this.invalidate(); // Force the viewport to redraw
+    }
+
+    protected void addSquare(int x, int y, Square.Type t) {
+        mMap.addSquare(x, y, t);
         this.invalidate(); // Force the viewport to redraw
     }
 
@@ -127,11 +179,23 @@ public abstract class AbstractViewport extends View {
         );
     }
 
+    /**
+     * Convert distance from view space to world space
+     * @param d distance to convert
+     * @return the converted distance
+     */
     public float fromViewToWorld (float d) {
         return d / mScaleFactor;
     }
 
 
+    /**
+     * Convert coordinates from world space to view space
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return the converted point
+     */
+    @SuppressWarnings("unused")
     public PointF fromWorldToView (float x, float y) {
         return new PointF(
             (x - mViewportFrame.left) * mScaleFactor,
@@ -139,11 +203,15 @@ public abstract class AbstractViewport extends View {
         );
     }
 
+    /**
+     * Convert distance from world space to view space
+     * @param d distance to convert
+     * @return the converted distance
+     */
+    @SuppressWarnings("unused")
     public float fromWorldToView (float d) {
         return d * mScaleFactor;
     }
-
-
 
     /**
      * Perform the scale, the translation
@@ -154,8 +222,8 @@ public abstract class AbstractViewport extends View {
         super.onDraw(canvas);
 
         // Update viewport frame
-        mViewportFrame.bottom = mViewportFrame.top + canvas.getHeight();
-        mViewportFrame.right = mViewportFrame.left + canvas.getWidth();
+        mViewportFrame.bottom = mViewportFrame.top + fromViewToWorld(canvas.getHeight());
+        mViewportFrame.right = mViewportFrame.left + fromViewToWorld(canvas.getWidth());
 
         // Scale the viewport
         canvas.scale(mScaleFactor, mScaleFactor);
@@ -177,9 +245,67 @@ public abstract class AbstractViewport extends View {
         invalidate();
     }
 
+
+    public boolean limitViewportToXBounds(float left, float right) {
+        float new_left = mViewportFrame.left;
+        boolean zoom_is_max = mOldViewportFrame.containsX(left, right);
+
+        if (zoom_is_max) {
+            new_left = left;
+        }
+        else {
+            // Check limits
+            if (mViewportFrame.left < left) {
+                new_left = left;
+            } else if (mViewportFrame.right > right) {
+                new_left = right - mViewportFrame.width();
+            }
+        }
+
+        // Offset viewport
+        mViewportFrame.offsetTo(new_left, mViewportFrame.top);
+
+        return zoom_is_max;
+    }
+
+    public boolean limitViewportToYBounds(float top, float bottom) {
+        float new_top = mViewportFrame.top;
+        boolean zoom_is_max = mOldViewportFrame.containsY(top, bottom);
+
+        if (zoom_is_max) {
+            new_top = top;
+        }
+        else {
+            // Check limits
+            if (mViewportFrame.top < top) {
+                new_top = top;
+            } else if (mViewportFrame.bottom > bottom) {
+                new_top = bottom - mViewportFrame.height();
+            }
+        }
+
+        // Offset viewport
+        mViewportFrame.offsetTo(mViewportFrame.left, new_top);
+
+        return zoom_is_max;
+    }
+
+    public boolean limitViewportToBounds(float left, float top, float right, float bottom) {
+        return (
+                limitViewportToXBounds(left, right) &&
+                        limitViewportToYBounds(top, bottom)
+        );
+    }
+
+    public void limitViewportToBounds(RectF bounds) {
+        limitViewportToBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+    }
+
+
     /***********************************************
      *  Gesture Listeners
      ***********************************************/
+
     /**
      * ScaleListener : Listen the scale of the viewport
      */
@@ -204,7 +330,6 @@ public abstract class AbstractViewport extends View {
         public void onScaleEnd(ScaleGestureDetector detector) {
             mState = State.SCROLLING;
         }
-
         /**
          * Called when the user perform a scale with fingers
          * @param detector : the scale gesture detector
@@ -212,11 +337,37 @@ public abstract class AbstractViewport extends View {
          */
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            mScaleFactor *= detector.getScaleFactor();
-            mScaleFactor  = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
+            SRectF bounds = mMap.getBounds();
+
+            float dS = detector.getScaleFactor();
+            // We need to update viewportFrame size without onDraw function
+            mViewportFrame.right = mViewportFrame.left + mViewportFrame.width() * dS;
+            mViewportFrame.bottom = mViewportFrame.top + mViewportFrame.height() * dS;
+
+            float world_offset_x_start = fromViewToWorld(OFFSET_X);
+            float world_offset_y_start = fromViewToWorld(OFFSET_Y);
+            float world_offset_x_end = fromViewToWorld(OFFSET_X + ADD_COL_WIDTH);
+            float world_offset_y_end = fromViewToWorld(OFFSET_Y + ADD_ROW_HEIGHT);
+
+            // Backup the viewport cloning it
+            mOldViewportFrame.left = mViewportFrame.left;
+            mOldViewportFrame.right = mViewportFrame.right;
+            mOldViewportFrame.top = mViewportFrame.top;
+            mOldViewportFrame.bottom = mViewportFrame.bottom;
+
+            if (!limitViewportToBounds(
+                    bounds.left - world_offset_x_start,
+                    bounds.top - world_offset_y_start,
+                    bounds.right + world_offset_x_end,
+                    bounds.bottom + world_offset_y_end
+                )|| dS > 1.00f
+            ) {
+                mScaleFactor *= dS;
+            }
 
             return true;
         }
+
     }
 
     /**
@@ -229,8 +380,10 @@ public abstract class AbstractViewport extends View {
          */
         @Override
         public void onLongPress(MotionEvent e) {
-            if (mSelectionListener != null)
+            if (mSelectionListener != null) {
                 mState = State.SELECTING;
+                updateHoverSelection(e);
+            }
         }
 
         /**
@@ -249,40 +402,58 @@ public abstract class AbstractViewport extends View {
 
                 RectF bounds = mMap.getBounds();
 
-                // Offset along X-axis
-                if (mViewportFrame.width() < bounds.width()) {
-                    float dx = (distanceX / mScaleFactor);
+                // Backup the viewport cloning it
+                mOldViewportFrame.left = mViewportFrame.left;
+                mOldViewportFrame.right = mViewportFrame.right;
+                mOldViewportFrame.top = mViewportFrame.top;
+                mOldViewportFrame.bottom = mViewportFrame.bottom;
 
-                    // Offset the viewport according to the finger distance
-                    mViewportFrame.offset(dx, 0);
+                float world_offset_x_start = fromViewToWorld(OFFSET_X);
+                float world_offset_y_start = fromViewToWorld(OFFSET_Y);
+                float world_offset_x_end = fromViewToWorld(OFFSET_X + ADD_COL_WIDTH);
+                float world_offset_y_end = fromViewToWorld(OFFSET_Y + ADD_ROW_HEIGHT);
 
+                // Offset the viewport according to the finger distance
+                mViewportFrame.offset(distanceX, 0);
 
-                    // Now, we just have to ensure that we are not crossing world bounds
-                    if (mViewportFrame.left < bounds.left) {
-                        mViewportFrame.offsetTo(bounds.left, mViewportFrame.top);
-                    } else if (mViewportFrame.left > bounds.right - fromViewToWorld(mViewportFrame.width())) {
-                        mViewportFrame.offsetTo(bounds.right - fromViewToWorld(mViewportFrame.width()), mViewportFrame.top);
-                    }
-                }
+                // Now, we just have to ensure that we are not crossing world bounds
+                limitViewportToXBounds(
+                    bounds.left - world_offset_x_start,
+                    bounds.right + world_offset_x_end
+                );
 
-                // Offset along Y-axis
-                if (mViewportFrame.height() < bounds.height()) {
-                    float dy = (distanceY / mScaleFactor);
+                // Offset the viewport according to the finger distance
+                mViewportFrame.offset(0, distanceY);
 
-                    // Offset the viewport according to the finger distance
-                    mViewportFrame.offset(0, dy);
+                // Now, we just have to ensure that we are not crossing world bounds
+                limitViewportToYBounds(
+                    bounds.top - world_offset_y_start,
+                    bounds.bottom + world_offset_y_end
+                );
 
-                    // Now, we just have to ensure that we are not crossing world bounds
-                    if (mViewportFrame.top < bounds.top) {
-                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.top);
-                    } else if (mViewportFrame.top > bounds.bottom - fromViewToWorld(mViewportFrame.height())) {
-                        mViewportFrame.offsetTo(mViewportFrame.left, bounds.bottom - fromViewToWorld(mViewportFrame.height()));
-                    }
-                }
             }
 
             return true;
         }
+
+        @Override
+        public boolean onSingleTapConfirmed (MotionEvent e) {
+            PointF tap = fromViewToWorld(e.getX(), e.getY());
+            try {
+                if (mAddRowButton.contains(tap.x, tap.y)) {
+                    mMap.addRow();
+                    invalidate();
+                } else if (mAddColumnButton.contains(tap.x, tap.y)) {
+                    mMap.addColumn();
+                    invalidate();
+                }
+            }
+            catch(NullPointerException ex) {
+                return false;
+            }
+            return true;
+        }
+
     }
 
 

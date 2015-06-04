@@ -1,8 +1,9 @@
 package fr.gi.utbm.lo53project;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -10,12 +11,23 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     public static String TAG_WORLDMAP = "Global WorldMap";
+    public static String TAG_WORLDMAP_BUNDLE = "Global WorldMap Bundle";
+    public static String TAG_PREF_USING_SERVER = "Using Server Boolean";
+    public static String TAG_PREF_SERVER_IP = "Server IP String";
+    public static String TAG_PREF_SERVER_PORT_LOCATION = "ServerLocation Port Integer";
+    public static String TAG_PREF_SERVER_PORT_CALIBRATION = "Server Calibration Port Integer";
+    public static String TAG_PREF_DEFAULT_MAP_WIDTH = "Default Map Width";
+    public static String TAG_PREF_DEFAULT_MAP_HEIGHT = "Default Map Height";
+
+    public static final int PREFERENCE_MODE_PRIVATE = 0;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -25,17 +37,16 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-
-    private Bundle mWorldMapBundle;
+    
+    private Bundle mMapSaveBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Create a Bundle containing the WorldMap
-        mWorldMapBundle = new Bundle();
-        mWorldMapBundle.putSerializable(TAG_WORLDMAP, new WorldMap());
+
+        System.out.println("MainActivity : Creating ...");
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calibration);
+        setContentView(R.layout.main_layout);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -48,48 +59,87 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        if (savedInstanceState == null || !savedInstanceState.containsKey(TAG_WORLDMAP_BUNDLE)) {
+            mMapSaveBundle = new Bundle();
+
+            // Initialize the fragment container with settings
+            if (findViewById(R.id.container) != null) {
+
+                // Create a new Fragment to be placed in the activity layout
+                SettingsFragment settings_frag = new SettingsFragment();
+
+                // Replace the empty 'container' FrameLayout to the settings one
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, settings_frag).commit();
+
+            }
+        }
+
+
+
+        System.out.println("MainActivity : Created !");
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putBundle(TAG_WORLDMAP_BUNDLE, mMapSaveBundle);
+    }
+
+    @Override
+    public void onRestoreInstanceState (@NonNull Bundle savedInstanceState) {
+        mMapSaveBundle = savedInstanceState.getBundle(TAG_WORLDMAP_BUNDLE);
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
+        System.out.println("##############################");
+        System.out.println("MainActivity : Selecting item ...");
+
+        // Force to close the keyboard
+        hideKeyboard();
+
         Fragment objFragment = null;
 
         switch(position) {
             case 0 :
+                mTitle = getString(R.string.title_section1);
                 objFragment = new CalibrationFragment();
                 break;
             case 1 :
+                mTitle = getString(R.string.title_section2);
                 objFragment = new LocationFragment();
                 break;
         }
 
+        restoreActionBar();
+
+        // Initialize world map and its bundle
+        if(mMapSaveBundle.size() == 0) {
+            int width = getPreferences(PREFERENCE_MODE_PRIVATE).getInt(TAG_PREF_DEFAULT_MAP_WIDTH, 3);
+            int height = getPreferences(PREFERENCE_MODE_PRIVATE).getInt(TAG_PREF_DEFAULT_MAP_HEIGHT, 3);
+            mMapSaveBundle.putSerializable(TAG_WORLDMAP, new WorldMap(width, height));
+        }
+
         // Give the bundle (containing the WorldMap) to the fragment
-        objFragment.setArguments(mWorldMapBundle);
+        objFragment.setArguments(mMapSaveBundle);
 
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, objFragment)
                 .commit();
-    }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-        }
+        System.out.println("MainActivity : Item " + mTitle + " selected !");
     }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        actionBar.setSubtitle(mTitle);
+        actionBar.setTitle(getTitle());
     }
 
 
@@ -100,6 +150,8 @@ public class MainActivity extends ActionBarActivity
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.calibration, menu);
+            menu.findItem(R.id.action_send).setVisible(false);
+            menu.findItem(R.id.action_cancel).setVisible(false);
             restoreActionBar();
             return true;
         }
@@ -121,34 +173,12 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+    private void hideKeyboard() {
+        // Check if no view has focus:
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
-
 }
