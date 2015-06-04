@@ -245,72 +245,6 @@ public abstract class AbstractViewport extends View {
         invalidate();
     }
 
-    /***********************************************
-     *  Gesture Listeners
-     ***********************************************/
-    /**
-     * ScaleListener : Listen the scale of the viewport
-     */
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-
-        /**
-         * Called when a scale gesture begin
-         * @param detector : the scale gesture detector
-         * @return true anyway
-         */
-        @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector) {
-            mState = State.SCALING;
-            return true;
-        }
-
-        /**
-         * Called when a scale gesture end
-         * @param detector : the scale gesture detector
-         */
-        @Override
-        public void onScaleEnd(ScaleGestureDetector detector) {
-            mState = State.SCROLLING;
-        }
-
-        /**
-         * Called when the user perform a scale with fingers
-         * @param detector : the scale gesture detector
-         * @return true anyway
-         */
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            SRectF bounds = mMap.getBounds();
-
-            float dS = detector.getScaleFactor();
-            // We need to update viewportFrame size without onDraw function
-            mViewportFrame.right = mViewportFrame.left + mViewportFrame.width() * dS;
-            mViewportFrame.bottom = mViewportFrame.top + mViewportFrame.height() * dS;
-
-            float world_offset_x_start = fromViewToWorld(OFFSET_X);
-            float world_offset_y_start = fromViewToWorld(OFFSET_Y);
-            float world_offset_x_end = fromViewToWorld(OFFSET_X + ADD_COL_WIDTH);
-            float world_offset_y_end = fromViewToWorld(OFFSET_Y + ADD_ROW_HEIGHT);
-
-            // Backup the viewport cloning it
-            mOldViewportFrame.left = mViewportFrame.left;
-            mOldViewportFrame.right = mViewportFrame.right;
-            mOldViewportFrame.top = mViewportFrame.top;
-            mOldViewportFrame.bottom = mViewportFrame.bottom;
-
-            if (!limitViewportToBounds(
-                    bounds.left - world_offset_x_start,
-                    bounds.top - world_offset_y_start,
-                    bounds.right + world_offset_x_end,
-                    bounds.bottom + world_offset_y_end
-                )|| dS > 1.00f
-            ) {
-                mScaleFactor *= dS;
-            }
-
-            return true;
-        }
-    }
 
     public boolean limitViewportToXBounds(float left, float right) {
         float new_left = mViewportFrame.left;
@@ -358,13 +292,82 @@ public abstract class AbstractViewport extends View {
 
     public boolean limitViewportToBounds(float left, float top, float right, float bottom) {
         return (
-            limitViewportToXBounds(left, right) &&
-            limitViewportToYBounds(top, bottom)
+                limitViewportToXBounds(left, right) &&
+                        limitViewportToYBounds(top, bottom)
         );
     }
 
     public void limitViewportToBounds(RectF bounds) {
         limitViewportToBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+    }
+
+
+    /***********************************************
+     *  Gesture Listeners
+     ***********************************************/
+
+    /**
+     * ScaleListener : Listen the scale of the viewport
+     */
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+
+        /**
+         * Called when a scale gesture begin
+         * @param detector : the scale gesture detector
+         * @return true anyway
+         */
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            mState = State.SCALING;
+            return true;
+        }
+
+        /**
+         * Called when a scale gesture end
+         * @param detector : the scale gesture detector
+         */
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            mState = State.SCROLLING;
+        }
+        /**
+         * Called when the user perform a scale with fingers
+         * @param detector : the scale gesture detector
+         * @return true anyway
+         */
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            SRectF bounds = mMap.getBounds();
+
+            float dS = detector.getScaleFactor();
+            // We need to update viewportFrame size without onDraw function
+            mViewportFrame.right = mViewportFrame.left + mViewportFrame.width() * dS;
+            mViewportFrame.bottom = mViewportFrame.top + mViewportFrame.height() * dS;
+
+            float world_offset_x_start = fromViewToWorld(OFFSET_X);
+            float world_offset_y_start = fromViewToWorld(OFFSET_Y);
+            float world_offset_x_end = fromViewToWorld(OFFSET_X + ADD_COL_WIDTH);
+            float world_offset_y_end = fromViewToWorld(OFFSET_Y + ADD_ROW_HEIGHT);
+
+            // Backup the viewport cloning it
+            mOldViewportFrame.left = mViewportFrame.left;
+            mOldViewportFrame.right = mViewportFrame.right;
+            mOldViewportFrame.top = mViewportFrame.top;
+            mOldViewportFrame.bottom = mViewportFrame.bottom;
+
+            if (!limitViewportToBounds(
+                    bounds.left - world_offset_x_start,
+                    bounds.top - world_offset_y_start,
+                    bounds.right + world_offset_x_end,
+                    bounds.bottom + world_offset_y_end
+                )|| dS > 1.00f
+            ) {
+                mScaleFactor *= dS;
+            }
+
+            return true;
+        }
+
     }
 
     /**
