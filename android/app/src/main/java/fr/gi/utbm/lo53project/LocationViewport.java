@@ -9,6 +9,10 @@ import android.util.AttributeSet;
  */
 public class LocationViewport extends AbstractViewport{
 
+    public LocationViewport(Context context, AttributeSet attrs) {
+        super(context, attrs, null);
+    }
+
     public LocationViewport(Context context, AttributeSet attrs, WorldMap map) {
         super(context, attrs, map);
     }
@@ -17,9 +21,10 @@ public class LocationViewport extends AbstractViewport{
     protected void onDraw (Canvas canvas) {
         super.onDraw(canvas);
 
-        for (Position p : mMap.getPositions()) {
-            canvas.drawPoint(p.x, p.y, mMap.paints.get(p.type));
-        }
+        mMap.drawSquares(canvas);
+
+        if (mMap.drawSquares(canvas, Square.Type.LOCATION))
+            invalidate();
     }
 
 }

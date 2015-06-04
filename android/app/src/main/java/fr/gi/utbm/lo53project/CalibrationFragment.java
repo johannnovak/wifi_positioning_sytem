@@ -3,28 +3,46 @@ package fr.gi.utbm.lo53project;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 /**
  * Created by Android on 06/04/2015 for LO53Project
  */
 public class CalibrationFragment extends AbstractFragment {
 
-    private CalibrationViewport mViewport;
+    private Square mSquareWaitingForValidation;
 
-    @Nullable
-    @Override
+    /**
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
+    @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        System.out.println("Calibration fragment : Creating view...");
 
         // the super function fetch mMap from bundle
         super.onCreateView(inflater, container, savedInstanceState);
+
+        // Get server port from preferences
+        mServerPort = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getInt(
+                MainActivity.TAG_PREF_SERVER_PORT_CALIBRATION,
+                getResources().getInteger(R.integer.server_port_calibration) // default value
+        );
 
         // Initialize view
         View rootView = inflater.inflate(R.layout.calibration_layout, container, false);
@@ -33,10 +51,7 @@ public class CalibrationFragment extends AbstractFragment {
         mViewport = new CalibrationViewport(getActivity(), null, mMap, new AbstractViewport.SelectionListener() {
             @Override
             public void onSelect(float x, float y) {
-//                sendPoint(x, y);
-
-                // To remove when we can send to server
-                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+                startWaitingForValidation(x, y);
             }
         });
 
@@ -44,15 +59,105 @@ public class CalibrationFragment extends AbstractFragment {
         LinearLayout calibration_viewport_layout = (LinearLayout)rootView.findViewById(R.id.calib_viewport_layout);
         calibration_viewport_layout.addView(mViewport);
 
-        // Initialize calibration's URL
-        try {
-            mUrl = new URL("http://192.168.43.78:8080/wifi_positioning/calibrate");
-        }
-        catch (MalformedURLException e) {
-            e.printStackTrace();
+        System.out.println("Calibration fragment : View created !");
+        return rootView;
+    }
+
+    /**
+     * Enable fragment to use send & cancel buttons
+     * @param menu menu
+     * @param inflater menu inflater
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.calibration, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * Choose a handler according to the button clicked (i.e. options item selected)
+     * @param item options item selected
+     * @return true if all is fine
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // If we clicked on the send action button
+        if (item.getItemId() == R.id.action_send) {
+
+            handleSendButton();
+            stopWaitingForValidation ();
+            return true;
         }
 
-        return rootView;
+        // If we clicked on the cancel action button
+        if (item.getItemId() == R.id.action_cancel) {
+
+            handleCancelButton();
+            stopWaitingForValidation();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     *
+     */
+    private void handleSendButton() {
+        boolean sent;
+
+        if (mUsingServer) {
+            sent = sendPoint(mSquareWaitingForValidation.x, mSquareWaitingForValidation.y);
+        }
+        else {
+            sent = true;
+        }
+
+        // If position have been sent correctly, we add the point to the viewport
+        if (sent) {
+            mViewport.addSquare(mSquareWaitingForValidation.x, mSquareWaitingForValidation.y, Square.Type.CALIBRATION);
+            Toast.makeText(getActivity(), "Position " + mSquareWaitingForValidation.toString() + " sent !", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     *
+     */
+    private void handleCancelButton() {
+        Toast.makeText(getActivity(), "Position " + mSquareWaitingForValidation.toString() + " cancelled !", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     */
+    private void startWaitingForValidation (float x, float y) {
+
+        // World map start waiting (fix the current hover point)
+        mMap.startWaiting();
+
+        // Save the current selected point
+        mSquareWaitingForValidation = mMap.toSquare(x, y);
+
+        // Enable user to select buttons
+        setHasOptionsMenu(true);
+    }
+
+    /**
+     *
+     */
+    private void stopWaitingForValidation () {
+
+        // World map stop waiting
+        mMap.stopWaiting();
+
+        // We remove the waiting point
+        mSquareWaitingForValidation = null;
+
+        // User can't use buttons anymore until he'll make a new selection
+        setHasOptionsMenu(false);
     }
 
     /**
@@ -60,23 +165,39 @@ public class CalibrationFragment extends AbstractFragment {
      * @param x x coordinate
      * @param y y coordinate
      */
-    private void sendPoint(float x, float y) {
+    private boolean sendPoint(float x, float y) {
+        boolean sent = false;
+
+        // Open a client socket
+        Socket clientSocket = new Socket();
+
         try {
-            // Connection to the server
-            HttpURLConnection connection = (HttpURLConnection) mUrl.openConnection();
+            clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 20000);
 
-            // Sending coordinates
-            connection.addRequestProperty("x", Float.toString(x));
-            connection.addRequestProperty("y", Float.toString(y));
-            connection.connect();
+            // Send calibration position to the server "mobileMacAddress;x;y"
+            clientSocket.getOutputStream().write((mMacAddress + ";" + (int) x + ";" + (int) y + ";").getBytes());
 
-            // If server return ok we add the point to the world map
-            if (connection.getResponseCode() == 200) {
-                mViewport.addPoint(x, y, Position.Type.CALIBRATION);
+            String code = new String(IOUtils.toByteArray(clientSocket.getInputStream()));
+
+            Toast.makeText(getActivity(), "Server answer is : " + code, Toast.LENGTH_SHORT).show();
+
+            // Check server answer
+            if (code.equals("200")) {
+                sent = true;
             }
-        } catch (IOException e) {
+            else {
+                sent = false;
+            }
+
+            // Close socket
+            clientSocket.close();
+
+        }
+        catch (IOException e) {
+            Toast.makeText(getActivity(), "IOException : unable to make a connection with the server.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
-    }
 
+        return sent;
+    }
 }
