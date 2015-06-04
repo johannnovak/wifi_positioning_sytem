@@ -2,13 +2,6 @@
 <items version="2" >
 
     <item
-        jar="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.0.0/libs/internal_impl-22.0.0.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
-        <dex dex="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/pre-dexed/debug/internal_impl-22.0.0-f06acf774d8f0dfa18225537e33220d513f9ff25.jar" />
-    </item>
-    <item
         jar="/home/celian/android-sdks/extras/android/m2repository/com/android/support/support-annotations/22.0.0/support-annotations-22.0.0.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -16,18 +9,25 @@
         <dex dex="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/pre-dexed/debug/support-annotations-22.0.0-8cf5f1597373f10dcabde8f61210a77b1ad8387f.jar" />
     </item>
     <item
-        jar="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.0.0/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="d84409890828e07d344a3b9b1da545dba9897b51">
-        <dex dex="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/pre-dexed/debug/classes-a5b47e721597e92e675b665f2c28b0fe74b00218.jar" />
-    </item>
-    <item
         jar="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.0.0/classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="4e86306289ace4aa0cfec44a05ed2b410d36989d">
         <dex dex="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/pre-dexed/debug/classes-65721527ce260d725e8d163c9ef02c3ac9aa58a8.jar" />
+    </item>
+    <item
+        jar="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.0.0/libs/internal_impl-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
+        <dex dex="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/pre-dexed/debug/internal_impl-22.0.0-f06acf774d8f0dfa18225537e33220d513f9ff25.jar" />
+    </item>
+    <item
+        jar="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.0.0/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="d84409890828e07d344a3b9b1da545dba9897b51">
+        <dex dex="/home/celian/AndroidStudio/android-LO53/android/app/build/intermediates/pre-dexed/debug/classes-a5b47e721597e92e675b665f2c28b0fe74b00218.jar" />
     </item>
     <item
         jar="/home/celian/AndroidStudio/android-LO53/android/app/libs/commons-io-2.4.jar"
