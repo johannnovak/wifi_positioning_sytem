@@ -25,7 +25,7 @@ public class CalibrationFragment extends AbstractFragment {
     private Square mSquareWaitingForValidation;
 
     /**
-     *
+     * {@inheritDoc}
      * @param inflater
      * @param container
      * @param savedInstanceState
@@ -50,7 +50,7 @@ public class CalibrationFragment extends AbstractFragment {
         // Initialize viewport and its listener
         mViewport = new CalibrationViewport(getActivity(), null, mMap, new AbstractViewport.SelectionListener() {
             @Override
-            public void onSelect(float x, float y) {
+            public void onSelect(int x, int y) {
                 startWaitingForValidation(x, y);
             }
         });
@@ -102,17 +102,12 @@ public class CalibrationFragment extends AbstractFragment {
     }
 
     /**
-     *
+     * Handle the sending
      */
     private void handleSendButton() {
-        boolean sent;
 
-        if (mUsingServer) {
-            sent = sendPoint(mSquareWaitingForValidation.x, mSquareWaitingForValidation.y);
-        }
-        else {
-            sent = true;
-        }
+        // Return true if we are not using the server, else return the send point result
+        boolean sent = !mUsingServer || sendPoint(mSquareWaitingForValidation.x, mSquareWaitingForValidation.y);
 
         // If position have been sent correctly, we add the point to the viewport
         if (sent) {
@@ -122,31 +117,36 @@ public class CalibrationFragment extends AbstractFragment {
     }
 
     /**
-     *
+     * Handle the sending cancel
      */
     private void handleCancelButton() {
         Toast.makeText(getActivity(), "Position " + mSquareWaitingForValidation.toString() + " cancelled !", Toast.LENGTH_SHORT).show();
     }
 
     /**
+     * Start waiting than the user make his choice between :
+     *  - select send button to send the current square
+     *  - select cancel button to cancel sending
+     *  - select another square to send
      *
-     * @param x
-     * @param y
+     *  Coordinates are used to initialize the current square which wait for validation
+     * @param x x coordinate of the square
+     * @param y y coordinate of the square
      */
-    private void startWaitingForValidation (float x, float y) {
+    private void startWaitingForValidation (int x, int y) {
 
         // World map start waiting (fix the current hover point)
         mMap.startWaiting();
 
-        // Save the current selected point
-        mSquareWaitingForValidation = mMap.toSquare(x, y);
+        // Save the current selected square
+        mSquareWaitingForValidation = new Square(x, y);
 
         // Enable user to select buttons
         setHasOptionsMenu(true);
     }
 
     /**
-     *
+     * Stop waiting, the map can release the hovered square and the current square is removed
      */
     private void stopWaitingForValidation () {
 
@@ -161,12 +161,12 @@ public class CalibrationFragment extends AbstractFragment {
     }
 
     /**
-     * Send a point to the server and call addPoint if server return OK
+     * Send a point to the server and verify the result
      * @param x x coordinate
      * @param y y coordinate
+     * @return a boolean which defines if the point have been sent
      */
-    private boolean sendPoint(float x, float y) {
-        boolean sent = false;
+    private boolean sendPoint(int x, int y) {
 
         // Open a client socket
         Socket clientSocket = new Socket();
@@ -175,22 +175,17 @@ public class CalibrationFragment extends AbstractFragment {
             clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 20000);
 
             // Send calibration position to the server "mobileMacAddress;x;y"
-            clientSocket.getOutputStream().write((mMacAddress + ";" + (int) x + ";" + (int) y + ";").getBytes());
+            clientSocket.getOutputStream().write((mMacAddress + ";" + x + ";" + y + ";").getBytes());
 
             String code = new String(IOUtils.toByteArray(clientSocket.getInputStream()));
 
             Toast.makeText(getActivity(), "Server answer is : " + code, Toast.LENGTH_SHORT).show();
 
-            // Check server answer
-            if (code.equals("200")) {
-                sent = true;
-            }
-            else {
-                sent = false;
-            }
-
             // Close socket
             clientSocket.close();
+
+            // Check server answer
+            return code.equals("200");
 
         }
         catch (IOException e) {
@@ -198,6 +193,6 @@ public class CalibrationFragment extends AbstractFragment {
             e.printStackTrace();
         }
 
-        return sent;
+        return false;
     }
 }
