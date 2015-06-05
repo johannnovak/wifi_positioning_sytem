@@ -39,7 +39,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="number"
+            android:inputType="phone|number"
             android:ems="10"
             android:id="@+id/editText_server_ip"
             android:layout_row="0"
