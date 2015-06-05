@@ -123,43 +123,51 @@ public class WorldMap implements Serializable {
     }
 
     /**
-     * Get the current hover square
-     * @return
+     * @return the current hover square
      */
     public Square getCurrentHoverSquare() {
         return mCurrentHoverSquare;
     }
 
     /**
-     *
+     * Start to wait setting the "current hover square" immortality to true
      */
     public void startWaiting () {
-        int lastIndex = mSquares.get(Square.Type.HOVER).size()-1;
-        mSquares.get(Square.Type.HOVER).get(lastIndex).setImmortality(true);
+        mCurrentHoverSquare.setImmortality(true);
     }
 
     /**
-     *
+     * Stop to wait setting the "current hover square" immortality to false
      */
     public void stopWaiting () {
-        int lastIndex = mSquares.get(Square.Type.HOVER).size()-1;
-        mSquares.get(Square.Type.HOVER).get(lastIndex).setImmortality(false);
+        mCurrentHoverSquare.setImmortality(false);
     }
 
     /**
-     * Add a position to the map
+     * Add a position of the given type to the map
      * @param x x coordinate
      * @param y y coordinate
-     * @param t position type
+     * @param t square type
      */
     public void addPosition(float x, float y, Square.Type t) {
         addSquare(toSquare(x, y), t);
     }
 
+    /**
+     * Add a square of the given type to the map
+     * @param x row index
+     * @param y column index
+     * @param t square type
+     */
     public void addSquare(int x, int y, Square.Type t) {
         addSquare(new Square(x, y), t);
     }
 
+    /**
+     * Add a square of the given type to the map
+     * @param s square
+     * @param t square type
+     */
     public void addSquare(Square s, Square.Type t) {
         boolean add_permission = false;
 
@@ -220,17 +228,6 @@ public class WorldMap implements Serializable {
         if (add_permission) mSquares.get(t).add(s);
     }
 
-//    public void addHoverPosition (float x, float y) {
-//        if (mBounds.contains(x, y)) {
-//            Square p = toSquare(x, y);
-//            if (!mSquares.get(Square.Type.HOVER).contains(p)) {
-//                mSquares.get(Square.Type.HOVER).add(p);
-//            }
-//            mCurrentHoverSquare = p;
-//            mCurrentHoverSquare.setImmortality(true);
-//        }
-//    }
-
     /**
      * Clear all positions from the map
      */
@@ -288,9 +285,10 @@ public class WorldMap implements Serializable {
     }
 
     /**
-     * Draw all positions of both types CALIBRATION & LOCATION in the canvas
+     * Draw all positions of all types in the canvas
      * @param canvas canvas where to draw
      */
+    @SuppressWarnings("unused")
     public boolean drawSquares (Canvas canvas) {
         boolean r1 = drawSquares(canvas, Square.Type.CALIBRATION);
         boolean r2 = drawSquares(canvas, Square.Type.LOCATION);
@@ -298,6 +296,11 @@ public class WorldMap implements Serializable {
         return r1 || r2 || r3;
     }
 
+    /**
+     * Update lives of each square of a given type (naturally, immortals square's life will not decrease !)
+     * @param t type of squares to update
+     * @return true if it remains some alive squares
+     */
     private boolean updateLives (Square.Type t) {
         // Update life value of squares of type t
         for (Square s : mSquares.get(t)) {
@@ -356,11 +359,17 @@ public class WorldMap implements Serializable {
         );
     }
 
+    /**
+     * Add a row to the map
+     */
     public void addRow() {
         mGridHeight ++;
         mBounds.bottom += squareHeight;
     }
 
+    /**
+     * Add a column to the map
+     */
     public void addColumn() {
         mGridWidth ++;
         mBounds.right += squareWidth;
@@ -379,13 +388,23 @@ public class WorldMap implements Serializable {
         );
     }
 
-    private PointF toReal(Square p) {
+    /**
+     * Get real coordinates of the square. It corresponds to the center point of the square
+     * @param s the square
+     * @return real square's coordinates
+     */
+    @SuppressWarnings("unused")
+    private PointF toReal(Square s) {
         return new PointF(
-                p.x * squareWidth,
-                p.y * squareHeight
+                s.x * squareWidth + squareWidth/2,
+                s.y * squareHeight + squareHeight/2
         );
     }
 
+    /**
+     * Store the map in a string, in the goal to be displayed in a console.
+     * @return the map as a string
+     */
     public String toString() {
         String str = "--------------World map------------------\n";
         str += "| Calibration \t\tLocation \t\tHover\n";
