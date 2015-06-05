@@ -18,7 +18,9 @@ import android.view.View;
  */
 public abstract class AbstractViewport extends View {
 
-    // State
+    /**
+     * State enumeration
+     */
     private enum State {
         NONE,
         SCROLLING,
@@ -27,31 +29,60 @@ public abstract class AbstractViewport extends View {
     }
     private State mState;
 
+    /**
+     * Margins
+     */
     public static float OFFSET_X = 25f;
     public static float OFFSET_Y = 25f;
+
+    /**
+     * Add row & col buttons
+     * (size by default equal to zero but increased in calibration viewport)
+     */
     protected int ADD_ROW_HEIGHT = 0;
     protected int ADD_COL_WIDTH = 0;
-
-    // Scale factor
-    private float mScaleFactor = 1.f;
-
-    // Frames
-    protected SRectF mViewportFrame = new SRectF();
-    protected SRectF mOldViewportFrame = new SRectF();
-
-    // Gesture Detectors
-    private ScaleGestureDetector mScaleGestureDetector;
-    private GestureDetector mGestureDetector;
-
-    // World Map
-    protected WorldMap mMap;
-
-    private SelectionListener mSelectionListener;
-
     protected RectF mAddRowButton;
     protected RectF mAddColumnButton;
     protected Paint mButtonPaint;
 
+    /**
+     * Scale factor (used for zoom)
+     */
+    private float mScaleFactor = 1.f;
+
+    /**
+     * Frames (used for translation)
+     */
+    protected SRectF mViewportFrame = new SRectF();
+    protected SRectF mOldViewportFrame = new SRectF();
+
+    /**
+     * Gesture detectors
+     */
+    private ScaleGestureDetector mScaleGestureDetector;
+    private GestureDetector mGestureDetector;
+
+    /**
+     * The world map, used to draw grid and squares
+     */
+    protected WorldMap mMap;
+
+
+    /**
+     * Listener which contains a virtual function called when we select a square
+     */
+    private SelectionListener mSelectionListener;
+
+
+    /**
+     * Constructor without selection listener
+     * @param c context
+     * @param attrs attribute set
+     * @param map world map
+     */
+    public AbstractViewport(Context c, AttributeSet attrs, WorldMap map) {
+        this(c, attrs, map, null);
+    }
 
     /**
      * Constructor with a selection listener
@@ -77,24 +108,6 @@ public abstract class AbstractViewport extends View {
         mAddRowButton = null;
         mAddColumnButton = null;
         mButtonPaint = null;
-    }
-
-    /**
-     * Constructor without selection listener
-     * @param c context
-     * @param attrs attribute set
-     * @param map world map
-     */
-    public AbstractViewport(Context c, AttributeSet attrs, WorldMap map) {
-        this(c, attrs, map, null);
-    }
-
-    public float getScaleFactor() {
-        return this.mScaleFactor;
-    }
-
-    public SRectF getViewportFrame () {
-        return this.mViewportFrame;
     }
 
     /**
@@ -126,7 +139,7 @@ public abstract class AbstractViewport extends View {
         switch (e.getAction()) {
             case MotionEvent.ACTION_UP:
                 if (mState == State.SELECTING) {
-                    PointF selected = mMap.fingerUp();
+                    Square selected = mMap.getCurrentHoverSquare();
                     if(selected != null)
                         mSelectionListener.onSelect(selected.x, selected.y);
                 }
@@ -154,13 +167,20 @@ public abstract class AbstractViewport extends View {
      * Add a point to the world map and force the viewport to redraw
      * @param x x coordinate
      * @param y y coordinate
+     * @param t type of square which will be created
      */
-//    synchronized
+    @SuppressWarnings("unused")
     protected void addPosition(float x, float y, Square.Type t) {
         mMap.addPosition(x, y, t);
         this.invalidate(); // Force the viewport to redraw
     }
 
+    /**
+     * Add a square to the world map and force the viewport to redraw
+     * @param x row index of square
+     * @param y col index of square
+     * @param t type of square
+     */
     protected void addSquare(int x, int y, Square.Type t) {
         mMap.addSquare(x, y, t);
         this.invalidate(); // Force the viewport to redraw
@@ -245,7 +265,12 @@ public abstract class AbstractViewport extends View {
         invalidate();
     }
 
-
+    /**
+     * Limit the viewport to world map bounds in his width
+     * @param left left bound
+     * @param right right bound
+     * @return true if the we cannot zoom any more
+     */
     public boolean limitViewportToXBounds(float left, float right) {
         float new_left = mViewportFrame.left;
         boolean zoom_is_max = mOldViewportFrame.containsX(left, right);
@@ -268,6 +293,12 @@ public abstract class AbstractViewport extends View {
         return zoom_is_max;
     }
 
+    /**
+     * Limit the viewport to world map bounds in his height
+     * @param top top bound
+     * @param bottom bottom bound
+     * @return true if the we cannot zoom any more
+     */
     public boolean limitViewportToYBounds(float top, float bottom) {
         float new_top = mViewportFrame.top;
         boolean zoom_is_max = mOldViewportFrame.containsY(top, bottom);
@@ -290,15 +321,29 @@ public abstract class AbstractViewport extends View {
         return zoom_is_max;
     }
 
+    /**
+     * Combined call to limitViewportToXBounds & limitViewportToYBounds
+     * @param left left bound
+     * @param top top bound
+     * @param right right bound
+     * @param bottom bottom bound
+     * @return true if both not permit zoom
+     */
     public boolean limitViewportToBounds(float left, float top, float right, float bottom) {
         return (
-                limitViewportToXBounds(left, right) &&
-                        limitViewportToYBounds(top, bottom)
+            limitViewportToXBounds(left, right) &&
+            limitViewportToYBounds(top, bottom)
         );
     }
 
-    public void limitViewportToBounds(RectF bounds) {
-        limitViewportToBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+    /**
+     * Combined call to limitViewportToXBounds & limitViewportToYBounds
+     * @param bounds bounds
+     * @return true if both not permit zoom
+     */
+    @SuppressWarnings("unused")
+    public boolean limitViewportToBounds(RectF bounds) {
+        return limitViewportToBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
     }
 
 
@@ -330,6 +375,7 @@ public abstract class AbstractViewport extends View {
         public void onScaleEnd(ScaleGestureDetector detector) {
             mState = State.SCROLLING;
         }
+
         /**
          * Called when the user perform a scale with fingers
          * @param detector : the scale gesture detector
@@ -436,6 +482,11 @@ public abstract class AbstractViewport extends View {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         * @param e
+         * @return
+         */
         @Override
         public boolean onSingleTapConfirmed (MotionEvent e) {
             PointF tap = fromViewToWorld(e.getX(), e.getY());
@@ -466,7 +517,7 @@ public abstract class AbstractViewport extends View {
          * @param x : x of selected location
          * @param y : y of selected location
          */
-        void onSelect(float x, float y);
+        void onSelect(int x, int y);
     }
 
 }

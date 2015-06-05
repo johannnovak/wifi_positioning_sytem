@@ -18,8 +18,15 @@ import android.view.inputmethod.InputMethodManager;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    /**
+     * Bundle's tags
+     */
     public static String TAG_WORLDMAP = "Global WorldMap";
     public static String TAG_WORLDMAP_BUNDLE = "Global WorldMap Bundle";
+
+    /**
+     * Preference's tags
+     */
     public static String TAG_PREF_USING_SERVER = "Using Server Boolean";
     public static String TAG_PREF_SERVER_IP = "Server IP String";
     public static String TAG_PREF_SERVER_PORT_LOCATION = "ServerLocation Port Integer";
@@ -28,6 +35,7 @@ public class MainActivity extends ActionBarActivity
     public static String TAG_PREF_DEFAULT_MAP_HEIGHT = "Default Map Height";
 
     public static final int PREFERENCE_MODE_PRIVATE = 0;
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -37,9 +45,16 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-    
+
+    /**
+     * Used to save the map when the instance is saved
+     */
     private Bundle mMapSaveBundle;
 
+    /**
+     * {@inheritDoc}
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -76,24 +91,34 @@ public class MainActivity extends ActionBarActivity
             }
         }
 
-
-
         System.out.println("MainActivity : Created !");
     }
 
+    /**
+     * {@inheritDoc}
+     * @param savedInstanceState
+     */
     @Override
     public void onSaveInstanceState (Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putBundle(TAG_WORLDMAP_BUNDLE, mMapSaveBundle);
     }
 
+    /**
+     * {@inheritDoc}
+     * @param savedInstanceState
+     */
     @Override
     public void onRestoreInstanceState (@NonNull Bundle savedInstanceState) {
         mMapSaveBundle = savedInstanceState.getBundle(TAG_WORLDMAP_BUNDLE);
     }
 
+    /**
+     * {@inheritDoc}
+     * @param index
+     */
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(int index) {
 
         System.out.println("##############################");
         System.out.println("MainActivity : Selecting item ...");
@@ -103,7 +128,7 @@ public class MainActivity extends ActionBarActivity
 
         Fragment objFragment = null;
 
-        switch(position) {
+        switch(index) {
             case 0 :
                 mTitle = getString(R.string.title_section1);
                 objFragment = new CalibrationFragment();
@@ -124,7 +149,8 @@ public class MainActivity extends ActionBarActivity
         }
 
         // Give the bundle (containing the WorldMap) to the fragment
-        objFragment.setArguments(mMapSaveBundle);
+        if (objFragment != null)
+            objFragment.setArguments(mMapSaveBundle);
 
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -135,6 +161,9 @@ public class MainActivity extends ActionBarActivity
         System.out.println("MainActivity : Item " + mTitle + " selected !");
     }
 
+    /**
+     * Restore title and subtitle of the action bar
+     */
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
@@ -143,6 +172,11 @@ public class MainActivity extends ActionBarActivity
     }
 
 
+    /**
+     * {@inheritDoc}
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
@@ -158,6 +192,11 @@ public class MainActivity extends ActionBarActivity
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * {@inheritDoc}
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -173,6 +212,9 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Force to close the keyboard
+     */
     private void hideKeyboard() {
         // Check if no view has focus:
         View view = this.getCurrentFocus();

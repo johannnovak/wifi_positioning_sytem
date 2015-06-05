@@ -15,13 +15,31 @@ import android.view.ViewGroup;
  */
 public abstract class AbstractFragment extends Fragment {
 
+    /**
+     * The common map
+     */
     protected WorldMap mMap;
+
+    /**
+     * The abstract viewport which will be instantiated in child classes
+     */
+    protected AbstractViewport mViewport;
+
+    /**
+     * Properties relative to the server and future connection to it
+     */
     protected boolean mUsingServer;
     protected String mServerIP;
     protected int mServerPort;
     protected String mMacAddress;
-    protected AbstractViewport mViewport;
 
+    /**
+     * {@inheritDoc}
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,7 +50,7 @@ public abstract class AbstractFragment extends Fragment {
         mMap = (WorldMap) args.getSerializable(MainActivity.TAG_WORLDMAP);
 
         // Get the Mac Address
-        mMacAddress = getMacAddress(getActivity());
+        mMacAddress = computeMacAddress(getActivity());
 
         // Some preferences : server IP and "using server" boolean
         mServerIP = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE).getString(
@@ -48,7 +66,12 @@ public abstract class AbstractFragment extends Fragment {
         return null;
     }
 
-    private String getMacAddress(Context context) {
+    /**
+     * Get the mac address from an app context
+     * @param context context from where we get the mac address
+     * @return mac address
+     */
+    private String computeMacAddress(Context context) {
         WifiManager wifimanager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String macAddress = wifimanager.getConnectionInfo().getMacAddress();
         if (macAddress == null) {

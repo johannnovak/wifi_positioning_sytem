@@ -9,20 +9,37 @@ import android.util.AttributeSet;
  */
 public class LocationViewport extends AbstractViewport{
 
+    /**
+     * {@inheritDoc}
+     * @param context
+     * @param attrs
+     */
     public LocationViewport(Context context, AttributeSet attrs) {
         super(context, attrs, null);
     }
 
+    /**
+     * {@inheritDoc}
+     * @param context
+     * @param attrs
+     * @param map
+     */
     public LocationViewport(Context context, AttributeSet attrs, WorldMap map) {
         super(context, attrs, map);
     }
 
+    /**
+     * {@inheritDoc}
+     * @param canvas canvas
+     */
     @Override
     protected void onDraw (Canvas canvas) {
         super.onDraw(canvas);
 
-        mMap.drawSquares(canvas);
+        // Draw calibration squares
+        mMap.drawSquares(canvas, Square.Type.CALIBRATION);
 
+        // Draw location squares
         if (mMap.drawSquares(canvas, Square.Type.LOCATION))
             invalidate();
     }
