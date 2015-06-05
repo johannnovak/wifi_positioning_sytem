@@ -98,7 +98,9 @@ public abstract class SocketController
 			m_serverSocketChannel = ServerSocketChannel.open();
 			InetAddress localAddress = MiscUtils.getHostIP4Address();
 			if (localAddress == null)
-				throw new IOException("Error could not obtain the IPv4 address.");
+			{
+				localAddress = InetAddress.getLocalHost();
+			}
 			m_serverSocketChannel.bind(new InetSocketAddress(localAddress, port));
 			m_serverSocketChannel.configureBlocking(false);
 
@@ -551,7 +553,13 @@ public abstract class SocketController
 			final SelectionKey _selectionKey,
 			final String _key)
 	{
-		return ((Map<String, String>) _selectionKey.attachment()).get(_key);
+		try
+		{
+			return ((Map<String, String>) _selectionKey.attachment()).get(_key);
+		} catch (NullPointerException e)
+		{
+			return "X";
+		}
 	}
 
 	/* --------------------------------------------------------------------- */

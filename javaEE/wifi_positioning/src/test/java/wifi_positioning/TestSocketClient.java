@@ -20,8 +20,8 @@ public class TestSocketClient
 	{
 		System.out.println("client");
 
-		port = 3001;
-		ip = "172.20.44.197";
+		port = 3002;
+		ip = "127.0.1.1";
 
 		// r = new Random();
 		// for (int i = 0; i < r.nextInt(1); ++i)
