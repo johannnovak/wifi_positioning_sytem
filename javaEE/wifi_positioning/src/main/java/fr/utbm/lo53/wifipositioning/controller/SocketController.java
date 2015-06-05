@@ -187,11 +187,12 @@ public abstract class SocketController
 				/* Infinite loop listening to entering connections. */
 				while (true)
 				{
-					/* Listens to any connections. */
-					if (_selector.select() == 0)
-						continue;
 
 					Set<SelectionKey> selectedKeys = _selector.selectedKeys();
+
+					/* Listens to any connections. */
+					if (selectedKeys.isEmpty())
+						_selector.select();
 					Iterator<SelectionKey> keysIterator = selectedKeys.iterator();
 
 					/*
