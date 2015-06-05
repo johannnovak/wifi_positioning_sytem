@@ -36,13 +36,13 @@ public class WorldMap implements Serializable {
     /**
      * Size of a square
      */
-    public float squareWidth;
-    public float squareHeight;
+    private float mSquareWidth;
+    private float mSquareHeight;
 
     /**
      * Paints
      */
-    public Map<Square.Type , SPaint> paints;
+    private Map<Square.Type , SPaint> mPaints;
     private SPaint mGridPaint;
 
     /**
@@ -60,14 +60,14 @@ public class WorldMap implements Serializable {
         initialize();
         mGridWidth = width;
         mGridHeight = height;
-        mBounds = new SRectF(0, 0, squareWidth * mGridWidth, squareHeight * mGridHeight);
+        mBounds = new SRectF(0, 0, mSquareWidth * mGridWidth, mSquareHeight * mGridHeight);
     }
     /**
      * Hard initialize all parameters of the world map
      */
     private void initialize() {
-        squareWidth = 200;
-        squareHeight = 200;
+        mSquareWidth = 200;
+        mSquareHeight = 200;
 
         // Paint dedicated to calibration points
         final SPaint calibrationPaint  = new SPaint();
@@ -97,7 +97,7 @@ public class WorldMap implements Serializable {
         mGridPaint.setStyle(Paint.Style.STROKE);
         mGridPaint.setColor(Color.WHITE);
 
-        paints = new HashMap<Square.Type , SPaint>() {{
+        mPaints = new HashMap<Square.Type , SPaint>() {{
             put(Square.Type.HOVER,        hoverPaint);
             put(Square.Type.CALIBRATION,  calibrationPaint);
             put(Square.Type.LOCATION,     locationPaint);
@@ -254,16 +254,16 @@ public class WorldMap implements Serializable {
      * @param t type of the square to draw
      */
     public void drawSquare (Canvas canvas, Square s, Square.Type t) {
-        Paint paint = paints.get(t);
+        Paint paint = mPaints.get(t);
 
         // Setting the alpha value according to its life
         paint.setAlpha(s.life);
 
         canvas.drawRect(
-                s.x * squareWidth,
-                s.y * squareHeight,
-                s.x * squareWidth + squareWidth,
-                s.y * squareHeight + squareHeight,
+                s.x * mSquareWidth,
+                s.y * mSquareHeight,
+                s.x * mSquareWidth + mSquareWidth,
+                s.y * mSquareHeight + mSquareHeight,
                 paint
         );
     }
@@ -289,7 +289,7 @@ public class WorldMap implements Serializable {
      * @param canvas canvas where to draw
      */
     @SuppressWarnings("unused")
-    public boolean drawSquares (Canvas canvas) {
+    public boolean drawAllSquares (Canvas canvas) {
         boolean r1 = drawSquares(canvas, Square.Type.CALIBRATION);
         boolean r2 = drawSquares(canvas, Square.Type.LOCATION);
         boolean r3 = drawSquares(canvas, Square.Type.HOVER);
@@ -325,8 +325,8 @@ public class WorldMap implements Serializable {
      */
     public void drawGrid(Canvas canvas) {
 
-        float dx = squareWidth;
-        float dy = squareHeight;
+        float dx = mSquareWidth;
+        float dy = mSquareHeight;
 
         // Row lines
         for (int i = 0; i < mGridHeight; i++)
@@ -364,7 +364,7 @@ public class WorldMap implements Serializable {
      */
     public void addRow() {
         mGridHeight ++;
-        mBounds.bottom += squareHeight;
+        mBounds.bottom += mSquareHeight;
     }
 
     /**
@@ -372,7 +372,7 @@ public class WorldMap implements Serializable {
      */
     public void addColumn() {
         mGridWidth ++;
-        mBounds.right += squareWidth;
+        mBounds.right += mSquareWidth;
     }
 
     /**
@@ -383,8 +383,8 @@ public class WorldMap implements Serializable {
      */
     public Square toSquare (float x, float y) {
         return new Square(
-                (int)Math.floor(x / squareWidth),
-                (int)Math.floor(y / squareHeight)
+                (int)Math.floor(x / mSquareWidth),
+                (int)Math.floor(y / mSquareHeight)
         );
     }
 
@@ -394,10 +394,10 @@ public class WorldMap implements Serializable {
      * @return real square's coordinates
      */
     @SuppressWarnings("unused")
-    private PointF toReal(Square s) {
+    public PointF toReal(Square s) {
         return new PointF(
-                s.x * squareWidth + squareWidth/2,
-                s.y * squareHeight + squareHeight/2
+                s.x * mSquareWidth + mSquareWidth/2,
+                s.y * mSquareHeight + mSquareHeight/2
         );
     }
 
