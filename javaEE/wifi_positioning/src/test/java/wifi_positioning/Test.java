@@ -17,5 +17,6 @@ public class Test
 		// sb.append(String.format("%02X%s", bytes[i], (i < (bytes.length - 1))
 		// ? ":" : ""));
 		// System.out.println(sb.toString());
+		System.out.println(1 << 2);
 	}
 }

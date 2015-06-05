@@ -188,11 +188,10 @@ public abstract class SocketController
 				while (true)
 				{
 
-					Set<SelectionKey> selectedKeys = _selector.selectedKeys();
-
 					/* Listens to any connections. */
-					if (selectedKeys.isEmpty())
-						_selector.select();
+					_selector.select();
+
+					Set<SelectionKey> selectedKeys = _selector.selectedKeys();
 					Iterator<SelectionKey> keysIterator = selectedKeys.iterator();
 
 					/*
@@ -203,6 +202,12 @@ public abstract class SocketController
 					{
 						/* Gets one channel from the selector. */
 						SelectionKey key = keysIterator.next();
+
+						/* Removes the current key from the set. */
+						keysIterator.remove();
+
+						if (!key.isValid())
+							continue;
 
 						s_logger.debug("Selected key ID : '{}'",
 								getPropertyFromKey(key, s_channelIDKey));
@@ -222,10 +227,8 @@ public abstract class SocketController
 						{
 							handleWritableChannel(key);
 						}
-
-						/* Removes the current key from the set. */
-						keysIterator.remove();
 					}
+
 				}
 			} catch (IOException e)
 			{
@@ -280,13 +283,13 @@ public abstract class SocketController
 					String.format(
 							"Channel-%s : An error occured when obtaining the connected client channel (%s).",
 							channelID, m_controllerName), e);
+			return;
 		}
 
 		/* Registers the clientChannel in the selector. */
 		try
 		{
-			SelectionKey key;
-			key = clientChannel.register(_selector, SelectionKey.OP_READ);
+			SelectionKey key = clientChannel.register(_selector, SelectionKey.OP_READ);
 			addPropertyToKey(key, s_channelIDKey, getNextChannelID());
 
 			s_logger.debug("A new client channel is ready to be read : {} !",
