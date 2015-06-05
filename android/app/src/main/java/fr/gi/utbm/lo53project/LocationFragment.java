@@ -8,9 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -111,20 +113,26 @@ public class LocationFragment extends AbstractFragment {
                 if (mUsingServer) {
                     try {
                         // Get the accepted socket object
-                        Socket socket = new Socket();
-                        socket.connect(new InetSocketAddress(mServerIP, mServerPort), 500);
+                        Socket clientSocket = new Socket();
+                        clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 500);
                         try {
-                            String code = new String(IOUtils.toByteArray(socket.getInputStream()));
+                            // Send mobile mac address to the server
+                            clientSocket.getOutputStream().write((mMacAddress).getBytes());
+
+                            // Get the response code we have to decode to retrieve indices
+                            String code = new String(IOUtils.toByteArray(clientSocket.getInputStream()));
 
                             // Publish the received data
                             publishProgress(decode(code));
 
-                            socket.close();
+                            clientSocket.close();
                         } catch (Exception e) {
+                            Toast.makeText(getActivity(), "Sent or reception failed", Toast.LENGTH_SHORT).show();
                             e.printStackTrace();
                         }
                     }
-                    catch (Exception e) {
+                    catch (IOException e) {
+                        Toast.makeText(getActivity(), "Unable to connect to the server", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
                 }
@@ -160,6 +168,7 @@ public class LocationFragment extends AbstractFragment {
 
         /**
          * Decode the string code received in a square to display
+         * The code format is quite simple : "x;y"
          * @param code string code
          * @return square to display
          */
