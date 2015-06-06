@@ -114,7 +114,7 @@ public class LocationFragment extends AbstractFragment {
                     try {
                         // Get the accepted socket object
                         Socket clientSocket = new Socket();
-                        clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 500);
+                        clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 20000);
                         try {
                             // Send mobile mac address to the server
                             clientSocket.getOutputStream().write((mMacAddress).getBytes());
