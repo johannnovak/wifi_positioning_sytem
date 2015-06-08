@@ -98,6 +98,8 @@ public class LocateController extends SocketController
 			/* Adds the mobile MacAddress. */
 			requestData.add(data);
 
+			s_logger.debug("Data parsed : {}.", data);
+
 			return requestData;
 
 		} catch (Exception e)

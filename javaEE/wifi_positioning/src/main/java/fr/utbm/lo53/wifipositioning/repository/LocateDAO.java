@@ -29,7 +29,7 @@ public class LocateDAO
 	private final static Logger		s_logger	= LoggerFactory.getLogger(LocateDAO.class);
 
 	/** Singleton of the class. */
-	private static LocateDAO		s_locateDAO;
+	private static LocateDAO		s_locateDAO	= new LocateDAO();
 
 	/** Singleton of the Hibernate's {@link SessionFactory}. */
 	private final SessionFactory	m_sessionFactory;
@@ -79,12 +79,14 @@ public class LocateDAO
 			session.beginTransaction();
 
 			/* Creates HQLQuery from the different Measurements. */
-			String hqlQueryString = "SELECT p FROM Measurement m join Position p where ";
+			String hqlQueryString = "SELECT p FROM Measurement m join m.position p where ";
 			for (Measurement m : _measurements)
-				hqlQueryString += "m.rssi + epsilon > " + m.getRssi() + " and m.rssi - epsilon < "
-						+ m.getRssi() + " and ";
-			hqlQueryString = hqlQueryString.substring(0, hqlQueryString.length() - 3);
+				hqlQueryString += "m.rssi + :epsilon > " + m.getRssi()
+						+ " and m.rssi - :epsilon < " + m.getRssi() + " and ";
+			/* to remove last 'and' */
+			hqlQueryString = hqlQueryString.substring(0, hqlQueryString.length() - 4);
 			Query hqlQuery = session.createQuery(hqlQueryString);
+			hqlQuery.setParameter("epsilon", _epsilon);
 
 			/* Gets the different obtained Positions. */
 			@SuppressWarnings("unchecked")
@@ -95,9 +97,13 @@ public class LocateDAO
 			{
 				s_logger.error("Error when querying database for locate. Number of position got from query > 1.");
 				return null;
+			} else if (matchingPositions.isEmpty())
+			{
+				s_logger.error("Error when querying database for locate. No positions found.");
+				return null;
 			}
 			/*
-			 * There hasn' been any errors, we can safely commit our database
+			 * No errors, we can safely commit our database
 			 * updates.
 			 */
 			session.getTransaction().commit();

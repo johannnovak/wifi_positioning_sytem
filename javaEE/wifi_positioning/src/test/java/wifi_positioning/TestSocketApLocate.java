@@ -19,10 +19,10 @@ public class TestSocketApLocate
 	{
 		int apCount = 0;
 		String[] macAdresses = { "00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03" };
-		double[] xAp = { 600, 800, 40000 };
-		double[] yAp = { 200, 30000, 15000 };
+		double[] xAp = { 3, 10, 20 };
+		double[] yAp = { 1, 15, 8 };
 
-		double xIni = 200.f;
+		double xIni = 0.f;
 		double yIni = 0.f;
 
 		double currentX;
@@ -93,8 +93,8 @@ public class TestSocketApLocate
 					String returned = macAdresses[apCount] + ";";
 
 					long t = System.currentTimeMillis() - time;
-					currentX = xIni + (t * 1000);
-					currentY = yIni + (t * 500);
+					currentX = xIni;// + (t * 1000);
+					currentY = yIni;// + (t * 500);
 
 					double rssi = Math.sqrt(((currentX - xAp[apCount]) * (currentX - xAp[apCount]))
 							+ ((currentY - yAp[apCount]) * (currentY - yAp[apCount])));
@@ -107,7 +107,7 @@ public class TestSocketApLocate
 					clientSocketChannel.close();
 					apCount++;
 					apCount %= 3;
-					time = t;
+					// time = t;
 				}
 
 				/* Removes the current key from the set. */

@@ -5,6 +5,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -103,6 +104,8 @@ public class CalibrateController extends SocketController
 
 			/* Adds the y position. */
 			requestData.add(Float.parseFloat(splitData[2]));
+
+			s_logger.debug("Data parsed : {}.", Arrays.asList(splitData));
 
 			return requestData;
 

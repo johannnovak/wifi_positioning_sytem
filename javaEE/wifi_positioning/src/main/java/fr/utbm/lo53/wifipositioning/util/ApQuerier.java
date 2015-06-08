@@ -1,12 +1,8 @@
 package fr.utbm.lo53.wifipositioning.util;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -87,10 +83,8 @@ public class ApQuerier
 				else
 					return null;
 
-				String apMacAddress = getForeignMacAddress();
-
 				/* Create new measurement from values. */
-				Measurement measurement = new Measurement(rssi, apMacAddress);
+				Measurement measurement = new Measurement(rssi, _mobileMacAddress);
 
 				s_logger.debug("Parsing successful.");
 				return measurement;
@@ -100,47 +94,6 @@ public class ApQuerier
 			}
 		}
 		return null;
-	}
-
-	/* --------------------------------------------------------------------- */
-
-	/**
-	 * Method used to obtain the MacAddress of the device at the other end of
-	 * the {@link Socket}.
-	 * 
-	 * @return MacAddress of the device at the other end of the {@link Socket}
-	 */
-	private String getForeignMacAddress()
-	{
-		try
-		{
-			/* Gets the MacAddress of the socket other end device. */
-			byte[] bytes = NetworkInterface.getByInetAddress(m_socket.getLocalAddress())
-					.getHardwareAddress();
-
-			/* If null, it is localhost. */
-			if (bytes == null)
-			{
-				NetworkInterface ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-				if (ni != null)
-					bytes = ni.getHardwareAddress();
-			}
-
-			StringBuilder sb = new StringBuilder();
-
-			if (bytes != null)
-			{
-				/* Formats the bytes into a readable MacAddress. */
-				for (int i = 0; i < bytes.length; ++i)
-					sb.append(String
-							.format("%02X%s", bytes[i], (i < (bytes.length - 1)) ? ":" : ""));
-			}
-			return sb.toString();
-		} catch (SocketException | UnknownHostException e)
-		{
-			s_logger.error("Could not find MacAddress for socket.", e);
-		}
-		return "";
 	}
 
 	/* --------------------------------------------------------------------- */
