@@ -1,0 +1,27 @@
+\documentclass[a4paper,12pt]{report}
+
+\input{0_packages.tex}
+
+% Title Page
+\title{LO53 Project Report\\Wi-Fi Based Positioning System}
+\author{Celian GARCIA \and Johann NOVAK \and  Aurelie PELLIGAND \and Donatien RABILLER}
+
+\begin{document}
+\maketitle
+
+\input{1_introduction.tex}
+
+\tableofcontents
+\hypersetup{linkcolor=blue}
+
+\input{2_chapter_android.tex}
+
+\input{3_chapter_tp_link.tex}
+
+\input{4_chapter_server.tex}
+
+\input{5_conclusion.tex}
+  
+\input{6_appendix.tex}
+
+\end{document}

@@ -1,0 +1,31 @@
+\usepackage[latin1]{inputenc}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{geometry}
+\usepackage{soul}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{url}
+\usepackage[counterclockwise]{rotating}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{enumitem} %for itemize no space
+\usepackage{float} % for figure[H]
+\usepackage[bottom]{footmisc} %for footnote mandatory bottom position
+\usepackage[english]{babel}
+\usepackage[justification=centering]{caption}
+
+
+
+\geometry{bmargin = 2.9cm, tmargin = 2cm}
+\definecolor{gris}{rgb}{0.5,0.5,0.5}
+\definecolor{darkgreen}{rgb}{0,0.39,0}
+\definecolor{darkred}{rgb}{0.33,0.6,0.7}
+\definecolor{violet}{rgb}{0.28,0.24,0.55}
+\hypersetup{linkcolor=black, urlcolor=blue, colorlinks= true, breaklinks=true, pdfborder= 0 0 0}
+\def\UrlBreaks{\do\/\do-}
+
+\setlist[itemize]{noitemsep, topsep=0pt} %for itemize no space

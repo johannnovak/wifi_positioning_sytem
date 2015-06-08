@@ -1,0 +1,16 @@
+\chapter*{Conclusion}
+ We can conclude that this project was first, hard to achieve. There were several steps for us in order to comprehend the big picture : 
+  \begin{itemize}
+     \item[$\rightarrow$] what were the different steps of the communication between the devices;
+     \item[$\rightarrow$] how can the pcap library be used;
+     \item[$\rightarrow$] what protocols can be used in order to transport the information between all devices;
+     \item[$\rightarrow$] how the android graphical interface can be designed;
+  \end{itemize}
+  ~\\
+\indent As the server required sockets in order to communicate with the Access Points, the same technology has been applied to the communication between the mobile phone and the server. \\
+\indent The whole structure of the project relies on the fact that our database has to be filled through a calibration beforehand. It compels the application user to first perform a calibration. This had an impact on both the android application and the server as it needs an extra step before locating.s
+\\
+\indent The application was globally an enriching first android development experience, because we had the occasion to have an overview of a large panel of its specificities. Thanks to the Android API (written in Java but is a very specific use of Java language), very efficient shortcuts, were at our disposal and it was quite easy to understand all base concepts.
+\\
+\indent Some improvements can be made on the server side. First, the handling of channels is made with 3 steps but it could have been separated into additional steps : one for the request parsing, one for the APs' RSSI requests and one for the database access for example. Also, a trajectory deduction could have also been implemented by inserting in the database past positions concerning a mobile phone and by deducing server-side, a global direction. Finally, by adding a new table inide the database related to the mobile phone, we could have implemented a system to give to the phones, the other phones location along with the requested one. \\
+\indent This project has made us aware on the fact that nowadays, devices can interact together by many means and can communicate all kind of information to each other. We also discovered new technologies and how to use them such as the Android API, non-blocking TCP sockets or the pcap library. Furthermore, this project was not made individually but on the contrary, it was achieved as a team helping each other out.
