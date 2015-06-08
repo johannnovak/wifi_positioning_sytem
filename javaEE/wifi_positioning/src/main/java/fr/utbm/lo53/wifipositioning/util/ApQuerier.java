@@ -84,7 +84,7 @@ public class ApQuerier
 					return null;
 
 				/* Create new measurement from values. */
-				Measurement measurement = new Measurement(rssi, _mobileMacAddress);
+				Measurement measurement = new Measurement(rssi, dataParsed[0]);
 
 				s_logger.debug("Parsing successful.");
 				return measurement;

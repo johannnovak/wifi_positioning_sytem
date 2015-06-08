@@ -13,7 +13,7 @@ public class TestDBCalibrate
 			final String[] args)
 	{
 		double x = 0, y = 0;
-		String[] macAdresses = { "00:73:8d:9e:cb:ab", "00:73:8d:9e:cb:ab", "00:73:8d:9e:cb:ab" };
+		String[] macAdresses = { "00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03" };
 		double[] xAp = { 3, 10, 20 };
 		double[] yAp = { 1, 15, 8 };
 

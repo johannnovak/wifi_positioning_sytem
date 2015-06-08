@@ -93,8 +93,8 @@ public class TestSocketApLocate
 					String returned = macAdresses[apCount] + ";";
 
 					long t = System.currentTimeMillis() - time;
-					currentX = xIni;// + (t * 1000);
-					currentY = yIni;// + (t * 500);
+					currentX = xIni + (t / 2);
+					currentY = yIni + (t / 2);
 
 					double rssi = Math.sqrt(((currentX - xAp[apCount]) * (currentX - xAp[apCount]))
 							+ ((currentY - yAp[apCount]) * (currentY - yAp[apCount])));
