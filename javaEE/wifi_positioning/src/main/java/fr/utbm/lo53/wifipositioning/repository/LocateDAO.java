@@ -80,27 +80,40 @@ public class LocateDAO
 			session.beginTransaction();
 
 			List<Position> matchingPositionsList = new ArrayList<Position>();
+			int maxLoop = 5;
+			int currentLoop = 0;
+			float epsilonTemp = _epsilon;
 
-			for (Measurement m : _measurements)
+			while ((currentLoop > maxLoop) || matchingPositionsList.isEmpty()
+					|| (matchingPositionsList.size() > 1))
 			{
-				String hqlQueryString = "SELECT p FROM Measurement m join m.position p where m.macAddress='"
-						+ m.getMacAddress()
-						+ "' and m.rssi + :epsilon > "
-						+ m.getRssi()
-						+ " and m.rssi - :epsilon < " + m.getRssi();
+				for (Measurement m : _measurements)
+				{
+					String hqlQueryString = "SELECT p FROM Measurement m join m.position p where m.macAddress='"
+							+ m.getMacAddress()
+							+ "' and m.rssi + :epsilon > "
+							+ m.getRssi()
+							+ " and m.rssi - :epsilon < " + m.getRssi();
 
-				Query hqlQuery = session.createQuery(hqlQueryString);
-				hqlQuery.setParameter("epsilon", _epsilon);
+					Query hqlQuery = session.createQuery(hqlQueryString);
+					hqlQuery.setParameter("epsilon", epsilonTemp);
 
-				s_logger.debug("Executing query : '{}'.", hqlQuery.getQueryString());
+					s_logger.debug("Executing query : '{}'.", hqlQuery.getQueryString());
 
-				/* Gets the different obtained Positions. */
-				@SuppressWarnings("unchecked")
-				List<Position> resultList = hqlQuery.list();
+					/* Gets the different obtained Positions. */
+					@SuppressWarnings("unchecked")
+					List<Position> resultList = hqlQuery.list();
 
-				if (!matchingPositionsList.isEmpty())
-					resultList.retainAll(matchingPositionsList);
-				matchingPositionsList = resultList;
+					if (!matchingPositionsList.isEmpty())
+						resultList.retainAll(matchingPositionsList);
+					matchingPositionsList = resultList;
+				}
+
+				if (matchingPositionsList.isEmpty())
+					epsilonTemp *= 1.10;
+				else if (matchingPositionsList.size() > 1)
+					epsilonTemp *= 0.9;
+				++currentLoop;
 			}
 
 			/* If not only one Position has been found, error in threshold. */
