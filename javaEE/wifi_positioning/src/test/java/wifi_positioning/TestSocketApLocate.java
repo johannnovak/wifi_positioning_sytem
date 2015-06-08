@@ -93,8 +93,8 @@ public class TestSocketApLocate
 					String returned = macAdresses[apCount] + ";";
 
 					long t = System.currentTimeMillis() - time;
-					currentX = xIni + (t / 2);
-					currentY = yIni + (t / 2);
+					currentX = xIni + (t / 2000);
+					currentY = yIni + (t / 2000);
 
 					double rssi = Math.sqrt(((currentX - xAp[apCount]) * (currentX - xAp[apCount]))
 							+ ((currentY - yAp[apCount]) * (currentY - yAp[apCount])));
@@ -107,7 +107,7 @@ public class TestSocketApLocate
 					clientSocketChannel.close();
 					apCount++;
 					apCount %= 3;
-					// time = t;
+					time = t;
 				}
 
 				/* Removes the current key from the set. */

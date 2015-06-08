@@ -104,13 +104,14 @@ public class LocateDAO
 			}
 
 			/* If not only one Position has been found, error in threshold. */
-			if (matchingPositionsList.size() != 1)
-			{
-				s_logger.error("Error when querying database for locate. Number of position got from query > 1.");
-				return null;
-			} else if (matchingPositionsList.isEmpty())
+			if (matchingPositionsList.isEmpty())
 			{
 				s_logger.error("Error when querying database for locate. No positions found.");
+				return null;
+			} else if (matchingPositionsList.size() != 1)
+			{
+				s_logger.error("Error when querying database for locate. Number of position got from query > 1.");
+				s_logger.error("-> {}", matchingPositionsList);
 				return null;
 			}
 			/*
