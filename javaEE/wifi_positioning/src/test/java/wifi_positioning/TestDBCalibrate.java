@@ -1,5 +1,8 @@
 package wifi_positioning;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import fr.utbm.lo53.wifipositioning.model.Measurement;
 import fr.utbm.lo53.wifipositioning.model.Position;
 import fr.utbm.lo53.wifipositioning.service.CalibrateService;
@@ -16,6 +19,12 @@ public class TestDBCalibrate
 
 		for (int i = 0; i < 25; ++i)
 			for (int j = 0; j < 25; ++j)
+			{
+				Set<Measurement> set = new HashSet<Measurement>();
+				Position p = new Position();
+				p.setX(i);
+				p.setY(j);
+				p.setMeasurements(set);
 				for (int k = 0; k < 3; ++k)
 				{
 					Measurement m = null;
@@ -25,10 +34,12 @@ public class TestDBCalibrate
 							+ ((y - yAp[k]) * (y - yAp[k])));
 
 					m = new Measurement((float) rssi, macAdresses[k]);
-					Position p = new Position(i, j, m);
 					m.setPosition(p);
-					CalibrateService.getInstance().insertSample(p);
+					set.add(m);
 				}
+
+				CalibrateService.getInstance().insertSample(p);
+			}
 		// Measurement m = new Measurement(10.8f, "00:00:00:00:00:03");
 		// Position p = new Position(1, 1, m);
 		// m.setPosition(p);
