@@ -145,7 +145,7 @@ public class MainActivity extends ActionBarActivity
         if(mMapSaveBundle.size() == 0) {
             int width = getPreferences(PREFERENCE_MODE_PRIVATE).getInt(TAG_PREF_DEFAULT_MAP_WIDTH, 3);
             int height = getPreferences(PREFERENCE_MODE_PRIVATE).getInt(TAG_PREF_DEFAULT_MAP_HEIGHT, 3);
-            mMapSaveBundle.putSerializable(TAG_WORLDMAP, new WorldMap(width, height));
+                mMapSaveBundle.putSerializable(TAG_WORLDMAP, new WorldMap(width, height));
         }
 
         // Give the bundle (containing the WorldMap) to the fragment

@@ -98,7 +98,7 @@ public class LocationFragment extends AbstractFragment {
      * ReceiverTask : used to make the reception of data asynchronously
      * (otherwise, we could not drag and zoom the viewport at the same time)
      */
-    public class ReceiverAsyncTask extends AsyncTask<Void, Square, Void> {
+    public class ReceiverAsyncTask extends AsyncTask<Void, Square, String> {
 
         /**
          * {@inheritDoc}
@@ -106,7 +106,7 @@ public class LocationFragment extends AbstractFragment {
          * @return
          */
         @Override
-        protected Void doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
 
             while(!this.isCancelled()) {
 
@@ -114,7 +114,7 @@ public class LocationFragment extends AbstractFragment {
                     try {
                         // Get the accepted socket object
                         Socket clientSocket = new Socket();
-                        clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 500);
+                        clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 20000);
                         try {
                             // Send mobile mac address to the server
                             clientSocket.getOutputStream().write((mMacAddress).getBytes());
@@ -127,13 +127,13 @@ public class LocationFragment extends AbstractFragment {
 
                             clientSocket.close();
                         } catch (Exception e) {
-                            Toast.makeText(getActivity(), "Sent or reception failed", Toast.LENGTH_SHORT).show();
                             e.printStackTrace();
+                            return "Sent or reception failed";
                         }
                     }
                     catch (IOException e) {
-                        Toast.makeText(getActivity(), "Unable to connect to the server", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
+                        return "Unable to connect to the server";
                     }
                 }
                 else {
@@ -154,6 +154,15 @@ public class LocationFragment extends AbstractFragment {
             }
 
             return null;
+        }
+
+        /**
+         * Close the async task writing the error message in a toast message
+         * @param s
+         */
+        @Override
+        protected void onPostExecute (String message) {
+            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
         }
 
         /**
