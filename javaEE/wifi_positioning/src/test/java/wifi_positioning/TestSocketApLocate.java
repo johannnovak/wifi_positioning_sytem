@@ -25,10 +25,10 @@ public class TestSocketApLocate
 		double xIni = 0.f;
 		double yIni = 0.f;
 
-		double currentX;
-		double currentY;
+		double currentX = 0;
+		double currentY = 0;
 
-		long time = System.currentTimeMillis();
+		double time = System.currentTimeMillis();
 
 		@SuppressWarnings("resource")
 		ServerSocketChannel m_serverSocketChannel = ServerSocketChannel.open();
@@ -92,9 +92,10 @@ public class TestSocketApLocate
 					SocketChannel clientSocketChannel = (SocketChannel) key.channel();
 					String returned = macAdresses[apCount] + ";";
 
-					long t = System.currentTimeMillis() - time;
-					currentX = xIni + (t / 20000);
-					currentY = yIni + (t / 20000);
+					double t = System.currentTimeMillis() - time;
+					currentX += (xIni + (t / 1000)) % 25;
+					currentY += (yIni + (t / 1000)) % 25;
+					time = System.currentTimeMillis();
 
 					double rssi = Math.sqrt(((currentX - xAp[apCount]) * (currentX - xAp[apCount]))
 							+ ((currentY - yAp[apCount]) * (currentY - yAp[apCount])));
@@ -107,7 +108,6 @@ public class TestSocketApLocate
 					clientSocketChannel.close();
 					apCount++;
 					apCount %= 3;
-					time = t;
 				}
 
 				/* Removes the current key from the set. */

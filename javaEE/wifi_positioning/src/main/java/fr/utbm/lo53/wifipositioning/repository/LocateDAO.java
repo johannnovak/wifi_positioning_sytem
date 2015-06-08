@@ -83,9 +83,10 @@ public class LocateDAO
 			int maxLoop = 5;
 			int currentLoop = 0;
 			float epsilonTemp = _epsilon;
+			float deltaEpsilon = 0.3f;
 
-			while ((currentLoop > maxLoop) || matchingPositionsList.isEmpty()
-					|| (matchingPositionsList.size() > 1))
+			while ((matchingPositionsList.isEmpty() && (currentLoop < maxLoop))
+					|| ((matchingPositionsList.size() > 1) && (currentLoop < maxLoop)))
 			{
 				for (Measurement m : _measurements)
 				{
@@ -110,9 +111,16 @@ public class LocateDAO
 				}
 
 				if (matchingPositionsList.isEmpty())
-					epsilonTemp *= 1.10;
-				else if (matchingPositionsList.size() > 1)
-					epsilonTemp *= 0.9;
+				{
+					s_logger.debug("Epsilon increasing : {} -> {}", epsilonTemp, epsilonTemp
+							* (1 + deltaEpsilon));
+					epsilonTemp *= (1 + deltaEpsilon);
+				} else if (matchingPositionsList.size() > 1)
+				{
+					s_logger.debug("Epsilon increasing : {} -> {}", epsilonTemp, epsilonTemp
+							* (1 - deltaEpsilon));
+					epsilonTemp *= (1 - deltaEpsilon);
+				}
 				++currentLoop;
 			}
 
