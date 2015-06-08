@@ -122,8 +122,10 @@ public class LocationFragment extends AbstractFragment {
                             // Get the response code we have to decode to retrieve indices
                             String code = new String(IOUtils.toByteArray(clientSocket.getInputStream()));
 
-                            // Publish the received data
-                            publishProgress(decode(code));
+                            // Publish the received data if it is not 500
+                            if (!code.equals("500")) {
+                                publishProgress(decode(code));
+                            }
 
                             clientSocket.close();
                         } catch (Exception e) {
@@ -184,9 +186,11 @@ public class LocationFragment extends AbstractFragment {
         private Square decode (String code) {
             int x, y;
 
+
             String[] coordinates = code.split(";");
-            x = Integer.getInteger(coordinates[0]);
-            y = Integer.getInteger(coordinates[1]);
+
+            x = (int)Float.parseFloat(coordinates[0]);
+            y = (int)Float.parseFloat(coordinates[1]);
             return new Square(x, y);
         }
     }
