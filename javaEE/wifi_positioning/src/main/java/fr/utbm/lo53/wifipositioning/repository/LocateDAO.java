@@ -1,5 +1,6 @@
 package fr.utbm.lo53.wifipositioning.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class LocateDAO
 	private final static Logger		s_logger	= LoggerFactory.getLogger(LocateDAO.class);
 
 	/** Singleton of the class. */
-	private static LocateDAO		s_locateDAO;
+	private static LocateDAO		s_locateDAO	= new LocateDAO();
 
 	/** Singleton of the Hibernate's {@link SessionFactory}. */
 	private final SessionFactory	m_sessionFactory;
@@ -78,31 +79,73 @@ public class LocateDAO
 			/* Begins the transaction of data. */
 			session.beginTransaction();
 
-			/* Creates HQLQuery from the different Measurements. */
-			String hqlQueryString = "SELECT p FROM Measurement m join Position p where ";
-			for (Measurement m : _measurements)
-				hqlQueryString += "m.rssi + epsilon > " + m.getRssi() + " and m.rssi - epsilon < "
-						+ m.getRssi() + " and ";
-			hqlQueryString = hqlQueryString.substring(0, hqlQueryString.length() - 3);
-			Query hqlQuery = session.createQuery(hqlQueryString);
+			List<Position> matchingPositionsList = new ArrayList<Position>();
+			int maxLoop = 5;
+			int currentLoop = 0;
+			float epsilonTemp = _epsilon;
+			float deltaEpsilon = 0.3f;
 
-			/* Gets the different obtained Positions. */
-			@SuppressWarnings("unchecked")
-			List<Position> matchingPositions = hqlQuery.list();
+			while ((matchingPositionsList.isEmpty() && (currentLoop < maxLoop))
+					|| ((matchingPositionsList.size() > 1) && (currentLoop < maxLoop)))
+			{
+				for (Measurement m : _measurements)
+				{
+					String hqlQueryString = "SELECT p FROM Measurement m join m.position p where m.macAddress='"
+							+ m.getMacAddress()
+							+ "' and m.rssi + :epsilon > "
+							+ m.getRssi()
+							+ " and m.rssi - :epsilon < " + m.getRssi();
+
+					Query hqlQuery = session.createQuery(hqlQueryString);
+					hqlQuery.setParameter("epsilon", epsilonTemp);
+
+					s_logger.debug("Executing query : '{}'.", hqlQuery.getQueryString());
+
+					/* Gets the different obtained Positions. */
+					@SuppressWarnings("unchecked")
+					List<Position> resultList = hqlQuery.list();
+
+					if (!matchingPositionsList.isEmpty())
+						resultList.retainAll(matchingPositionsList);
+					matchingPositionsList = resultList;
+				}
+
+				if (matchingPositionsList.isEmpty())
+				{
+					s_logger.debug("Epsilon increasing : {} -> {}", epsilonTemp, epsilonTemp
+							* (1 + deltaEpsilon));
+					epsilonTemp *= (1 + deltaEpsilon);
+				} else if (matchingPositionsList.size() > 1)
+				{
+					s_logger.debug("Epsilon increasing : {} -> {}", epsilonTemp, epsilonTemp
+							* (1 - deltaEpsilon));
+					epsilonTemp *= (1 - deltaEpsilon);
+				}
+				++currentLoop;
+			}
 
 			/* If not only one Position has been found, error in threshold. */
-			if (matchingPositions.size() > 1)
+			if (matchingPositionsList.isEmpty())
+			{
+				s_logger.error("Error when querying database for locate. No positions found.");
+				return null;
+			} else if (matchingPositionsList.size() != 1)
 			{
 				s_logger.error("Error when querying database for locate. Number of position got from query > 1.");
+				s_logger.error("-> {}", matchingPositionsList);
 				return null;
 			}
 			/*
-			 * There hasn' been any errors, we can safely commit our database
+			 * No errors, we can safely commit our database
 			 * updates.
 			 */
 			session.getTransaction().commit();
 
-			return matchingPositions.get(0);
+			Position position = matchingPositionsList.get(0);
+
+			s_logger.debug("Position match : {}", position);
+
+			return position;
 		} catch (HibernateException he)
 		{
 			he.printStackTrace();
@@ -118,10 +161,8 @@ public class LocateDAO
 			}
 		} finally
 		{
-			if (session != null)
-			{
+			if ((session != null) && session.isOpen())
 				session.close();
-			}
 		}
 		return null;
 	}

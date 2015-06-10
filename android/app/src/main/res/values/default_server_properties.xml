@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="using_server">true</bool>
+    <string name="server_ip">192.168.43.39</string>
+    <integer name="server_port_calibration">3001</integer>
+    <integer name="server_port_location">3002</integer>
+</resources>

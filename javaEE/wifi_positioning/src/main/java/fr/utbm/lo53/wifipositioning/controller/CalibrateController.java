@@ -5,6 +5,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +19,9 @@ import fr.utbm.lo53.wifipositioning.service.CalibrateService;
 /**
  * Class extending from {@link SocketController}.<br>
  * Specialized class needed to construct the {@link SocketController}
- * constructor with specific parameters.
+ * constructor with specific parameters. It implements the necessary abstract
+ * methods in order to calibrate the mobile device, that is : inserting a
+ * position associated with a measurement inside the database.
  * 
  * @author jnovak
  *
@@ -50,6 +53,21 @@ public class CalibrateController extends SocketController
 		s_logger.debug("CalibrateController created.");
 	}
 
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * Method used to parse the
+	 * inputstream of a {@link SocketChannel} and return a List of Object
+	 * containing the necessary informations.
+	 * 
+	 * @param _key
+	 *            {@link SelectionKey} referencing on the {@link SocketChannel}
+	 *            whose inputstream is read.
+	 * @return List of object where necessary parsed informations are stored :<br>
+	 *         - index 0 : Mobile phone's MacAddress;<br>
+	 *         - index 1 : x position;<br>
+	 *         - index 2 : y position.
+	 */
 	@Override
 	protected List<Object> parseMobileData(
 			final SelectionKey _key)
@@ -87,6 +105,8 @@ public class CalibrateController extends SocketController
 			/* Adds the y position. */
 			requestData.add(Float.parseFloat(splitData[2]));
 
+			s_logger.debug("Data parsed : {}.", Arrays.asList(splitData));
+
 			return requestData;
 
 		} catch (Exception e)
@@ -99,6 +119,18 @@ public class CalibrateController extends SocketController
 		return null;
 	}
 
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * Method used to insert informations in the database.
+	 * 
+	 * @param _mobileRequestData
+	 *            Data containing the position of the mobile phone.
+	 * @param _rssiMeasurement
+	 *            Set of {@link Measurement} associated with a coordinate (x,y).
+	 * @return True if no errors have occurred when accessing the database.<br>
+	 *         False otherwise.
+	 */
 	@Override
 	protected boolean accessDatabase(
 			final List<Object> _mobileRequestData,

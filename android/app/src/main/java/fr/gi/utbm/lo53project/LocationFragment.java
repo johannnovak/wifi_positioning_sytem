@@ -1,28 +1,66 @@
 package fr.gi.utbm.lo53project;
 
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 /**
  * Created by Android on 06/04/2015 for LO53Project
  */
 public class LocationFragment extends AbstractFragment {
 
-    private LocationViewport mViewport;
+    /**
+     * Used in case of not using server, to display randomly between (0, 0) to (def_w, def_h)
+     */
+    private int default_width;
+    private int default_height;
 
+    /**
+     * Asynchronous task which handle reception of squares
+     */
+    private ReceiverAsyncTask mReceiverTask;
+
+    /**
+     * {@inheritDoc}
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // the super function fetch mMap from bundle
         super.onCreateView(inflater, container, savedInstanceState);
+
+        SharedPreferences prefs = getActivity().getPreferences(MainActivity.PREFERENCE_MODE_PRIVATE);
+        // Get server port from resources
+        mServerPort = prefs.getInt(
+                MainActivity.TAG_PREF_SERVER_PORT_LOCATION,
+                getResources().getInteger(R.integer.server_port_location) // default value
+        );
+
+        default_width = prefs.getInt(
+                MainActivity.TAG_PREF_DEFAULT_MAP_WIDTH,
+                3
+        );
+        default_height = prefs.getInt(
+                MainActivity.TAG_PREF_DEFAULT_MAP_HEIGHT,
+                3
+        );
 
         // Initialize view
         View rootView = inflater.inflate(R.layout.location_layout, container, false);
@@ -32,23 +70,128 @@ public class LocationFragment extends AbstractFragment {
         LinearLayout location_viewport_layout = (LinearLayout)rootView.findViewById(R.id.location_viewport_layout);
         location_viewport_layout.addView(mViewport);
 
-        // Initialize location's URL
-        try {
-            mUrl = new URL("http://192.168.43.78:8080/wifi_positioning/locate");
-        }
-        catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
         return rootView;
     }
 
-    private void receivePoint() {
-        // TO DO
-        // - create a thread which loop ?
-        // - receiver already implemented
-
-        // use mViewport.addPoint(x, y, Position.Type.LOCATION);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mReceiverTask.cancel(false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // A task can be executed only once so we need to instantiate a new
+        mReceiverTask = new ReceiverAsyncTask();
+        mReceiverTask.execute();
+    }
+
+    /**
+     * ReceiverTask : used to make the reception of data asynchronously
+     * (otherwise, we could not drag and zoom the viewport at the same time)
+     */
+    public class ReceiverAsyncTask extends AsyncTask<Void, Square, String> {
+
+        /**
+         * {@inheritDoc}
+         * @param params
+         * @return
+         */
+        @Override
+        protected String doInBackground(Void... params) {
+
+            while(!this.isCancelled()) {
+
+                if (mUsingServer) {
+                    try {
+                        // Get the accepted socket object
+                        Socket clientSocket = new Socket();
+                        clientSocket.connect(new InetSocketAddress(mServerIP, mServerPort), 20000);
+                        try {
+                            // Send mobile mac address to the server
+                            clientSocket.getOutputStream().write((mMacAddress).getBytes());
+
+                            // Get the response code we have to decode to retrieve indices
+                            String code = new String(IOUtils.toByteArray(clientSocket.getInputStream()));
+
+                            // Publish the received data if it is not 500
+                            if (!code.equals("500")) {
+                                publishProgress(decode(code));
+                            }
+
+                            clientSocket.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return "Sent or reception failed";
+                        }
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                        return "Unable to connect to the server";
+                    }
+                }
+                else {
+                    try {
+                        Thread.sleep(500);
+
+                        publishProgress(
+                            new Square(
+                                (int)(Math.random() * default_width),
+                                (int)(Math.random() * default_height)
+                            )
+                        );
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /**
+         * Close the async task writing the error message in a toast message
+         * @param s
+         */
+        @Override
+        protected void onPostExecute (String message) {
+            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+        }
+
+        /**
+         * {@inheritDoc}
+         * @param p
+         */
+        @Override
+        protected void onProgressUpdate(Square... p) {
+            super.onProgressUpdate(p);
+            mViewport.addSquare(p[0].x, p[0].y, Square.Type.LOCATION);
+        }
+
+        /**
+         * Decode the string code received in a square to display
+         * The code format is quite simple : "x;y"
+         * @param code string code
+         * @return square to display
+         */
+        private Square decode (String code) {
+            int x, y;
+
+
+            String[] coordinates = code.split(";");
+
+            x = (int)Float.parseFloat(coordinates[0]);
+            y = (int)Float.parseFloat(coordinates[1]);
+            return new Square(x, y);
+        }
+    }
 }

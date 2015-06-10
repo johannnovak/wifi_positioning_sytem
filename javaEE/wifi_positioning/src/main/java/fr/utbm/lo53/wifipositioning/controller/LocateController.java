@@ -56,6 +56,19 @@ public class LocateController extends SocketController
 		s_logger.debug("LocateController created.");
 	}
 
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * Method used to parse the
+	 * inputstream of a {@link SocketChannel} and return a List of Object
+	 * containing the necessary informations.
+	 * 
+	 * @param _key
+	 *            {@link SelectionKey} referencing on the {@link SocketChannel}
+	 *            whose inputstream is read.
+	 * @return List of object where necessary parsed informations are stored :<br>
+	 *         - index 0 : Mobile phone's MacAddress;<br>
+	 */
 	@Override
 	protected List<Object> parseMobileData(
 			final SelectionKey _key)
@@ -85,6 +98,8 @@ public class LocateController extends SocketController
 			/* Adds the mobile MacAddress. */
 			requestData.add(data);
 
+			s_logger.debug("Data parsed : {}.", data);
+
 			return requestData;
 
 		} catch (Exception e)
@@ -97,6 +112,16 @@ public class LocateController extends SocketController
 		return null;
 	}
 
+	/**
+	 * Method used to query a {@link Position} from the database.
+	 * 
+	 * @param _mobileRequestData
+	 *            Not used, can be set to null.
+	 * @param _rssiMeasurement
+	 *            Set of {@link Measurement} associated with a coordinate (x,y).
+	 * @return True if no errors have occurred when accessing the database.<br>
+	 *         False otherwise.
+	 */
 	@Override
 	protected boolean accessDatabase(
 			final List<Object> _mobileRequestData,
