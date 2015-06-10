@@ -20,10 +20,10 @@ helper.o:
 main.o: 
 	$(CC) -o main.o -c main.c $(LIB) $(INCLUDES)
 
-pcap-thread.o: pcap-thread.h
+pcap-thread.o:
 	$(CC) -o pcap-thread.o -c rssi/pcap-thread.c $(LIB) $(INCLUDES)
 
-rssi_list.o: rssi_list.h
+rssi_list.o:
 	$(CC) -o rssi_list.o -c rssi/rssi_list.c $(LIB) $(INCLUDES)
 
 clean:

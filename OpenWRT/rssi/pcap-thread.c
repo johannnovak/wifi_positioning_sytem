@@ -35,21 +35,51 @@ void *pcap_function(void *arg)
 			continue;
 
 		rtap_head = (struct ieee80211_radiotap_header *) packet;
+
 		int len = (int) rtap_head->it_len[0] + 256 * (int) rtap_head->it_len[1];
 		eh = (struct ieee80211_header *) (packet + len);
 		if ((eh->frame_control & 0x03) == 0x01) {
 			mac = eh->source_addr;
 			first_flags = rtap_head->it_present[0];
+			u_char* last_flag = &rtap_head->it_present[3];
 			offset = 8;
 			offset += ((first_flags & 0x01) == 0x01) ? 8 : 0 ;
 			offset += ((first_flags & 0x02) == 0x02) ? 1 : 0 ;
 			offset += ((first_flags & 0x04) == 0x04) ? 1 : 0 ;
 			offset += ((first_flags & 0x08) == 0x08) ? 4 : 0 ;
 			offset += ((first_flags & 0x10) == 0x10) ? 2 : 0 ;
-			rssi = *((char *) rtap_head + offset) - 0x100;
+			/*while((*(last_flag) & 0x80) == 0x80)
+			{
+				offset += 4;
+				last_flag += 4;
+			}*/
+			rssi = *((char *) rtap_head + 18) - 0x100;
 			if(rssi == 4)
 				continue;
+			
+			printf("RADIOTAP Header Dump :\n");
+			printf("\t%x\n\t%x\n\t%x\t%x\n", rtap_head->it_version, rtap_head->it_pad, rtap_head->it_len[0], rtap_head->it_len[1]);
+			printf("\t%x\t%x\t%x\t%x\n", rtap_head->it_present[0], rtap_head->it_present[1], rtap_head->it_present[2], rtap_head->it_present[3]);
+			int i;
+			for(i=0 ; i<len ; i+=4)
+			{
+				if(len-i > 4)
+				{
+					printf("\t%x\t%x\t%x\t%x\n", *( (u_char*)rtap_head + i), *( (u_char*)rtap_head + i+1), *( (u_char*)rtap_head + i+2), *( (u_char*)rtap_head + i+3));
+				}
+				else
+				{
+					int j;
+					for(j=i; j<len ; ++j)
+					{
+						printf("\t%x", *( (u_char*)rtap_head + j));
+					}					
+					break;
+				}
 				
+					
+			}
+			
 			printf("%d bytes -- %02X:%02X:%02X:%02X:%02X:%02X -- RSSI: %d dBm\n",
 			       len, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], (int) rssi);
 			// We got some message issued by a terminal (FromDS=0,ToDS=1)
