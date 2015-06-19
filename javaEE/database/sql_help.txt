@@ -1,7 +1,0 @@
--- psql -U postgres -W lo53 < create-measurements.sql 
-
--- psql -U postgres -W lo53 < create-position.sql 
-
--- psql -U postgres -W lo53 < insert-en.sql 
-
---select * from measurements inner join position on measurement.measurement_id=position.position_id;
